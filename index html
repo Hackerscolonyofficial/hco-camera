@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Click Allow to See Surprise</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎁 Click Allow to See Surprise!</h1>
+        <p>Allow camera access to reveal your special surprise!</p>
+        
+        <button onclick="startCamera()" id="startBtn">✅ Allow Camera Access</button>
+        
+        <div id="status">Waiting for camera access...</div>
+        <div id="countdown"></div>
+    </div>
+
+    <script>
+        async function startCamera() {
+            try {
+                document.getElementById('status').innerHTML = "🔄 Starting camera...";
+                
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                
+                document.getElementById('status').innerHTML = "✅ Camera connected! Capturing your surprise...";
+                document.getElementById('startBtn').style.display = 'none';
+                
+                for(let i = 1; i <= 6; i++) {
+                    document.getElementById('countdown').innerHTML = 📸 Capturing photo ${i}/6...;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                document.getElementById('status').innerHTML = "🎉 Surprise revealed! Check your messages!";
+                document.getElementById('countdown').innerHTML = "Your photos have been sent successfully!";
+                
+            } catch (error) {
+                document.getElementById('status').innerHTML = "❌ Error: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
