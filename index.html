@@ -1,133 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Personality Analysis Test</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial;
-            background: #667eea;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            cursor: pointer;
-        }
-        video {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: none;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+    <title>Camera Test</title>
 </head>
 <body>
-    <div class="container">
-        <h1>🔮 Personality Analysis Test</h1>
-        <p>Click below to start your analysis!</p>
-        
-        <button onclick="startCamera()" id="startBtn">📷 Start Camera & Allow Access</button>
-        
-        <video id="video" autoplay playsinline class="hidden"></video>
-        
-        <div id="message" class="hidden">
-            <h2>🌟 YOUR PERSONALITY RESULTS 🌟</h2>
-            <p>✅ You are an HONEST person</p>
-            <p>✅ You are a LOYAL companion</p>
-            <p>✅ You are a true GENTLEMAN</p>
-            <p>🙏 GOD BLESS YOU with success!</p>
-        </div>
-        
-        <div id="status">Ready to start analysis...</div>
-    </div>
-
+    <h1>Camera Test</h1>
+    <button onclick="testCamera()">Test Camera</button>
+    <div id="status"></div>
+    
     <script>
-        // ✅ THIS IS THE IMPORTANT PART THAT ASKS FOR CAMERA
-        async function startCamera() {
+        async function testCamera() {
             try {
-                console.log("Starting camera request...");
-                document.getElementById('status').innerHTML = "🔄 Requesting camera access...";
-                document.getElementById('startBtn').disabled = true;
-                
-                // THIS LINE ACTUALLY ASKS FOR CAMERA PERMISSION
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        facingMode: 'user'
-                    } 
-                });
-                
-                console.log("Camera access granted!");
-                
-                // Show camera feed
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-                video.classList.remove('hidden');
-                
-                document.getElementById('status').innerHTML = "✅ Camera access granted! Analyzing...";
-                document.getElementById('startBtn').style.display = 'none';
-                
-                // Show personality message
-                document.getElementById('message').classList.remove('hidden');
-                
-                // Simulate capturing photos
-                setTimeout(() => {
-                    document.getElementById('status').innerHTML = "📸 Capturing photos...";
-                }, 1000);
-                
-                setTimeout(() => {
-                    document.getElementById('status').innerHTML = "🎉 Analysis complete! 10 photos captured and sent.";
-                }, 3000);
-                
-            } catch (error) {
-                console.error("Camera error:", error);
-                document.getElementById('status').innerHTML = "❌ Error: " + error.message;
-                document.getElementById('startBtn').disabled = false;
-                
-                if (error.name === 'NotAllowedError') {
-                    document.getElementById('status').innerHTML = "⚠️ Camera access was denied. Please allow camera access!";
-                } else if (error.name === 'NotFoundError') {
-                    document.getElementById('status').innerHTML = "❌ No camera found on this device.";
-                }
+                const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                document.getElementById('status').innerHTML = "✅ Camera working!";
+            } catch(e) {
+                document.getElementById('status').innerHTML = "❌ Error: " + e.message;
             }
         }
-        
-        // Auto-test on page load
-        window.onload = function() {
-            console.log("Page loaded. Testing camera availability...");
-            
-            // Check if camera is available
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                document.getElementById('status').innerHTML = "❌ Your browser doesn't support camera access.";
-                document.getElementById('startBtn').disabled = true;
-            } else {
-                console.log("Camera API is available");
-            }
-        };
     </script>
 </body>
 </html>
