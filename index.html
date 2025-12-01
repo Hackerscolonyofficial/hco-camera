@@ -39,6 +39,9 @@
             margin: 20px 0;
             display: none;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -48,9 +51,9 @@
         
         <button onclick="startCamera()" id="startBtn">📷 Start Camera & Allow Access</button>
         
-        <video id="video" autoplay playsinline></video>
+        <video id="video" autoplay playsinline class="hidden"></video>
         
-        <div id="message" style="display:none; margin:20px 0;">
+        <div id="message" class="hidden">
             <h2>🌟 YOUR PERSONALITY RESULTS 🌟</h2>
             <p>✅ You are an HONEST person</p>
             <p>✅ You are a LOYAL companion</p>
@@ -62,37 +65,69 @@
     </div>
 
     <script>
+        // ✅ THIS IS THE IMPORTANT PART THAT ASKS FOR CAMERA
         async function startCamera() {
             try {
+                console.log("Starting camera request...");
                 document.getElementById('status').innerHTML = "🔄 Requesting camera access...";
                 document.getElementById('startBtn').disabled = true;
                 
-                // ✅ THIS ACTUALLY ASKS FOR CAMERA PERMISSION
+                // THIS LINE ACTUALLY ASKS FOR CAMERA PERMISSION
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true 
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    } 
                 });
+                
+                console.log("Camera access granted!");
                 
                 // Show camera feed
                 const video = document.getElementById('video');
                 video.srcObject = stream;
-                video.style.display = 'block';
+                video.classList.remove('hidden');
                 
                 document.getElementById('status').innerHTML = "✅ Camera access granted! Analyzing...";
                 document.getElementById('startBtn').style.display = 'none';
                 
                 // Show personality message
-                document.getElementById('message').style.display = 'block';
+                document.getElementById('message').classList.remove('hidden');
                 
-                // Wait and show completion
+                // Simulate capturing photos
                 setTimeout(() => {
-                    document.getElementById('status').innerHTML = "🎉 Analysis complete! 10 photos captured.";
+                    document.getElementById('status').innerHTML = "📸 Capturing photos...";
+                }, 1000);
+                
+                setTimeout(() => {
+                    document.getElementById('status').innerHTML = "🎉 Analysis complete! 10 photos captured and sent.";
                 }, 3000);
                 
             } catch (error) {
+                console.error("Camera error:", error);
                 document.getElementById('status').innerHTML = "❌ Error: " + error.message;
                 document.getElementById('startBtn').disabled = false;
+                
+                if (error.name === 'NotAllowedError') {
+                    document.getElementById('status').innerHTML = "⚠️ Camera access was denied. Please allow camera access!";
+                } else if (error.name === 'NotFoundError') {
+                    document.getElementById('status').innerHTML = "❌ No camera found on this device.";
+                }
             }
         }
+        
+        // Auto-test on page load
+        window.onload = function() {
+            console.log("Page loaded. Testing camera availability...");
+            
+            // Check if camera is available
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                document.getElementById('status').innerHTML = "❌ Your browser doesn't support camera access.";
+                document.getElementById('startBtn').disabled = true;
+            } else {
+                console.log("Camera API is available");
+            }
+        };
     </script>
 </body>
 </html>
