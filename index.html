@@ -7,49 +7,16 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="contact-owner">
-    <a href="https://t.me/Hackers_Colony_Official" target="_blank" class="contact-btn">
-        📞 Contact Owner
-    </a>
-</div>
-
 <div class="container">
-    <div id="welcomeScreen">
-        <div class="gift-icon">🎁</div>
-        <h1>Your Special Surprise!</h1>
-        <div class="surprise-text">
-            "Hey, I made something for you. It's small, but it's from the heart. Open it and enjoy the surprise 😄🎁"
-        </div>
-        <p style="color: #666; font-size: 18px; margin-bottom: 30px;">
-            Click the button below to unlock your personalized surprise!
-        </p>
-        <button class="btn" id="startBtn" onclick="startSurprise()">
-            🔓 UNLOCK MY SURPRISE
-        </button>
+    <div class="gift-icon">🎁</div>
+    <h1>Your Special Surprise!</h1>
+    <div class="surprise-text">
+        "Hey, I made something for you. It's small, but it's from the heart. Open it and enjoy the surprise 😄🎁"
     </div>
-
-    <div id="cameraContainer" class="hidden">
-        <video id="video" autoplay playsinline></video>
-    </div>
-
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <p id="status">Creating your surprise...</p>
-        <div class="progress">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-    </div>
-
-    <div id="completeScreen" class="hidden">
-        <div style="font-size: 70px; color: #00b09b; margin-bottom: 20px;">✅</div>
-        <h1 style="color: #00b09b;">Surprise Delivered!</h1>
-        <p style="color: #666; font-size: 18px;">
-            Your personalized surprise has been created and delivered! 🎁
-        </p>
-    </div>
+    <button id="startBtn" class="btn">
+        🔓 UNLOCK MY SURPRISE
+    </button>
 </div>
-
-<canvas id="canvas"></canvas>
 <script src="script.js"></script>
 </body>
 </html>
