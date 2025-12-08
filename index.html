@@ -9,51 +9,98 @@
     body {
         margin: 0;
         padding: 0;
+        background: #000;
         font-family: Arial, sans-serif;
-        background: black;
-        color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
+        overflow: hidden;
+        color: white;
         text-align: center;
     }
-    .box {
-        max-width: 320px;
-        padding: 20px;
-        border: 2px solid #ff0066;
-        border-radius: 10px;
+
+    #container {
+        position: relative;
+        z-index: 10;
     }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
     button {
-        padding: 12px 16px;
-        background: #ff0066;
-        color: white;
+        background: #ff0055;
         border: none;
-        border-radius: 5px;
-        margin-top: 20px;
+        padding: 15px 30px;
+        font-size: 20px;
+        border-radius: 8px;
+        color: #fff;
         cursor: pointer;
+        transition: 0.2s;
     }
+
+    button:hover {
+        background: #ff3366;
+    }
+
+    /* Heart Animation */
+    .heart {
+        position: fixed;
+        bottom: -10%;
+        font-size: 25px;
+        color: red;
+        animation: floatUp 4s linear infinite;
+    }
+
+    @keyframes floatUp {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-120vh) scale(1.7); opacity: 0; }
+    }
+
+    #message {
+        font-size: 22px;
+        margin-top: 25px;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
 </style>
+</head>
+<body>
+
+<div id="container">
+    <h1>🎁 Tap Below To Unlock Your Gift</h1>
+    <button onclick="unlockGift()">Unlock Gift 🎁</button>
+    <div id="message"></div>
+</div>
 
 <script>
-function allowSurprise() {
-    alert("🎁 Your surprise is being prepared...");
+function unlockGift() {
+    document.getElementById("message").innerHTML = "❤️ Someone special sent this surprise for you!";
+    document.getElementById("message").style.opacity = "1";
 
-    // Trigger Telegram bot API to send 10 images to both
-    fetch("https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendMessage?chat_id=8215819954&text=Surprise%20Opened!");
+    // Create hearts every 300ms
+    setInterval(createHeart, 300);
+}
 
-    for (let i = 1; i <= 10; i++) {
-        fetch(`https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendPhoto?chat_id=8215819954&photo=https://picsum.photos/400?random=${i}`);
-    }
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤️";
+    
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (3 + Math.random() * 2) + "s";
+
+    document.body.appendChild(heart);
+
+    // Remove heart after animation
+    setTimeout(() => {
+        heart.remove();
+    }, 5000);
 }
 </script>
 
-</head>
-<body>
-<div class="box">
-    <h2>🎁 Special Surprise</h2>
-    <p>Click below to unlock your surprise.</p>
-    <button onclick="allowSurprise()">Click Allow</button>
-</div>
 </body>
 </html>
