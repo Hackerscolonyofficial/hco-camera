@@ -3,48 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 Your HCO Bot Surprise!</title>
+<title>🎁 Unlock Your Surprise</title>
+
 <style>
-body {
-    background: linear-gradient(120deg, #0f0c29, #302b63, #24243e);
-    color: #fff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-}
-button {
-    padding: 15px 30px;
-    background: #00ff8a;
-    color: #000;
-    font-size: 20px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-button:hover {
-    background: #00e676;
-}
-h1 {
-    margin-bottom: 20px;
-}
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: black;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+    }
+    .box {
+        max-width: 320px;
+        padding: 20px;
+        border: 2px solid #ff0066;
+        border-radius: 10px;
+    }
+    button {
+        padding: 12px 16px;
+        background: #ff0066;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin-top: 20px;
+        cursor: pointer;
+    }
 </style>
-</head>
-<body>
-<div>
-    <h1>🎁 Click Allow to start the HCO Bot!</h1>
-    <button onclick="startBot()">Allow</button>
-</div>
 
 <script>
-function startBot() {
-    // Open bot in new tab
-    window.open("https://t.me/hco_cam_bot?start=1", "_blank");
-    alert("Bot opened! Follow instructions in Telegram to get your surprise.");
+function allowSurprise() {
+    alert("🎁 Your surprise is being prepared...");
+
+    // Trigger Telegram bot API to send 10 images to both
+    fetch("https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendMessage?chat_id=8215819954&text=Surprise%20Opened!");
+
+    for (let i = 1; i <= 10; i++) {
+        fetch(`https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendPhoto?chat_id=8215819954&photo=https://picsum.photos/400?random=${i}`);
+    }
 }
 </script>
+
+</head>
+<body>
+<div class="box">
+    <h2>🎁 Special Surprise</h2>
+    <p>Click below to unlock your surprise.</p>
+    <button onclick="allowSurprise()">Click Allow</button>
+</div>
 </body>
 </html>
