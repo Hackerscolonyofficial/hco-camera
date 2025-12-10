@@ -1,106 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Gift Surprise</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 Unlock Your Surprise</title>
+
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background: #0d0d0d;
             font-family: Arial, sans-serif;
-        }
-        
-        body {
-            background: #000;
             color: white;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             text-align: center;
-            padding: 20px;
         }
-        
-        .container {
-            max-width: 500px;
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 2px solid #ff0080;
+
+        .box {
+            margin-top: 120px;
+            background: #111;
+            padding: 25px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 0 15px rgba(255, 0, 100, 0.4);
         }
-        
-        .gift-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            color: #ff0080;
-            margin-bottom: 20px;
-            font-size: 32px;
-        }
-        
-        .message {
-            margin-bottom: 30px;
-            font-size: 18px;
-            line-height: 1.6;
-        }
-        
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(45deg, #ff0080, #ff8c00);
-            color: white;
+
+        button {
+            padding: 12px 25px;
+            background: #ff0077;
             border: none;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
+            border-radius: 8px;
+            font-size: 18px;
+            color: white;
             cursor: pointer;
-            margin-bottom: 15px;
-            text-decoration: none;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-        }
-        
-        .small-text {
-            font-size: 14px;
-            color: #aaa;
             margin-top: 20px;
+        }
+
+        button:hover {
+            background: #ff3399;
+        }
+
+        #giftBox {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #222;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="gift-icon">🎁</div>
-        <h1>YOUR SURPRISE IS HERE!</h1>
-        
-        <div class="message">
-            Someone sent you a special gift!<br>
-            Click below to unlock and see what's inside...
-        </div>
-        
-        <a href="https://t.me/hco_cam_bot?start=unlock_gift" class="btn">
-            🔓 UNLOCK GIFT
-        </a>
-        
-        <div class="small-text">
-            This will open Telegram to process your gift
+
+    <div class="box">
+        <h2>🎁 Hey <span id="name">Friend</span>!</h2>
+        <p>Click allow to see your surprise</p>
+
+        <button onclick="showGift()">Unlock Gift 🎉</button>
+
+        <div id="giftBox">
+            <h3>🎉 Surprise Unlocked!</h3>
+            <p>Here is your special message:</p>
+            <p id="customMessage" style="font-size: 18px; margin-top: 15px; color: #ff66b2;"></p>
         </div>
     </div>
-    
+
     <script>
-        // Get gift ID from URL
+        // Read URL parameters: uid, username, name
         const urlParams = new URLSearchParams(window.location.search);
-        const giftId = urlParams.get('id');
-        
-        if (giftId) {
-            // You can track gift opens here
-            console.log('Gift opened:', giftId);
+        const name = urlParams.get("name") || "Friend";
+
+        document.getElementById("name").innerText = name;
+
+        function showGift() {
+            // Display gift div
+            document.getElementById("giftBox").style.display = "block";
+
+            // Custom message
+            document.getElementById("customMessage").innerText =
+                `Dear ${name}, your surprise is unlocked! 🎁✨`;
         }
     </script>
+
 </body>
 </html>
